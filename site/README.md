@@ -26,4 +26,4 @@ Add an example: write `src/pages/demo/<slug>/{before,after}.astro` and `src/data
 
 Git integration: build command `npm run build`, output directory `dist`, root directory `site`.
 
-Direct upload: `npm run build && npx wrangler pages deploy dist --project-name pristine`.
+Direct upload: `npm run build && npx wrangler pages deploy dist --project-name pristine-ui`.

@@ -10,13 +10,13 @@ An agent skill that makes web UI pristine. It looks at the real page (light and 
 
 Works with Claude Code, Codex, GitHub Copilot, Cursor and any agent that reads `SKILL.md`.
 
-**Site and examples:** https://pristine.pages.dev
+**Site and examples:** https://pristine-ui.pages.dev
 
 | Before (3.5/10) | After one `/pristine polish` (9.5/10) |
 | --- | --- |
 | ![SaaS landing page before Pristine](site/public/shots/saas-landing/before/desktop-light.webp) | ![SaaS landing page after Pristine](site/public/shots/saas-landing/after/desktop-light.webp) |
 
-Eight real before/after pairs, with the full critique and every change: https://pristine.pages.dev/#examples
+Eight real before/after pairs, with the full critique and every change: https://pristine-ui.pages.dev/#examples
 
 ## Commands
 
@@ -29,7 +29,7 @@ Eight real before/after pairs, with the full critique and every change: https://
 
 A target can be a URL, a pasted screenshot, a file path or a feature name. Name Lenses after `polish` to force them, for example `/pristine polish bolder typeset the hero`. There are 16: bolder, colorize, typeset, quieter, decolorize, distill, layout, adapt, consistency, animate, delight, overdrive, clarify, harden, optimize, polish-details.
 
-Full reference with examples: https://pristine.pages.dev/docs/
+Full reference with examples: https://pristine-ui.pages.dev/docs/
 
 ## Install
 
