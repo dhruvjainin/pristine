@@ -1,0 +1,913 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/fraunces";
+import "../../../components/demo/signup-onboarding/theme.css";
+
+type Status = "done" | "open" | "you" | "blocked" | "dropped";
+interface Item { s: Status; t: string; who: string; meta: string }
+interface Tpl {
+  name: string; hint: string; length: number; cadence: string; when: string; time: string;
+  people: string[]; prev: string | null; next: string;
+  carried: Item[];
+  agenda: { t: string; m: number }[];
+  decision: { t: string; meta: string } | null;
+}
+
+const templates: Record<string, Tpl> = {
+  sync: {
+    name: "Weekly team sync", hint: "Agenda, decisions, owners", length: 30, cadence: "Weekly",
+    when: "Mon 27 Oct", time: "10:00–10:30",
+    people: ["Dana Kowalczyk", "Ana Ribeiro", "Tomás Ferreira", "Mei Sato", "Aleksandra Wiśniewska-Kowalczyk", "Kwame Asante"],
+    prev: "20 Oct", next: "Mon 3 Nov's note",
+    carried: [
+      { s: "done", t: "Ship the pricing page copy", who: "Ana", meta: "Done Thu" },
+      { s: "open", t: "Fix the Safari upload bug on shared notes", who: "Tomás", meta: "Open 2 weeks" },
+      { s: "you", t: "Pick one of the two shortlisted designers", who: "You", meta: "Due today" },
+      { s: "blocked", t: "Security review sign-off", who: "Aleksandra W.-K.", meta: "Waiting on the customer's IT team" },
+    ],
+    agenda: [{ t: "Carried items", m: 5 }, { t: "Launch checklist: what's blocked?", m: 15 }, { t: "Hiring decision", m: 10 }],
+    decision: { t: "Launch moves to Tue 4 Nov", meta: "Decided 20 Oct" },
+  },
+  oneone: {
+    name: "1:1 check-in", hint: "Wins, blockers, feedback", length: 30, cadence: "Every 2 weeks",
+    when: "Tue 28 Oct", time: "15:30–16:00",
+    people: ["Dana Kowalczyk", "Kwame Asante"],
+    prev: "14 Oct", next: "Tue 11 Nov's note",
+    carried: [
+      { s: "done", t: "Share the Q4 roadmap draft", who: "You", meta: "Done Mon" },
+      { s: "you", t: "Write up Kwame's promotion case", who: "You", meta: "Due Fri" },
+      { s: "open", t: "Shadow two customer calls", who: "Kwame", meta: "1 of 2 done" },
+    ],
+    agenda: [{ t: "Wins since last time", m: 5 }, { t: "What's in the way", m: 15 }, { t: "Feedback, both directions", m: 10 }],
+    decision: { t: "Kwame leads the onboarding revamp", meta: "Decided 14 Oct" },
+  },
+  kickoff: {
+    name: "Project kickoff", hint: "Goal, scope, first milestone", length: 60, cadence: "Once",
+    when: "Wed 29 Oct", time: "14:00–15:00",
+    people: ["Dana Kowalczyk", "Ana Ribeiro", "Tomás Ferreira", "Mei Sato", "Kwame Asante", "Jo Park", "Lin Wei", "Sam Ortiz"],
+    prev: null, next: "the next meeting's note",
+    carried: [],
+    agenda: [{ t: "Goal, in one sentence", m: 10 }, { t: "In scope, out of scope", m: 25 }, { t: "Owners and first milestone", m: 20 }, { t: "Risks", m: 5 }],
+    decision: null,
+  },
+  retro: {
+    name: "Sprint retro", hint: "Went well, slowed us, try next", length: 45, cadence: "Every 2 weeks",
+    when: "Fri 31 Oct", time: "16:00–16:45",
+    people: ["Dana Kowalczyk", "Ana Ribeiro", "Tomás Ferreira", "Mei Sato", "Jo Park", "Kwame Asante"],
+    prev: "sprint 41", next: "the sprint 43 retro note",
+    carried: [
+      { s: "done", t: "Try: no-meeting Wednesday afternoons", who: "Mei", meta: "Kept" },
+      { s: "dropped", t: "Try: deploy only before 15:00", who: "Tomás", meta: "Dropped, it blocked hotfixes" },
+    ],
+    agenda: [{ t: "Went well", m: 10 }, { t: "Slowed us down", m: 20 }, { t: "Try next sprint", m: 15 }],
+    decision: { t: "Keep no-meeting Wednesdays", meta: "Decided in sprint 41" },
+  },
+};
+const keys = Object.keys(templates);
+const statusLabel: Record<Status, string> = { done: "Done", open: "Still open", you: "Needs you", blocked: "Blocked", dropped: "Dropped" };
+const initials = (n: string) => {
+  const w = n.replace(/-.*/, "").trim().split(/\s+/);
+  return (w[0][0] + (w.length > 1 ? w[w.length - 1][0] : "")).toUpperCase();
+};
+const openCount = (t: Tpl) => t.carried.filter((i) => i.s !== "done" && i.s !== "dropped").length;
+const plural = (n: number, one: string, many = one + "s") => `${n} ${n === 1 ? one : many}`;
+
+const zones = [
+  ["America/Los_Angeles", "Los Angeles (GMT−7)"],
+  ["America/New_York", "New York (GMT−4)"],
+  ["America/Sao_Paulo", "São Paulo (GMT−3)"],
+  ["Europe/London", "London (GMT+1)"],
+  ["Europe/Lisbon", "Lisbon (GMT+1)"],
+  ["Europe/Berlin", "Berlin (GMT+2)"],
+  ["Africa/Nairobi", "Nairobi (GMT+3)"],
+  ["Asia/Kolkata", "Kolkata (GMT+5:30)"],
+  ["Asia/Singapore", "Singapore (GMT+8)"],
+  ["Australia/Sydney", "Sydney (GMT+11)"],
+];
+const steps = ["Template", "Account", "Workspace", "Invite"];
+const ids = ["template", "account", "workspace", "invite"];
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#FAF8F3" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#161714" media="(prefers-color-scheme: dark)" />
+  <title>Get started · Fieldnote</title>
+  <script is:inline>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to setup</a>
+
+  <svg width="0" height="0" class="defs" aria-hidden="true">
+    <symbol id="mk-done" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path class="mk-cut" d="M5 8.3l2 2 4-4.5" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="mk-open" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 3.5a4.5 4.5 0 0 1 0 9z" fill="currentColor"/></symbol>
+    <symbol id="mk-you" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2.75" fill="currentColor"/></symbol>
+    <symbol id="mk-blocked" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path class="mk-cut" d="M5 8h6" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="mk-dropped" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <a class="brand" href="#template" aria-label="Fieldnote home">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 3.5h9.5L19 7v13.5H6z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M9 10h7M9 13.5h7M9 17h4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      <span>Fieldnote</span>
+    </a>
+    <p class="topbar-meta"><span class="hide-sm">Have an account?</span> <a href="#login">Log in</a></p>
+  </header>
+
+  <main id="main" class="onboard" data-onboard>
+    <div class="flow">
+      <nav class="stepper" aria-label="Setup progress">
+        <p class="stepper-count"><span data-step-count>Step 1 of 4</span><span class="stepper-now" data-step-now aria-hidden="true"> · Template</span></p>
+        <ol>
+          {steps.map((label, i) => (
+            <li data-step-dot={ids[i]} aria-current={i === 0 ? "step" : undefined}>
+              <a href={`#${ids[i]}`}>
+                <span class="dot" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" width="12" height="12"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="num">{i + 1}</span>
+                </span>
+                <span class="lbl">{label}</span>
+                <span class="sr" data-sr-state></span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <!-- 1. Template: build before signup -->
+      <section class="step is-current" id="template" data-step="template" aria-labelledby="h-template">
+        <h1 id="h-template">What's your next meeting?</h1>
+        <p class="lede">Pick one and watch your first note take shape. Anything left open carries into the next one by itself. No account needed yet.</p>
+        <form action="#account" data-form="template">
+          <fieldset class="choices">
+            <legend class="sr">Note template</legend>
+            {keys.map((key) => {
+              const tpl = templates[key];
+              return (
+                <label class="choice">
+                  <input type="radio" name="template" value={key} checked={key === "sync"} />
+                  <span class="choice-body">
+                    <span class="choice-title">{tpl.name}</span>
+                    <span class="choice-hint">{tpl.hint}</span>
+                  </span>
+                  <span class="choice-meta"><span class="num">{tpl.length} min</span><span>{tpl.cadence}</span></span>
+                </label>
+              );
+            })}
+          </fieldset>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">
+              <span data-template-cta>Use Weekly team sync</span>
+              <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M4 10h11m-4-4.5L15.5 10 11 14.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <a class="btn btn-quiet" href="#account" data-blank>Start blank</a>
+          </div>
+          <p class="next-up">
+            <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 5.5l7 5.5 7-5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Next: save it with your work email. No password to make up.
+          </p>
+        </form>
+      </section>
+
+      <!-- 2. Account: SSO + magic link -->
+      <section class="step" id="account" data-step="account" aria-labelledby="h-account">
+        <h2 id="h-account" class="step-title">Save your <span data-template-name>Weekly team sync</span></h2>
+        <p class="lede">Your note is ready. Create your account to keep it and share it before the meeting.</p>
+
+        <div data-account-form>
+          <a class="btn btn-secondary btn-block" href="#workspace" data-sso>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><rect x="3.5" y="8.5" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>
+            Continue with your company login (SSO)
+          </a>
+          <p class="divider"><span>or use your work email</span></p>
+          <form action="#workspace" data-form="account" novalidate>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="go" placeholder="name@company.com" aria-describedby="email-help email-error" required />
+              <p class="help" id="email-help">We'll email you a sign-in link. No password to remember.</p>
+              <p class="error" id="email-error" data-email-error hidden></p>
+            </div>
+            <label class="check">
+              <input type="checkbox" name="updates" />
+              <span>Email me product updates, about once a month</span>
+            </label>
+            <button class="btn btn-primary btn-block" type="submit">Email me a sign-in link</button>
+            <p class="legal">By continuing you agree to the <a href="#terms">Terms</a> and <a href="#privacy">Privacy policy</a>.</p>
+          </form>
+        </div>
+
+        <div class="sent" data-sent hidden>
+          <div class="notice" role="status">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M3 5.5l7 5.5 7-5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg>
+            <div>
+              <p class="notice-title">Link sent to <span class="email" data-sent-email></span></p>
+              <p>Keep setting up here. Confirm from your inbox within 24 hours to keep your workspace.</p>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="button" data-go="workspace">Continue to workspace</button>
+            <button class="btn btn-quiet" type="button" data-resend disabled>Resend in 30s</button>
+            <button class="btn btn-quiet" type="button" data-change-email>Use a different email</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Workspace: smart defaults -->
+      <section class="step" id="workspace" data-step="workspace" aria-labelledby="h-workspace">
+        <h2 id="h-workspace" class="step-title">Name your team's workspace</h2>
+        <p class="lede">We filled this in from your email. Change anything that's off.</p>
+        <form action="#invite" data-form="workspace" novalidate>
+          <div class="field">
+            <label for="ws-name">Workspace name</label>
+            <input id="ws-name" name="workspace" type="text" autocomplete="organization" value="Lumenrow" maxlength="60" aria-describedby="ws-help ws-error" required />
+            <p class="help" id="ws-help">Your notes live at <span class="url">fieldnote.app/<span data-slug>lumenrow</span></span></p>
+            <p class="error" id="ws-error" data-ws-error hidden>Give your workspace a name. Your team sees it in every invite.</p>
+          </div>
+          <div class="field">
+            <label for="tz">Team time zone</label>
+            <div class="select">
+              <select id="tz" name="tz" aria-describedby="tz-help">
+                {zones.map(([v, l]) => <option value={v} selected={v === "Europe/Lisbon"}>{l}</option>)}
+              </select>
+              <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5.5 8l4.5 4.5L14.5 8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="help" id="tz-help" data-tz-help>So meeting dates and reminders match your team's day.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Create workspace</button>
+            <a class="btn btn-quiet" href="#account" data-back="account">Back</a>
+          </div>
+        </form>
+      </section>
+
+      <!-- 4. Invite: skippable -->
+      <section class="step" id="invite" data-step="invite" aria-labelledby="h-invite">
+        <h2 id="h-invite" class="step-title">Who else is in this meeting?</h2>
+        <p class="lede">They'll get the <span data-template-name>Weekly team sync</span> note and can add agenda items before it starts. Optional.</p>
+        <form action="#first-run" data-form="invite" novalidate>
+          <div class="field">
+            <label for="invites">Teammates' emails</label>
+            <textarea id="invites" name="invites" rows="3" autocapitalize="none" spellcheck="false" placeholder="ana@lumenrow.co, tomas@lumenrow.co" aria-describedby="inv-help inv-error"></textarea>
+            <p class="help" id="inv-help">Separate with commas or new lines.</p>
+            <p class="error" id="inv-error" data-inv-error hidden></p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit" data-invite-cta>Send invites</button>
+            <a class="btn btn-quiet" href="#first-run" data-skip>Skip for now</a>
+          </div>
+          <p class="help after-actions">You can invite people later from any note's Share menu.</p>
+        </form>
+      </section>
+    </div>
+
+    <!-- Live preview: the signature. Open items carry from the last meeting. -->
+    <aside class="preview" aria-labelledby="preview-label">
+      <p class="preview-label" id="preview-label">
+        <span>Preview</span>
+        <span class="preview-note">Example content, so you can see a busy week</span>
+      </p>
+      <article class="paper" data-preview>
+        {keys.map((key) => {
+          const t = templates[key];
+          const open = openCount(t);
+          const shown = t.people.slice(0, 5);
+          return (
+            <div class="paper-in" data-tpl={key} hidden={key !== "sync"}>
+              <header class="paper-head">
+                <p class="paper-kicker"><span>{t.cadence}</span><span aria-hidden="true">·</span><span class="num">{t.length} min</span></p>
+                <h2 class="paper-title">{t.name}</h2>
+                <div class="paper-who">
+                  <p class="paper-meta num">{t.when} · {t.time}</p>
+                  <ul class="faces" aria-label={`${t.people.length} people: ${t.people.join(", ")}`}>
+                    {shown.map((p, i) => <li style={`--i:${i}`} title={p}>{initials(p)}</li>)}
+                    {t.people.length > shown.length && <li class="more">+{t.people.length - shown.length}</li>}
+                  </ul>
+                </div>
+              </header>
+
+              <section class="carry" aria-label={t.prev ? `Carried from ${t.prev}` : "Carried items"}>
+                <h3 class="sec-h">
+                  <span>{t.prev ? `Carried from ${t.prev}` : "Carried items"}</span>
+                  {t.carried.length > 0 && <span class="sec-count num">{open} open · {t.carried.length - open} closed</span>}
+                </h3>
+                {t.carried.length ? (
+                  <ul class="items">
+                    {t.carried.map((it, i) => (
+                      <li class="item" data-s={it.s} style={`--i:${i}`}>
+                        <svg class="mk" width="16" height="16" aria-hidden="true"><use href={`#mk-${it.s}`} /></svg>
+                        <span class="item-main">
+                          <span class="item-t"><span class="sr">{statusLabel[it.s]}: </span>{it.t}</span>
+                          <span class="item-meta"><span class="who">{it.who}</span><span aria-hidden="true"> · </span><span class="state">{it.meta}</span></span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="empty-line">First meeting in the series. Action items you add today show up here next time.</p>
+                )}
+              </section>
+
+              <section class="agenda" aria-label="Agenda">
+                <h3 class="sec-h"><span>Agenda</span><span class="sec-count num">{t.agenda.reduce((a, b) => a + b.m, 0)} of {t.length} min</span></h3>
+                <div class="timebar" aria-hidden="true">
+                  {t.agenda.map((a, i) => <span style={`flex:${a.m};--i:${i}`}></span>)}
+                </div>
+                <ol class="agenda-list">
+                  {t.agenda.map((a, i) => (
+                    <li style={`--i:${i}`}><span class="sw" aria-hidden="true"></span><span class="ag-t">{a.t}</span><span class="ag-m num">{a.m} min</span></li>
+                  ))}
+                </ol>
+              </section>
+
+              <section class="decide" aria-label="Decisions">
+                <h3 class="sec-h"><span>Decisions</span></h3>
+                {t.decision ? (
+                  <p class="decision"><span class="decision-t">{t.decision.t}</span><span class="decision-m">{t.decision.meta}</span></p>
+                ) : (
+                  <p class="empty-line">Decisions you log get a date and an owner, so nobody re-argues them.</p>
+                )}
+              </section>
+
+              <p class="paper-foot">
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 5.5h7.5a2.5 2.5 0 0 1 0 5H6M8 8.5l-2 2 2 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>{open > 0 ? `${plural(open, "open item")} will move into ${t.next}.` : `Open items move into ${t.next} by themselves.`}</span>
+              </p>
+            </div>
+          );
+        })}
+        <div class="paper-in" data-tpl="blank" hidden>
+          <header class="paper-head">
+            <p class="paper-kicker"><span>One-off</span></p>
+            <h2 class="paper-title">Untitled note</h2>
+          </header>
+          <p class="empty-line big">A blank page. Type <kbd>/</kbd> to add an agenda, a decision, or an action item with an owner and a date.</p>
+        </div>
+      </article>
+    </aside>
+  </main>
+
+  <!-- First run: the product, with the chosen template filled in -->
+  <section class="app" id="first-run" data-app aria-labelledby="note-title">
+    <div class="app-bar">
+      <a class="brand" href="#template" aria-label="Fieldnote home">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 3.5h9.5L19 7v13.5H6z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M9 10h7M9 13.5h7M9 17h4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+        <span data-ws-label>Lumenrow</span>
+      </a>
+      <button class="btn btn-primary btn-sm" type="button">Share note</button>
+    </div>
+    <div class="app-body">
+      <nav class="side" aria-label="Notes">
+        <p class="side-h">This week</p>
+        <ul>
+          <li><a href="#note-title" aria-current="page"><span class="truncate" data-tpl-name>Weekly team sync</span><span class="side-date" data-tpl-when>Mon 27 Oct</span></a></li>
+        </ul>
+        <p class="side-next" data-side-next>Next note is made for you after this meeting.</p>
+        <p class="side-h">People</p>
+        <ul class="people" data-people>
+          <li><span class="face">DK</span><span class="truncate">You</span><span class="pstate">Owner</span></li>
+        </ul>
+      </nav>
+      <div class="note-wrap">
+        <div class="ready" role="status">
+          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M6.8 10.2l2.2 2.2 4.3-4.6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p><strong><span data-ws-label>Lumenrow</span> is ready.</strong> <span data-ready-detail>Your note is waiting for the meeting.</span></p>
+        </div>
+        {[...keys, "blank"].map((key) => {
+          const t = templates[key];
+          return (
+            <article class="note" data-tpl={key} hidden={key !== "sync"}>
+              <p class="paper-meta num">{t ? `${t.when} · ${t.time}` : "No date"} · <span data-tz-label>Lisbon</span> · <span data-people-count>Just you</span></p>
+              <h1 class="note-title" id={key === "sync" ? "note-title" : undefined} tabindex="-1">{t ? t.name : "Untitled note"}</h1>
+              {t ? (
+                <>
+                  <p class="template-hint">Gray text comes from the template. Type over it, or delete what you don't need.</p>
+                  <div class="note-sec">
+                    <h2>Carried from last time</h2>
+                    <p class="empty-line">Nothing to carry yet. Action items still open after this meeting move into {t.next}.</p>
+                  </div>
+                  <div class="note-sec">
+                    <h2>Agenda <span class="sec-count num">{t.length} min</span></h2>
+                    <div class="timebar" aria-hidden="true">{t.agenda.map((a) => <span style={`flex:${a.m}`}></span>)}</div>
+                    <ol class="agenda-list">{t.agenda.map((a) => <li><span class="sw" aria-hidden="true"></span><span class="ag-t placeholder">{a.t}</span><span class="ag-m num">{a.m} min</span></li>)}</ol>
+                  </div>
+                  <div class="note-sec">
+                    <h2>Decisions</h2>
+                    <p class="placeholder">Type <kbd>/</kbd> decision to log one with today's date.</p>
+                  </div>
+                  <div class="note-sec">
+                    <h2>Action items</h2>
+                    <p class="placeholder">Owner · task · due date</p>
+                  </div>
+                </>
+              ) : (
+                <p class="placeholder big">Start typing. Press <kbd>/</kbd> for decisions, owners, and dates.</p>
+              )}
+            </article>
+          );
+        })}
+        <div class="tip" data-tip>
+          <p><kbd>/</kbd> adds a decision, owner, or due date anywhere in the note.</p>
+          <button class="btn btn-quiet btn-sm" type="button" data-tip-dismiss>Got it</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="tpl-data" set:html={JSON.stringify(Object.fromEntries(keys.map((k) => [k, { name: templates[k].name, when: templates[k].when, next: templates[k].next }])))}></script>
+  <script is:inline>
+  (() => {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const TPL = JSON.parse($("#tpl-data").textContent);
+    const ORDER = ["template", "account", "workspace", "invite"];
+    const FREE = ["gmail.com", "outlook.com", "hotmail.com", "yahoo.com", "icloud.com", "proton.me"];
+    const state = { template: "sync", email: "", workspace: "Lumenrow", invites: [] };
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+    function applyTemplate(key) {
+      state.template = key;
+      const tpl = TPL[key] || { name: "Untitled note", when: "", next: "the next meeting's note" };
+      $$("[data-template-name], [data-tpl-name]").forEach((el) => (el.textContent = tpl.name));
+      $("[data-tpl-when]").textContent = tpl.when || "No date";
+      $("[data-template-cta]").textContent = `Use ${tpl.name}`;
+      $("[data-side-next]").textContent = TPL[key] ? `${tpl.next[0].toUpperCase()}${tpl.next.slice(1)} is made for you after this meeting.` : "Add a date to turn this into a series.";
+      $$("[data-tpl]").forEach((el) => {
+        const on = el.dataset.tpl === key;
+        if (on && el.hidden) { el.hidden = false; el.classList.remove("swap"); void el.offsetWidth; el.classList.add("swap"); }
+        else if (!on) el.hidden = true;
+      });
+      $$(".note:not([hidden]) .note-title, .note .note-title").forEach((h) => h.removeAttribute("id"));
+      $(".note:not([hidden]) .note-title").id = "note-title";
+    }
+
+    function show(id, focus = true) {
+      const isApp = id === "first-run";
+      $("[data-onboard]").hidden = isApp;
+      $(".topbar").hidden = isApp;
+      $("[data-app]").classList.toggle("is-current", isApp);
+      const idx = ORDER.indexOf(id);
+      $$("[data-step]").forEach((s) => s.classList.toggle("is-current", s.dataset.step === id));
+      $$("[data-step-dot]").forEach((li, i) => {
+        const done = i < idx;
+        li.classList.toggle("is-done", done);
+        if (i === idx) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+        $("[data-sr-state]", li).textContent = done ? " (done)" : "";
+      });
+      if (idx >= 0) {
+        $("[data-step-count]").textContent = `Step ${idx + 1} of 4`;
+        $("[data-step-now]").textContent = ` · ${$$("[data-step-dot] .lbl")[idx].textContent}`;
+      }
+      if (history.replaceState) history.replaceState(null, "", `#${id}`);
+      if (!focus) return;
+      const target = isApp ? $("#note-title") : $(`#${id} h1, #${id} h2`);
+      target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+      scrollTo({ top: 0, behavior: reduce.matches ? "auto" : "smooth" });
+    }
+
+    function setWorkspace(name) {
+      state.workspace = name.trim() || "Your workspace";
+      $$("[data-ws-label]").forEach((el) => (el.textContent = state.workspace));
+      $("[data-slug]").textContent = state.workspace.toLowerCase().normalize("NFKD").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "") || "team";
+    }
+
+    function inferWorkspace(email) {
+      const [local, domain = ""] = email.split("@");
+      if (!domain || FREE.includes(domain.toLowerCase())) return `${local.split(/[._+]/)[0].replace(/^./, (c) => c.toUpperCase())}'s team`;
+      const base = domain.split(".").slice(-2, -1)[0] || domain;
+      return base.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    // Template
+    $$('input[name="template"]').forEach((r) => r.addEventListener("change", () => applyTemplate(r.value)));
+    $('[data-form="template"]').addEventListener("submit", (e) => { e.preventDefault(); show("account"); });
+    $("[data-blank]").addEventListener("click", (e) => { e.preventDefault(); applyTemplate("blank"); show("account"); });
+
+    // Account
+    const email = $("#email");
+    const emailErr = $("[data-email-error]");
+    const checkEmail = () => {
+      const v = email.value.trim();
+      let msg = "";
+      if (!v) msg = "Enter your work email so we can send the sign-in link.";
+      else if (!v.includes("@")) msg = `“${v}” is missing an @. Try name@company.com.`;
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) msg = "Check the part after the @. It needs a domain like company.com.";
+      emailErr.textContent = msg;
+      emailErr.hidden = !msg;
+      email.setAttribute("aria-invalid", msg ? "true" : "false");
+      return !msg;
+    };
+    email.addEventListener("blur", () => { if (email.value) checkEmail(); });
+    email.addEventListener("input", () => { if (!emailErr.hidden) checkEmail(); });
+    let timer;
+    $('[data-form="account"]').addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!checkEmail()) { email.focus(); return; }
+      state.email = email.value.trim();
+      $("[data-sent-email]").textContent = state.email;
+      $("[data-account-form]").hidden = true;
+      $("[data-sent]").hidden = false;
+      const name = inferWorkspace(state.email);
+      $("#ws-name").value = name;
+      setWorkspace(name);
+      const resend = $("[data-resend]");
+      let left = 30;
+      resend.disabled = true;
+      resend.textContent = "Resend in 30s";
+      clearInterval(timer);
+      timer = setInterval(() => {
+        left -= 1;
+        resend.textContent = left > 0 ? `Resend in ${left}s` : "Resend link";
+        if (left <= 0) { clearInterval(timer); resend.disabled = false; }
+      }, 1000);
+      $("[data-sent] .btn-primary").focus();
+    });
+    $("[data-resend]").addEventListener("click", () => { $('[data-form="account"]').requestSubmit(); });
+    $("[data-change-email]").addEventListener("click", () => {
+      $("[data-account-form]").hidden = false; $("[data-sent]").hidden = true; email.select();
+    });
+    $("[data-sso]").addEventListener("click", (e) => { e.preventDefault(); setWorkspace($("#ws-name").value); show("workspace"); });
+    $$("[data-go]").forEach((b) => b.addEventListener("click", () => show(b.dataset.go)));
+    $$("[data-back]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); show(a.dataset.back); }));
+    $$("[data-step-dot] a").forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = a.closest("li").dataset.stepDot;
+      if (ORDER.indexOf(id) <= ORDER.indexOf(document.querySelector(".step.is-current")?.dataset.step)) show(id);
+    }));
+
+    // Workspace
+    const tz = $("#tz");
+    try {
+      const ALIAS = { "Asia/Calcutta": "Asia/Kolkata", "Asia/Saigon": "Asia/Ho_Chi_Minh", "America/Buenos_Aires": "America/Argentina/Buenos_Aires", "Europe/Kiev": "Europe/Kyiv" };
+      const raw = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const here = ALIAS[raw] || raw;
+      if (here) {
+        if (![...tz.options].some((o) => o.value === here)) tz.add(new Option(here.replace(/_/g, " ").split("/").pop(), here), 0);
+        tz.value = here;
+        $("[data-tz-help]").textContent = "Detected from your browser, so dates and reminders match your team's day.";
+      }
+    } catch {}
+    const syncTz = () => $$("[data-tz-label]").forEach((el) => (el.textContent = tz.selectedOptions[0].text.replace(/\s*\(.*\)/, "")));
+    tz.addEventListener("change", syncTz); syncTz();
+    const ws = $("#ws-name");
+    ws.addEventListener("input", () => setWorkspace(ws.value));
+    $('[data-form="workspace"]').addEventListener("submit", (e) => {
+      e.preventDefault();
+      const ok = ws.value.trim().length > 0;
+      $("[data-ws-error]").hidden = ok;
+      ws.setAttribute("aria-invalid", ok ? "false" : "true");
+      if (!ok) { ws.focus(); return; }
+      setWorkspace(ws.value);
+      show("invite");
+    });
+
+    // Invite
+    const inv = $("#invites");
+    const invErr = $("[data-inv-error]");
+    const cta = $("[data-invite-cta]");
+    const parse = () => inv.value.split(/[\s,;]+/).map((s) => s.trim()).filter(Boolean);
+    inv.addEventListener("input", () => {
+      const n = parse().length;
+      cta.textContent = n ? `Send ${n} invite${n === 1 ? "" : "s"}` : "Send invites";
+      if (!invErr.hidden) invErr.hidden = true;
+    });
+    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const finish = (list) => {
+      state.invites = list;
+      const n = list.length;
+      $$("[data-people-count]").forEach((el) => (el.textContent = n ? `You + ${n} invited` : "Just you"));
+      $("[data-people]").innerHTML = '<li><span class="face">' + esc((state.email || "you")[0].toUpperCase()) + '</span><span class="truncate">You</span><span class="pstate">Owner</span></li>' +
+        list.map((m) => `<li><span class="face">${esc(m[0].toUpperCase())}</span><span class="truncate" title="${esc(m)}">${esc(m)}</span><span class="pstate is-pending">Invited</span></li>`).join("");
+      $("[data-ready-detail]").textContent = n
+        ? `We emailed ${n} teammate${n === 1 ? "" : "s"}. They'll land on this note.`
+        : "Invite your team from Share when the note is ready.";
+      show("first-run");
+    };
+    $('[data-form="invite"]').addEventListener("submit", (e) => {
+      e.preventDefault();
+      const list = parse();
+      if (!list.length) { invErr.textContent = "Add at least one email, or choose Skip for now."; invErr.hidden = false; inv.focus(); return; }
+      const bad = list.filter((x) => !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(x));
+      if (bad.length) { invErr.textContent = `Fix ${bad.length === 1 ? "this address" : "these addresses"}: ${bad.join(", ")}`; invErr.hidden = false; inv.setAttribute("aria-invalid", "true"); inv.focus(); return; }
+      inv.setAttribute("aria-invalid", "false");
+      finish(list);
+    });
+    $("[data-skip]").addEventListener("click", (e) => { e.preventDefault(); finish([]); });
+    $("[data-tip-dismiss]").addEventListener("click", () => { $("[data-tip]").hidden = true; $("#note-title").focus(); });
+
+    const picked = $('input[name="template"]:checked');
+    if (picked && picked.value !== "sync") applyTemplate(picked.value);
+    const start = location.hash.slice(1);
+    if (ORDER.indexOf(start) >= 2 || start === "first-run") setWorkspace(ws.value);
+    show(ORDER.includes(start) || start === "first-run" ? start : "template", false);
+  })();
+  </script>
+
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 400 var(--t-body)/1.55 var(--font-sans);
+      font-feature-settings: "cv11", "ss01";
+      font-optical-sizing: auto;
+      -webkit-font-smoothing: antialiased;
+      accent-color: var(--accent); caret-color: var(--accent);
+    }
+    ::selection { background: color-mix(in oklab, var(--accent) 28%, transparent); }
+    h1, h2, h3 { margin: 0; text-wrap: balance; }
+    p { margin: 0; text-wrap: pretty; }
+    a { color: var(--accent-ink); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+    [hidden] { display: none !important; }
+    .num { font-variant-numeric: tabular-nums; }
+    .defs { position: absolute; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .skip { position: absolute; left: var(--s-4); top: -60px; padding: var(--s-2) var(--s-3); background: var(--surface); border-radius: var(--r-sm); z-index: 10; }
+    .skip:focus-visible { top: var(--s-3); }
+
+    /* Top bar */
+    .topbar, .app-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+      padding: var(--s-3) max(var(--s-5), env(safe-area-inset-right)) var(--s-3) max(var(--s-5), env(safe-area-inset-left));
+      max-width: 1200px; margin: 0 auto;
+    }
+    .brand { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ink); text-decoration: none; font-weight: 650; letter-spacing: -0.015em; min-height: 44px; min-width: 0; }
+    .brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topbar-meta { color: var(--ink-3); font-size: var(--t-label); }
+    .topbar-meta a { display: inline-block; padding: 12px 0; font-weight: 560; }
+    @media (max-width: 380px) { .hide-sm { display: none; } }
+
+    /* Layout */
+    .onboard {
+      display: grid; gap: var(--s-7);
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 1200px; margin: 0 auto;
+      padding: var(--s-4) var(--s-5) var(--s-8);
+    }
+    @media (min-width: 960px) {
+      .onboard { grid-template-columns: minmax(0, 500px) minmax(0, 1fr); gap: 72px; padding-top: var(--s-5); align-items: start; }
+      .preview { position: sticky; top: var(--s-5); }
+    }
+    @media (max-width: 380px) { .onboard, .topbar { padding-left: var(--s-4); padding-right: var(--s-4); } }
+
+    /* Stepper */
+    .stepper { margin-bottom: var(--s-6); }
+    .stepper-count { font-size: var(--t-meta); font-weight: 560; color: var(--ink-3); font-variant-numeric: tabular-nums; margin-bottom: var(--s-2); }
+    .stepper ol { list-style: none; display: flex; gap: var(--s-1); margin: 0; padding: 0; }
+    .stepper li { flex: 1; min-width: 0; }
+    .stepper a {
+      display: flex; align-items: center; gap: var(--s-2); min-height: 44px;
+      padding-top: var(--s-2); border-top: 2px solid var(--line);
+      color: var(--ink-3); text-decoration: none; font-size: var(--t-label); font-weight: 520;
+      transition: color var(--dur-small) ease, border-color var(--dur-medium) var(--ease-out);
+    }
+    .stepper .dot { position: relative; display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 999px; border: 1.5px solid var(--line-strong); font-size: var(--t-micro); font-variant-numeric: tabular-nums; }
+    .stepper .dot svg { display: none; }
+    .stepper .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stepper li[aria-current="step"] a { border-top-color: var(--accent); color: var(--ink); font-weight: 600; }
+    .stepper li[aria-current="step"] .dot { border-color: var(--accent); color: var(--accent-ink); }
+    .stepper li.is-done a { border-top-color: var(--accent); color: var(--ink-2); }
+    .stepper li.is-done .dot { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .stepper li.is-done .dot svg { display: block; }
+    .stepper li.is-done .num { display: none; }
+    html:not(.js) .stepper { display: none; }
+    .stepper-now { display: none; }
+    @media (max-width: 520px) {
+      .stepper { margin-bottom: var(--s-5); }
+      .stepper .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+      .stepper-now { display: inline; color: var(--ink-2); }
+    }
+
+    /* Steps */
+    .step + .step { margin-top: var(--s-8); }
+    html.js .step:not(.is-current) { display: none; }
+    html.js .step + .step { margin-top: 0; }
+    .step.is-current { animation: enter var(--dur-medium) var(--ease-out); }
+    @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+    h1, .step-title {
+      font-family: var(--font-serif); font-size: var(--t-h1); font-weight: 520; line-height: 1.08; letter-spacing: -0.025em;
+      font-variation-settings: "opsz" 96, "SOFT" 30;
+    }
+    .lede { margin-top: var(--s-3); font-size: var(--t-lead); line-height: 1.5; color: var(--ink-2); max-width: 44ch; }
+    form { margin-top: var(--s-6); }
+
+    .choices { border: 0; padding: 0; margin: 0; display: grid; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+    .choice {
+      position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s-3); align-items: center;
+      padding: 14px var(--s-4); cursor: pointer; min-height: 64px;
+      transition: background-color var(--dur-small) ease;
+    }
+    .choice + .choice { border-top: 1px solid var(--line); }
+    .choice input { width: 20px; height: 20px; margin: 0; flex: none; }
+    .choice input:focus-visible { outline-color: transparent; }
+    .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--r-lg); }
+    .choice:has(input:checked) { background: var(--accent-soft); }
+    .choice:has(input:checked)::before { content: ""; position: absolute; inset: -1px 0; border-block: 1px solid color-mix(in oklab, var(--accent) 45%, transparent); pointer-events: none; }
+    .choice:first-child:has(input:checked)::before { border-top: 0; }
+    .choice:last-child:has(input:checked)::before { border-bottom: 0; }
+    .choice:active { background: var(--surface-2); }
+    .choice-body { display: grid; gap: 1px; min-width: 0; }
+    .choice-title { font-weight: 600; letter-spacing: -0.008em; }
+    .choice-hint { color: var(--ink-3); font-size: var(--t-label); }
+    .choice-meta { display: grid; justify-items: end; font-size: var(--t-meta); color: var(--ink-3); line-height: 1.35; text-align: right; }
+    .choice-meta .num { color: var(--ink-2); font-weight: 560; }
+
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); margin-top: var(--s-5); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+      min-height: 48px; padding: 0 var(--s-5); border-radius: var(--r-md);
+      font: 600 var(--t-body)/1.2 var(--font-sans); letter-spacing: -0.005em; text-decoration: none; text-align: center;
+      border: 1px solid transparent; cursor: pointer; touch-action: manipulation; user-select: none;
+      transition: background-color var(--dur-small) ease, border-color var(--dur-small) ease, transform var(--dur-press) var(--ease-out);
+    }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.55; }
+    .btn-primary { background: var(--accent); color: var(--on-accent); }
+    .btn-primary:active:not(:disabled) { background: var(--accent-press); }
+    .btn-primary svg { transition: transform var(--dur-small) var(--ease-out); }
+    .btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+    .btn-quiet { background: transparent; color: var(--accent-ink); padding: 0 var(--s-3); }
+    .btn-sm { min-height: 44px; padding: 0 var(--s-4); font-size: var(--t-label); }
+    .btn-block { width: 100%; }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+      .btn-primary:hover svg { transform: translateX(2px); }
+      .btn-secondary:hover { background: var(--surface-2); }
+      .btn-quiet:hover:not(:disabled) { background: var(--accent-soft); }
+      .choice:hover { background: var(--surface-2); }
+      .choice:has(input:checked):hover { background: var(--accent-soft); }
+      .stepper li.is-done a:hover, .stepper li[aria-current] a:hover { color: var(--ink); }
+      .faces li:hover { transform: translateY(-1px); }
+    }
+    .next-up { display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-4); font-size: var(--t-meta); color: var(--ink-3); }
+    .next-up svg { flex: none; }
+
+    .divider { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-5) 0 0; color: var(--ink-3); font-size: var(--t-meta); }
+    .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+    #account form { margin-top: var(--s-4); }
+    .field { display: grid; gap: var(--s-2); }
+    .field + .field { margin-top: var(--s-5); }
+    label, .field > label { font-weight: 560; font-size: var(--t-label); }
+    input[type="email"], input[type="text"], textarea, select {
+      width: 100%; min-height: 48px; padding: 12px 14px;
+      font: 400 1rem/1.4 var(--font-sans); color: var(--ink);
+      background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-md);
+      transition: border-color var(--dur-small) ease;
+    }
+    textarea { resize: vertical; min-height: 96px; }
+    input::placeholder, textarea::placeholder { color: var(--ink-3); opacity: 1; }
+    input:focus-visible, textarea:focus-visible, select:focus-visible { border-color: var(--accent); outline-offset: 0; }
+    input[aria-invalid="true"], textarea[aria-invalid="true"], input[aria-invalid="true"]:focus-visible, textarea[aria-invalid="true"]:focus-visible { border-color: var(--danger); }
+    .select { position: relative; }
+    select { appearance: none; padding-right: 44px; }
+    .select svg { position: absolute; right: 14px; top: 50%; translate: 0 -50%; color: var(--ink-3); pointer-events: none; }
+    .help { font-size: var(--t-meta); color: var(--ink-3); line-height: 1.45; }
+    .after-actions { margin-top: var(--s-4); }
+    .error { font-size: var(--t-meta); color: var(--danger); font-weight: 520; line-height: 1.45; }
+    .url { font-weight: 560; color: var(--ink-2); overflow-wrap: anywhere; }
+    .check { display: flex; gap: var(--s-3); align-items: flex-start; margin-top: var(--s-4); padding: var(--s-2) 0; font-weight: 400; color: var(--ink-2); cursor: pointer; }
+    .check input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; }
+    #account .btn-primary { margin-top: var(--s-4); }
+    .legal { margin-top: var(--s-3); font-size: var(--t-meta); color: var(--ink-3); }
+    .legal a { display: inline-block; padding: 4px 0; }
+
+    .sent { margin-top: var(--s-6); }
+    .notice { display: flex; gap: var(--s-3); padding: var(--s-4); border-radius: var(--r-lg); background: var(--success-soft); color: var(--ink); }
+    .notice svg { color: var(--success); flex: none; margin-top: 2px; }
+    .notice-title { font-weight: 600; margin-bottom: var(--s-1); }
+    .email { overflow-wrap: anywhere; }
+
+    /* Preview: the note, built live */
+    .preview-label { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s-1) var(--s-3); margin-bottom: var(--s-3); font-size: var(--t-meta); }
+    .preview-label > span:first-child { font-weight: 600; color: var(--ink-2); }
+    .preview-note { color: var(--ink-3); }
+    .paper {
+      background: var(--surface); border-radius: var(--r-xl); box-shadow: var(--shadow-paper);
+      padding: var(--s-6) var(--s-6) var(--s-5);
+    }
+    .paper-in.swap { animation: swap 200ms var(--ease-out); }
+    @keyframes swap { from { opacity: 0; filter: blur(2px); } }
+    .paper-kicker { display: flex; gap: 6px; font-size: var(--t-meta); color: var(--ink-3); font-weight: 520; }
+    .paper-title { font-family: var(--font-serif); font-size: var(--t-h2); font-weight: 540; letter-spacing: -0.02em; line-height: 1.12; margin-top: var(--s-1); overflow-wrap: anywhere; font-variation-settings: "opsz" 72; }
+    .paper-who { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2) var(--s-4); margin-top: var(--s-2); }
+    .paper-meta { font-size: var(--t-meta); color: var(--ink-3); overflow-wrap: anywhere; }
+    .faces { display: flex; list-style: none; margin: 0; padding: 0 0 0 6px; }
+    .faces li {
+      display: grid; place-items: center; width: 28px; height: 28px; margin-left: -6px; border-radius: 50%;
+      background: var(--surface-2); color: var(--ink-2); border: 2px solid var(--surface);
+      font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.02em;
+      transition: transform var(--dur-press) var(--ease-out);
+    }
+    .faces .more { background: var(--surface); border-color: var(--line); color: var(--ink-3); font-weight: 600; }
+
+    .sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); font: 650 var(--t-label)/1.3 var(--font-sans); letter-spacing: -0.005em; }
+    .sec-count { font-size: var(--t-meta); font-weight: 500; color: var(--ink-3); white-space: nowrap; }
+    .carry, .agenda, .decide { margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--line); }
+    .items { list-style: none; margin: var(--s-2) 0 0; padding: 0; display: grid; }
+    .item { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: var(--s-3); padding: var(--s-2) 0; align-items: start; }
+    .mk { margin-top: 3px; color: var(--ink-3); }
+    .mk-cut { stroke: var(--surface); }
+    .item-main { display: grid; gap: 1px; min-width: 0; }
+    .item-t { font-size: var(--t-label); line-height: 1.4; color: var(--ink); overflow-wrap: anywhere; }
+    .item-meta { font-size: var(--t-meta); color: var(--ink-3); line-height: 1.4; }
+    .item-meta .who { color: var(--ink-2); font-weight: 560; }
+    .item[data-s="done"] .mk { color: var(--success); }
+    .item[data-s="done"] .item-t, .item[data-s="dropped"] .item-t { color: var(--ink-3); text-decoration: line-through; text-decoration-color: color-mix(in oklab, var(--ink-3) 70%, transparent); }
+    .item[data-s="open"] .mk { color: var(--warning); }
+    .item[data-s="open"] .state { color: var(--warning); font-weight: 560; }
+    .item[data-s="you"] .mk { color: var(--accent); }
+    .item[data-s="you"] .state { color: var(--accent-ink); font-weight: 600; }
+    .item[data-s="you"] .item-t { font-weight: 560; }
+    .item[data-s="blocked"] .mk { color: var(--danger); }
+    .item[data-s="blocked"] .state { color: var(--danger); font-weight: 520; }
+
+    .timebar { display: flex; gap: 2px; height: 8px; margin-top: var(--s-3); border-radius: 3px; overflow: hidden; }
+    .timebar span { background: var(--bar-2); transform-origin: left; }
+    .timebar span:nth-child(1) { background: var(--bar-1); }
+    .timebar span:nth-child(3n) { background: var(--bar-3); }
+    .agenda-list { list-style: none; margin: var(--s-2) 0 0; padding: 0; display: grid; }
+    .agenda-list li { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: var(--s-3); align-items: baseline; padding: 6px 0; font-size: var(--t-label); }
+    .agenda-list .sw { width: 8px; height: 8px; border-radius: 2px; background: var(--bar-2); transform: translateY(-1px); }
+    .agenda-list li:nth-child(1) .sw { background: var(--bar-1); }
+    .agenda-list li:nth-child(3n) .sw { background: var(--bar-3); }
+    .ag-t { min-width: 0; overflow-wrap: anywhere; }
+    .ag-m { color: var(--ink-3); font-size: var(--t-meta); }
+    .decision { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--s-3); margin-top: var(--s-2); font-size: var(--t-label); }
+    .decision-t { font-weight: 560; }
+    .decision-m { font-size: var(--t-meta); color: var(--ink-3); }
+    .empty-line { margin-top: var(--s-2); font-size: var(--t-label); color: var(--ink-3); }
+    .empty-line.big { margin-top: var(--s-5); font-size: var(--t-body); }
+    .paper-foot { display: flex; gap: var(--s-2); align-items: flex-start; margin-top: var(--s-5); padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--surface-2); font-size: var(--t-meta); color: var(--ink-2); }
+    .paper-foot svg { flex: none; margin-top: 2px; color: var(--ink-3); }
+
+    /* Entrance: the note assembles once on load */
+    .paper-in:not(.swap) .item, .paper-in:not(.swap) .agenda-list li { animation: rise 260ms var(--ease-out) both; animation-delay: calc(140ms + var(--i, 0) * 50ms); }
+    .paper-in:not(.swap) .timebar span { animation: draw 320ms var(--ease-out) both; animation-delay: calc(220ms + var(--i, 0) * 60ms); }
+    .paper-in:not(.swap) .faces li { animation: fade 220ms var(--ease-out) both; animation-delay: calc(80ms + var(--i, 0) * 30ms); }
+    @keyframes rise { from { opacity: 0; transform: translateY(4px); } }
+    @keyframes draw { from { transform: scaleX(0); } }
+    @keyframes fade { from { opacity: 0; } }
+
+    @media (max-width: 959px) {
+      html.js .preview { order: 2; }
+      .paper { padding: var(--s-5); border-radius: var(--r-lg); }
+    }
+    @media (max-width: 380px) {
+      .paper { padding: var(--s-4); }
+      .choice { grid-template-columns: auto minmax(0, 1fr); }
+      .choice-meta { grid-column: 2; justify-items: start; display: flex; gap: 6px; }
+    }
+
+    /* First run */
+    .app { border-top: 1px solid var(--line); min-height: 100dvh; background: var(--bg); }
+    html.js .app:not(.is-current) { display: none; }
+    html.js .app.is-current { border-top: 0; animation: enter var(--dur-medium) var(--ease-out); }
+    .app-bar { max-width: none; border-bottom: 1px solid var(--line); background: var(--surface); }
+    .app-body { display: grid; grid-template-columns: minmax(0, 1fr); }
+    .side { padding: var(--s-4) var(--s-5); border-bottom: 1px solid var(--line); }
+    .side-h { font-size: var(--t-meta); font-weight: 600; color: var(--ink-3); margin: var(--s-2) 0; }
+    .side-h + ul { margin-bottom: var(--s-3); }
+    .side ul { list-style: none; margin: 0; padding: 0; }
+    .side a { display: grid; gap: 0; padding: var(--s-2) var(--s-3); border-radius: var(--r-sm); text-decoration: none; color: var(--ink); min-height: 44px; }
+    .side a[aria-current] { background: var(--surface-2); font-weight: 560; }
+    .side-date { font-size: var(--t-meta); color: var(--ink-3); font-weight: 400; font-variant-numeric: tabular-nums; }
+    .side-next { font-size: var(--t-meta); color: var(--ink-3); padding: 0 var(--s-3) var(--s-4); }
+    .people li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: var(--s-2); align-items: center; padding: 6px var(--s-3); font-size: var(--t-label); }
+    .face { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); color: var(--ink-2); font-size: 0.6875rem; font-weight: 650; }
+    .pstate { font-size: var(--t-micro); color: var(--ink-3); }
+    .pstate.is-pending { color: var(--warning); font-weight: 560; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (min-width: 900px) {
+      .app-body { grid-template-columns: 260px minmax(0, 1fr); min-height: calc(100dvh - 69px); }
+      .side { border-bottom: 0; border-right: 1px solid var(--line); padding: var(--s-5) var(--s-4); }
+    }
+    .note-wrap { padding: var(--s-5); max-width: 760px; width: 100%; margin: 0 auto; }
+    @media (min-width: 900px) { .note-wrap { padding: var(--s-6) var(--s-7); } }
+    .ready { display: flex; gap: var(--s-3); align-items: flex-start; padding: var(--s-3) var(--s-4); border-radius: var(--r-md); background: var(--success-soft); }
+    .ready svg { color: var(--success); flex: none; margin-top: 2px; }
+    .note { margin-top: var(--s-6); }
+    .note-title { font-size: clamp(2rem, 1.6rem + 1.6vw, 2.5rem); margin-top: var(--s-2); overflow-wrap: anywhere; }
+    .template-hint { margin-top: var(--s-3); font-size: var(--t-meta); color: var(--ink-3); }
+    .note-sec { margin-top: var(--s-6); }
+    .note-sec h2 { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-h3); font-weight: 650; letter-spacing: -0.01em; padding-bottom: var(--s-2); border-bottom: 1px solid var(--line); }
+    .note-sec .placeholder { margin-top: var(--s-3); }
+    .note-sec .agenda-list .placeholder { margin-top: 0; }
+    .placeholder { color: var(--ink-3); }
+    .placeholder.big { margin-top: var(--s-5); }
+    .tip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2) var(--s-4); margin-top: var(--s-7); padding: var(--s-2) var(--s-2) var(--s-2) var(--s-4); border: 1px dashed var(--line-strong); border-radius: var(--r-md); color: var(--ink-2); font-size: var(--t-label); }
+    kbd { font: 600 0.8125rem/1 var(--font-sans); padding: 3px 7px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 6px; background: var(--surface); color: var(--ink-2); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .step.is-current, html.js .app.is-current { animation: fade var(--dur-small) ease-out; }
+      .paper-in.swap { animation: fade var(--dur-small) ease-out; }
+      .paper-in:not(.swap) .item, .paper-in:not(.swap) .agenda-list li, .paper-in:not(.swap) .timebar span { animation: fade var(--dur-small) ease-out both; animation-delay: 0ms; }
+      .btn:active:not(:disabled), .faces li:hover { transform: none; }
+      .btn-primary:hover svg { transform: none; }
+    }
+  </style>
+</body>
+</html>

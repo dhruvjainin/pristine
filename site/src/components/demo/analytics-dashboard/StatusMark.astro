@@ -1,0 +1,15 @@
+---
+// Tiny status marks: each state has its own shape, so color is never the only signal.
+// Colors come from --mark-* tokens on the page; the visible label next to the mark carries the words.
+interface Props { state: "live" | "done" | "running" | "retrying" | "failed" | "needs" | "pending"; size?: number; label?: string }
+const { state, size = 14, label } = Astro.props;
+---
+<span class="mark" data-state={state} style={`--mark-size:${size}px`} role={label ? "img" : undefined} aria-label={label} aria-hidden={label ? undefined : "true"}>
+  {state === "live" && <svg viewBox="0 0 16 16"><circle class="ring" cx="8" cy="8" r="6.5" /><circle cx="8" cy="8" r="3.5" class="fill" /></svg>}
+  {state === "done" && <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" class="fill" /><path d="M5 8.2l2 2 4-4.2" class="glyph" /></svg>}
+  {state === "running" && <svg viewBox="0 0 16 16" class="spin"><circle cx="8" cy="8" r="6" class="track" /><path d="M8 2a6 6 0 0 1 6 6" class="arc" /></svg>}
+  {state === "retrying" && <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" class="track" /><path d="M8 2a6 6 0 0 1 6 6" class="arc spin" /><circle cx="8" cy="8" r="1.6" class="fill" /></svg>}
+  {state === "needs" && <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" class="fill" /><path d="M8 4.6v4" class="glyph" /><path d="M8 11.3h.01" class="glyph" /></svg>}
+  {state === "failed" && <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" class="fill" /><path d="M5.6 5.6l4.8 4.8M10.4 5.6l-4.8 4.8" class="glyph" /></svg>}
+  {state === "pending" && <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" class="dash" /></svg>}
+</span>

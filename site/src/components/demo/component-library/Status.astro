@@ -1,0 +1,86 @@
+---
+type State = "queued" | "running" | "passed" | "warning" | "failed" | "needs" | "canceled" | "skipped";
+interface Props { state: State; value?: number; size?: "sm" | "md" | "lg"; label?: string; class?: string; id?: string }
+const { state, value, size = "md", label, class: cls = "", id } = Astro.props;
+
+const NAMES: Record<State, string> = {
+  queued: "Queued", running: "Running", passed: "Passed", warning: "Passed with warnings",
+  failed: "Failed", needs: "Needs you", canceled: "Canceled", skipped: "Skipped",
+};
+
+// Eight arc segments around r=6, one per 12.5%, with a small gap between them.
+const seg = (i: number) => {
+  const a0 = ((-90 + i * 45 + 5) * Math.PI) / 180;
+  const a1 = ((-90 + (i + 1) * 45 - 5) * Math.PI) / 180;
+  const p = (a: number) => `${(8 + 6 * Math.cos(a)).toFixed(3)} ${(8 + 6 * Math.sin(a)).toFixed(3)}`;
+  return `M${p(a0)}A6 6 0 0 1 ${p(a1)}`;
+};
+const filled = value == null ? 0 : Math.floor((value / 100) * 8);
+const name = label ?? (state === "running" && value != null ? `Running, ${value}%` : NAMES[state]);
+---
+<span class={`st st-${size} ${cls}`.trim()} id={id} data-state={state} data-determinate={value != null ? "" : undefined} role={name ? "img" : undefined} aria-label={name || undefined} aria-hidden={name ? undefined : "true"}>
+  <svg viewBox="0 0 16 16" aria-hidden="true">
+    <g class="g g-queued"><circle cx="8" cy="8" r="6" class="ring dashed" /></g>
+    <g class="g g-running">
+      <circle cx="8" cy="8" r="6" class="track" />
+      <path class="spin" d="M8 2a6 6 0 0 1 6 6" />
+      <g class="segs">{Array.from({ length: 8 }, (_, i) => <path d={seg(i)} class={i < filled ? "on" : i === filled ? "now" : undefined} />)}</g>
+    </g>
+    <g class="g g-passed"><circle cx="8" cy="8" r="7" class="disc" /><path class="glyph draw" d="M5 8.3l2 2 4-4.3" pathLength="1" /></g>
+    <g class="g g-warning"><circle cx="8" cy="8" r="7" class="disc" /><path class="glyph draw" d="M8 4.6v3.8" pathLength="1" /><circle cx="8" cy="11.1" r="0.95" class="dot" /></g>
+    <g class="g g-failed"><circle cx="8" cy="8" r="7" class="disc" /><path class="glyph draw" d="M5.7 5.7l4.6 4.6M10.3 5.7l-4.6 4.6" pathLength="1" /></g>
+    <g class="g g-needs"><circle cx="8" cy="8" r="6" class="ring" /><circle cx="8" cy="8" r="2.5" class="core" /></g>
+    <g class="g g-canceled"><circle cx="8" cy="8" r="6" class="ring" /><rect x="5.75" y="5.75" width="4.5" height="4.5" rx="0.9" class="core" /></g>
+    <g class="g g-skipped"><circle cx="8" cy="8" r="6" class="ring" /><path class="glyph-line" d="M5.6 10.4l4.8-4.8" /></g>
+  </svg>
+</span>
+
+<style is:global>
+  .st { --st-c: var(--st-neutral); display: inline-grid; place-items: center; flex-shrink: 0; width: 16px; height: 16px; color: var(--st-c); vertical-align: -3px; }
+  .st-sm { width: 12px; height: 12px; vertical-align: -1px; }
+  .st-lg { width: 20px; height: 20px; vertical-align: -4px; }
+  .st svg { width: 100%; height: 100%; overflow: visible; }
+  .st .g { display: none; }
+  .st[data-state="queued"] .g-queued, .st[data-state="running"] .g-running, .st[data-state="passed"] .g-passed,
+  .st[data-state="warning"] .g-warning, .st[data-state="failed"] .g-failed, .st[data-state="needs"] .g-needs,
+  .st[data-state="canceled"] .g-canceled, .st[data-state="skipped"] .g-skipped { display: inline; }
+  .st[data-state="running"] { --st-c: var(--st-run); }
+  .st[data-state="passed"] { --st-c: var(--st-ok); }
+  .st[data-state="warning"] { --st-c: var(--st-warn); }
+  .st[data-state="failed"] { --st-c: var(--st-err); }
+  .st[data-state="needs"] { --st-c: var(--st-need); }
+
+  .st .ring, .st .track { fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .st .dashed { stroke-dasharray: 2.1 2.6; stroke-linecap: round; }
+  .st .track { opacity: 0.22; }
+  .st .disc { fill: currentColor; }
+  .st .glyph { fill: none; stroke: var(--st-glyph); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .st .glyph-line { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+  .st .dot { fill: var(--st-glyph); }
+  .st .core { fill: currentColor; }
+  .st .spin { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; transform-origin: 8px 8px; animation: st-spin 900ms linear infinite; }
+  .st .segs { display: none; }
+  .st .segs path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; opacity: 0.22; transition: opacity 180ms var(--ease-out); }
+  .st .segs path.on { opacity: 1; }
+  .st[data-determinate] .segs { display: inline; }
+  .st[data-determinate] .spin, .st[data-determinate] .track { display: none; }
+  .st[data-determinate] .segs path.now { animation: st-breathe 1.2s ease-in-out infinite alternate; }
+
+  /* The entrance runs only when a state changes, never on first paint. */
+  .st[data-changed] svg { animation: st-in 280ms var(--ease-out); }
+  .st[data-changed] .draw { stroke-dasharray: 1; animation: st-draw 240ms var(--ease-out) 80ms backwards; }
+  .st[data-state="needs"] .core { animation: st-breathe 1.6s ease-in-out infinite alternate; }
+
+  @keyframes st-spin { to { transform: rotate(360deg); } }
+  @keyframes st-breathe { from { opacity: 1; } to { opacity: 0.4; } }
+  @keyframes st-in { from { transform: scale(0.6); opacity: 0; } }
+  @keyframes st-draw { from { stroke-dashoffset: 1; } }
+  @keyframes st-fade { from { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .st .spin { animation: st-breathe 1.2s ease-in-out infinite alternate; }
+    .st[data-changed] svg { animation: st-fade 200ms ease-out; }
+    .st[data-changed] .draw { animation: st-fade 200ms ease-out; }
+    .st[data-state="needs"] .core { animation-duration: 3s; }
+  }
+</style>

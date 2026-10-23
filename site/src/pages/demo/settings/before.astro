@@ -1,0 +1,164 @@
+---
+const members = [
+  { name: "Sam Okafor", email: "sam.okafor@tidepool-growth.example", role: "Owner", active: "Active now" },
+  { name: "Aleksandra Wiśniewska-Kowalczyk", email: "aleksandra.wisniewska-kowalczyk@tidepool-growth.example", role: "Admin", active: "2 hours ago" },
+  { name: "Bartholomew Fitzgerald", email: "bartholomew.fitzgerald@northwind-industries-holdings.example.com", role: "Editor", active: "Yesterday" },
+  { name: "Jo", email: "jo@kiln.example", role: "Viewer", active: "Oct 2, 2026" },
+  { name: "Đặng Thị Ngọc Hân", email: "han.dang@saigonmetrics.example.vn", role: "Editor", active: "3 days ago" },
+  { name: "Priya Raman", email: "priya@ledgerfox.example", role: "Viewer", active: "Never signed in" },
+];
+const notifications: [string, string, boolean][] = [
+  ["Weekly digest", "Get a summary every week", true],
+  ["Activation alerts", "When activation changes", true],
+  ["Usage alerts", "When you're close to your limit", true],
+  ["New members", "When someone joins", false],
+  ["Product updates", "News and announcements", false],
+];
+---
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Settings - Tidepool</title>
+  <style is:global>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f9fafb; color: #111827; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    .nav { background: #fff; border-bottom: 1px solid #e5e7eb; }
+    .nav-inner { max-width: 1024px; margin: 0 auto; padding: 0 16px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-weight: 700; font-size: 18px; color: #111827; }
+    .links a { color: #6b7280; margin-left: 24px; text-decoration: none; font-size: 14px; font-weight: 500; }
+    .links a.current { color: #111827; }
+    .wrap { max-width: 768px; margin: 0 auto; padding: 40px 16px 64px; }
+    h1 { font-size: 24px; font-weight: 700; line-height: 32px; }
+    .sub { color: #6b7280; font-size: 14px; margin-top: 4px; margin-bottom: 32px; }
+    .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 24px; margin-bottom: 24px; }
+    h2 { font-size: 16px; font-weight: 600; line-height: 24px; }
+    .help { font-size: 12px; color: #6b7280; margin-top: 2px; margin-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full { grid-column: 1 / -1; }
+    input, select { display: block; width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font: inherit; font-size: 14px; color: #111827; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    input::placeholder { color: #9ca3af; }
+    input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 1px #2563eb; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; background: #2563eb; color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .btn:hover { background: #1d4ed8; }
+    .btn:focus { outline: none; }
+    .btn-red { background: #dc2626; }
+    .btn-red:hover { background: #b91c1c; }
+    .btn-sm { padding: 2px 8px; font-size: 12px; border-radius: 4px; }
+    .link { background: none; border: 0; color: #2563eb; font: inherit; font-size: 12px; cursor: pointer; padding: 0; }
+    .link.red { color: #dc2626; margin-left: 8px; }
+    .inline { display: flex; gap: 8px; margin-bottom: 16px; }
+    .inline input { flex: 1; }
+    .table-wrap { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { font-size: 12px; font-weight: 500; color: #6b7280; text-align: left; padding: 8px 12px; background: #f9fafb; text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 10px 12px; border-top: 1px solid #e5e7eb; white-space: nowrap; color: #374151; }
+    td.name { color: #111827; font-weight: 500; }
+    .badge { display: inline-block; background: #f3f4f6; color: #374151; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid #f3f4f6; }
+    .toggle-row:first-of-type { border-top: 0; }
+    .toggle-row .t { font-size: 14px; font-weight: 500; }
+    .toggle-row .s { font-size: 12px; color: #6b7280; }
+    .toggle { width: 44px; height: 24px; border-radius: 999px; background: #e5e7eb; position: relative; cursor: pointer; flex-shrink: 0; transition: background-color 0.2s ease-in-out; }
+    .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s ease-in-out; }
+    .toggle.on { background: #2563eb; }
+    .toggle.on::after { transform: translateX(20px); }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .stat { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 16px; }
+    .stat span { display: block; font-size: 12px; color: #6b7280; }
+    .stat b { font-size: 20px; font-weight: 600; }
+    .plan-line { font-size: 14px; color: #374151; margin-bottom: 16px; }
+    .actions-row { display: flex; gap: 8px; margin-top: 16px; }
+    .footer { display: flex; justify-content: flex-end; }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+      .links { display: none; }
+      .panel { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="logo">Tidepool</div>
+      <div class="links"><a href="#">Dashboard</a><a href="#">Analytics</a><a href="#" class="current">Settings</a></div>
+    </div>
+  </nav>
+  <main class="wrap">
+    <h1>Settings</h1>
+    <p class="sub">Manage your account settings and preferences.</p>
+    <form onsubmit="event.preventDefault(); alert('Settings saved!')">
+      <section class="panel">
+        <h2>Profile</h2>
+        <p class="help">This information will be displayed to your team.</p>
+        <div class="grid">
+          <input placeholder="Full name" value="Sam Okafor" />
+          <input placeholder="Email" value="sam.okafor@tidepool-growth.example" />
+          <input class="full" placeholder="Job title" value="Head of growth" />
+          <select class="full"><option>(GMT+05:30) Kolkata</option><option>(GMT+00:00) London</option><option>(GMT-08:00) Los Angeles</option></select>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Workspace</h2>
+        <p class="help">Configure your workspace settings.</p>
+        <div class="grid">
+          <input class="full" placeholder="Workspace name" value="Tidepool Growth" />
+          <input class="full" placeholder="Workspace URL" value="tidepool-growth" />
+          <select class="full"><option>Week starts Monday</option><option>Week starts Sunday</option></select>
+        </div>
+        <div class="actions-row">
+          <button type="button" class="btn">Update workspace</button>
+          <button type="button" class="btn btn-red" onclick="if (confirm('Are you sure?')) alert('Workspace deleted')">Delete workspace</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Team members</h2>
+        <p class="help">Invite and manage your team.</p>
+        <div class="inline"><input placeholder="Enter email address" /><button type="button" class="btn">Invite</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last active</th><th></th></tr></thead>
+            <tbody>
+              {members.map((m) => (
+                <tr>
+                  <td class="name">{m.name}</td>
+                  <td>{m.email}</td>
+                  <td><span class="badge">{m.role}</span></td>
+                  <td>{m.active}</td>
+                  <td><button type="button" class="link">Edit</button><button type="button" class="link red" onclick="confirm('Are you sure?')">Remove</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Notifications</h2>
+        <p class="help">Choose what you want to hear about.</p>
+        {notifications.map(([t, s, on]) => (
+          <div class="toggle-row"><div><div class="t">{t}</div><div class="s">{s}</div></div><div class={`toggle${on ? " on" : ""}`} onclick="this.classList.toggle('on')"></div></div>
+        ))}
+      </section>
+
+      <section class="panel">
+        <h2>Billing</h2>
+        <p class="help">Manage your subscription.</p>
+        <p class="plan-line">You are currently on the <b>Growth</b> plan.</p>
+        <div class="stats">
+          <div class="stat"><span>Tracked users</span><b>4,212</b></div>
+          <div class="stat"><span>Next invoice</span><b>$149</b></div>
+          <div class="stat"><span>Uptime</span><b>99.9%</b></div>
+        </div>
+        <button type="button" class="btn">Upgrade plan</button>
+      </section>
+
+      <div class="footer"><button type="submit" class="btn">Save</button></div>
+    </form>
+  </main>
+</body>
+</html>

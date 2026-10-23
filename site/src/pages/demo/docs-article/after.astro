@@ -1,0 +1,646 @@
+---
+import "@fontsource-variable/inter/opsz.css";
+import "@fontsource-variable/jetbrains-mono";
+import "../../../components/demo/docs-article/theme.css";
+
+const basic = `<span class="tk">import</span> { Dialog, Button } <span class="tk">from</span> <span class="ts">"@grain-ui/react"</span>;
+
+<span class="tk">export function</span> <span class="tf">DeleteProject</span>({ project, onDelete }) {
+  <span class="tk">return</span> (
+    &lt;<span class="tt">Dialog.Root</span>&gt;
+      &lt;<span class="tt">Dialog.Trigger</span> <span class="ta">asChild</span>&gt;
+        &lt;<span class="tt">Button</span> <span class="ta">variant</span>=<span class="ts">"danger"</span>&gt;Delete {project.name}…&lt;/<span class="tt">Button</span>&gt;
+      &lt;/<span class="tt">Dialog.Trigger</span>&gt;
+<span class="hl">      &lt;<span class="tt">Dialog.Content</span> <span class="ta">closeOnBackdrop</span>={<span class="tk">false</span>}&gt;</span>
+        &lt;<span class="tt">Dialog.Title</span>&gt;Delete {project.name}?&lt;/<span class="tt">Dialog.Title</span>&gt;
+        &lt;<span class="tt">Dialog.Description</span>&gt;
+          This removes {project.deployments} deployments. It can’t be undone.
+        &lt;/<span class="tt">Dialog.Description</span>&gt;
+        &lt;<span class="tt">Dialog.Close</span> <span class="ta">asChild</span>&gt;
+          &lt;<span class="tt">Button</span>&gt;Cancel&lt;/<span class="tt">Button</span>&gt;
+        &lt;/<span class="tt">Dialog.Close</span>&gt;
+<span class="hl">        &lt;<span class="tt">Button</span> <span class="ta">variant</span>=<span class="ts">"danger"</span> <span class="ta">onClick</span>={onDelete}&gt;Delete project&lt;/<span class="tt">Button</span>&gt;</span>
+      &lt;/<span class="tt">Dialog.Content</span>&gt;
+    &lt;/<span class="tt">Dialog.Root</span>&gt;
+  );
+}`;
+
+const focus = `<span class="tk">const</span> cancelRef = <span class="tf">useRef</span>(<span class="tk">null</span>);
+
+<span class="hl">&lt;<span class="tt">Dialog.Content</span> <span class="ta">initialFocus</span>={cancelRef}&gt;</span>
+  <span class="tc">{/* Destructive dialogs start on the safe action */}</span>
+  &lt;<span class="tt">Dialog.Close</span> <span class="ta">asChild</span>&gt;
+<span class="hl">    &lt;<span class="tt">Button</span> <span class="ta">ref</span>={cancelRef}&gt;Cancel&lt;/<span class="tt">Button</span>&gt;</span>
+  &lt;/<span class="tt">Dialog.Close</span>&gt;
+&lt;/<span class="tt">Dialog.Content</span>&gt;`;
+
+const css = `<span class="tc">/* What Dialog.Content ships with: enter in 220ms, centered */</span>
+<span class="tt">dialog</span> {
+  <span class="ta">opacity</span>: <span class="ts">0</span>;
+  <span class="ta">transform</span>: <span class="tf">scale</span>(<span class="ts">0.96</span>);
+  <span class="ta">transition</span>: opacity <span class="ts">220ms</span> var(--grain-ease-out),
+              transform <span class="ts">220ms</span> var(--grain-ease-out);
+}
+<span class="tt">dialog[open]</span> { <span class="ta">opacity</span>: <span class="ts">1</span>; <span class="ta">transform</span>: none; }
+<span class="tk">@starting-style</span> {
+  <span class="tt">dialog[open]</span> { <span class="ta">opacity</span>: <span class="ts">0</span>; <span class="ta">transform</span>: <span class="tf">scale</span>(<span class="ts">0.96</span>); }
+}`;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Building an accessible dialog · Grain UI docs</title>
+  <dialog class="dlg" id="demo-dlg" aria-labelledby="demo-title" aria-describedby="demo-desc">
+    <form method="dialog">
+      <h2 id="demo-title">Delete atlas-web?</h2>
+      <p id="demo-desc">This removes 14 deployments. It can’t be undone.</p>
+      <div class="foot">
+        <button class="btn" value="cancel" autofocus data-n="cancel">Cancel</button>
+        <button class="btn btn-danger" value="delete" data-n="confirm">Delete project</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script is:inline>document.documentElement.classList.add("js");</script>
+  <style is:global>
+    :root {
+      color-scheme: light dark;
+      --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+
+
+      --r-sm: 6px; --r-md: 8px; --r-lg: 12px;
+      --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --dur-press: 140ms; --dur-small: 180ms;
+      --topbar: 60px;
+      --measure: 70ch;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--topbar) + 24px); scrollbar-color: var(--border-strong) var(--bg); }
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+    body {
+      margin: 0; background: var(--bg); color: var(--text-2);
+      font: 400 1rem/1.6 var(--font-sans); font-optical-sizing: auto; font-feature-settings: "cv11", "ss01";
+      -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+      caret-color: var(--accent); accent-color: var(--accent);
+    }
+    ::selection { background: var(--accent-soft); color: var(--text); }
+    a { color: var(--accent-text); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+    @media (hover: hover) and (pointer: fine) { a:hover { text-decoration-thickness: 2px; } }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .skip { position: absolute; left: var(--s-4); top: -60px; z-index: 50; background: var(--surface); color: var(--text); padding: var(--s-2) var(--s-4); border-radius: var(--r-md); }
+    .skip:focus-visible { top: var(--s-2); }
+
+    /* ---------- top bar ---------- */
+    .topbar { position: sticky; top: 0; z-index: 10; height: var(--topbar); background: var(--bg); border-bottom: 1px solid var(--border); }
+    .topbar-inner { max-width: 1440px; height: 100%; margin: 0 auto; padding: 0 var(--s-5); display: flex; align-items: center; gap: var(--s-5); }
+    .brand { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--text); font-weight: 650; letter-spacing: -0.01em; text-decoration: none; flex-shrink: 0; }
+    .brand svg { width: 24px; height: 24px; }
+    .brand small { font-weight: 500; color: var(--text-3); font-size: 0.9375rem; }
+    .search { position: relative; flex: 1; max-width: 400px; margin-left: var(--s-4); }
+    .search .icon { position: absolute; left: 12px; top: 50%; translate: 0 -50%; color: var(--text-3); pointer-events: none; }
+    .search input { width: 100%; height: 40px; padding: 0 56px 0 36px; border-radius: var(--r-md); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: 400 1rem/1 var(--font-sans); transition: border-color 150ms ease, background-color 150ms ease; }
+    .search input::placeholder { color: var(--text-3); }
+    .search input:focus-visible { outline-offset: 1px; border-color: var(--focus); background: var(--surface); border-radius: var(--r-md); }
+    .search kbd { position: absolute; right: 8px; top: 50%; translate: 0 -50%; font: 500 0.75rem/1 var(--font-sans); color: var(--text-3); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 4px 6px; background: var(--surface); }
+    .topnav { display: flex; gap: var(--s-1); margin-left: auto; }
+    .topnav a { color: var(--text-2); text-decoration: none; font-size: 0.9375rem; font-weight: 500; padding: 10px var(--s-3); border-radius: var(--r-md); transition: background-color 150ms ease; }
+    .topnav a[aria-current] { color: var(--text); }
+    @media (hover: hover) and (pointer: fine) { .topnav a:hover { background: var(--hover); color: var(--text); } }
+
+    /* ---------- three-column layout ---------- */
+    .layout { max-width: 1360px; margin: 0 auto; padding: 0 var(--s-5); display: grid; grid-template-columns: 232px minmax(0, 1fr) 216px; gap: var(--s-7); }
+    .rail { position: sticky; top: var(--topbar); align-self: start; max-height: calc(100dvh - var(--topbar)); overflow: auto; padding: var(--s-6) 0 var(--s-7); overscroll-behavior: contain; }
+    .docnav h2, .toc h2 { font-size: 0.8125rem; font-weight: 600; color: var(--text); margin: 0 0 var(--s-2); padding-left: var(--s-3); }
+    .docnav section + section { margin-top: var(--s-5); }
+    .docnav ul, .toc ul { list-style: none; margin: 0; padding: 0; }
+    .docnav a { display: block; padding: 6px var(--s-3); border-radius: var(--r-md); color: var(--text-2); text-decoration: none; font-size: 0.9375rem; line-height: 1.4; transition: background-color 150ms ease; }
+    .docnav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-text); font-weight: 550; }
+    @media (hover: hover) and (pointer: fine) { .docnav a:not([aria-current]):hover { background: var(--hover); color: var(--text); } }
+    .toc ul { border-left: 1px solid var(--border); }
+    .toc li a { display: block; margin-left: -1px; padding: 5px var(--s-3); border-left: 2px solid transparent; color: var(--text-3); text-decoration: none; font-size: 0.875rem; line-height: 1.4; transition: color 150ms ease, border-color 150ms ease; }
+    .toc .sub a { padding-left: var(--s-5); }
+    .toc li a[aria-current="true"] { color: var(--accent-text); border-left-color: var(--accent); font-weight: 550; }
+    @media (hover: hover) and (pointer: fine) { .toc li a:hover { color: var(--text); } }
+    .toc-foot { margin-top: var(--s-5); padding-top: var(--s-4); border-top: 1px solid var(--border); display: grid; gap: var(--s-2); font-size: 0.875rem; }
+    .toc-foot a { display: inline-flex; gap: 6px; align-items: center; color: var(--text-3); text-decoration: none; padding: 4px 0; }
+    @media (hover: hover) and (pointer: fine) { .toc-foot a:hover { color: var(--text); } }
+
+    /* mobile disclosures */
+    .mobile-nav, .mobile-toc { display: none; }
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    .disclosure { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); }
+    .disclosure summary { display: flex; align-items: center; gap: var(--s-2); min-height: 44px; padding: 0 var(--s-4); font-size: 0.9375rem; font-weight: 550; color: var(--text); border-radius: var(--r-lg); }
+    .disclosure summary .chev { margin-left: auto; color: var(--text-3); transition: transform var(--dur-small) var(--ease-out); }
+    .disclosure[open] summary .chev { transform: rotate(180deg); }
+    .disclosure .panel { padding: 0 var(--s-2) var(--s-3); }
+    .disclosure .panel .toc ul { margin-left: var(--s-3); }
+
+    /* ---------- article ---------- */
+    main { min-width: 0; padding: var(--s-6) 0 var(--s-8); }
+    article { max-width: var(--measure); margin-inline: auto; }
+    .crumbs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.875rem; color: var(--text-3); margin: 0 0 var(--s-3); padding: 0; list-style: none; }
+    .crumbs a { color: var(--text-3); text-decoration: none; }
+    .crumbs li + li::before { content: "/"; margin-right: 6px; color: var(--border-strong); }
+    @media (hover: hover) and (pointer: fine) { .crumbs a:hover { color: var(--text); text-decoration: underline; } }
+    h1, h2, h3 { color: var(--text); text-wrap: balance; }
+    h1 { font-size: clamp(2.25rem, 1.7rem + 1.6vw, 3rem); line-height: 1.06; font-weight: 680; letter-spacing: -0.032em; margin: 0 0 var(--s-4); }
+    .lede { font-size: 1.1875rem; line-height: 1.6; color: var(--text-2); margin: 0 0 var(--s-4); }
+    .lede code { font-family: var(--font-mono); font-size: 0.875em; color: var(--text); background: var(--inline-code-bg); padding: 0.1em 0.34em; border-radius: 5px; }
+    .byline { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); font-size: 0.875rem; color: var(--text-3); padding-bottom: var(--s-6); border-bottom: 1px solid var(--border); margin-bottom: var(--s-2); }
+    .prose { font-size: 1.0625rem; line-height: 1.7; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 1.15em; text-wrap: pretty; }
+    .prose ul, .prose ol { padding-left: 1.25em; }
+    .prose li { margin-bottom: 0.4em; padding-left: 0.2em; }
+    .prose li::marker { color: var(--text-3); }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose h2 { font-size: 1.625rem; line-height: 1.2; font-weight: 650; letter-spacing: -0.018em; margin: 2.2em 0 0.6em; }
+    .prose h3 { font-size: 1.25rem; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; margin: 1.8em 0 0.5em; }
+    .prose h2 + h3 { margin-top: 1em; }
+    .anchor { position: relative; }
+    .anchor a.hash { position: absolute; left: -1.1em; top: 0; padding-right: 0.3em; color: var(--text-3); text-decoration: none; opacity: 0; transition: opacity 150ms ease; font-weight: 500; }
+    .anchor:hover a.hash, .anchor a.hash:focus-visible { opacity: 1; }
+    @media (hover: none) { .anchor a.hash { display: none; } }
+    .prose :not(pre) > code { font-family: var(--font-mono); font-size: 0.875em; background: var(--inline-code-bg); color: var(--text); padding: 0.12em 0.36em; border-radius: 5px; overflow-wrap: anywhere; }
+    kbd { font: 500 0.8125em/1 var(--font-sans); color: var(--text); padding: 3px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: var(--r-sm); background: var(--surface); }
+
+    /* code blocks */
+    .code { margin: 1.5em 0; border: 1px solid var(--code-border); border-radius: var(--r-lg); background: var(--code-bg); overflow: hidden; }
+    .code-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); height: 44px; padding: 0 var(--s-2) 0 var(--s-4); border-bottom: 1px solid var(--code-border); font-size: 0.8125rem; color: var(--text-3); }
+    .code-head span { font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .copy { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r-md); background: transparent; color: var(--text-2); font: 500 0.8125rem/1 var(--font-sans); cursor: pointer; transition: background-color 150ms ease, transform var(--dur-press) var(--ease-out); position: relative; }
+    .copy::after { content: ""; position: absolute; inset: -6px; }
+    @media (hover: hover) and (pointer: fine) { .copy:hover { background: var(--hover); color: var(--text); } }
+    .copy:active { transform: scale(0.97); }
+    .copy .done { display: none; }
+    .copy[data-copied] .done { display: inline; }
+    .copy[data-copied] .idle { display: none; }
+    pre { margin: 0; padding: var(--s-4) var(--s-5); overflow-x: auto; tab-size: 2; }
+    pre code { font: 400 0.875rem/1.7 var(--font-mono); color: var(--code-text); font-variant-ligatures: none; }
+    .tk { color: var(--tk); } .ts { color: var(--ts); } .tc { color: var(--tc); font-style: italic; } .tf { color: var(--tf); } .tt { color: var(--tt); } .ta { color: var(--ta); }
+
+    /* callouts */
+    .callout { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s-3); margin: 1.5em 0; padding: var(--s-4) var(--s-5) var(--s-4) var(--s-4); border-radius: var(--r-lg); background: var(--surface-2); font-size: 1rem; line-height: 1.6; }
+    .callout .icon { width: 20px; height: 20px; margin-top: 2px; color: var(--text-3); }
+    .callout p { margin: 0; }
+    .callout p + p { margin-top: 0.5em; }
+    .callout strong { display: block; margin-bottom: 2px; }
+    .callout.warning { background: var(--warning-bg); color: var(--warning); }
+    .callout.warning strong { color: var(--warning); }
+    .callout.warning .icon { color: var(--warning-icon); }
+
+    /* props table */
+    .table-wrap { margin: 1.5em 0; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); }
+    table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.9375rem; line-height: 1.5; }
+    caption { text-align: left; padding: var(--s-3) var(--s-4); font-size: 0.875rem; color: var(--text-3); border-bottom: 1px solid var(--border); }
+    th { text-align: left; font-size: 0.8125rem; font-weight: 600; color: var(--text-3); padding: var(--s-3) var(--s-4); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: var(--s-3) var(--s-4); border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    td code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text); }
+    td:first-child code { font-weight: 600; white-space: nowrap; }
+    td.type code { color: var(--tf); white-space: nowrap; }
+    td.def { white-space: nowrap; color: var(--text-3); }
+    td.desc { min-width: 220px; }
+
+    /* prev / next */
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); margin-top: var(--s-7); padding-top: var(--s-6); border-top: 1px solid var(--border); }
+    .pager a { display: grid; gap: 2px; padding: var(--s-4) var(--s-5); border: 1px solid var(--border); border-radius: var(--r-lg); text-decoration: none; background: var(--surface); transition: border-color 150ms ease, transform var(--dur-press) var(--ease-out); min-width: 0; }
+    .pager a:active { transform: scale(0.98); }
+    .pager small { font-size: 0.8125rem; color: var(--text-3); display: inline-flex; gap: 6px; align-items: center; }
+    .pager span { font-size: 1.0625rem; font-weight: 600; color: var(--text); }
+    .pager .next { text-align: right; justify-items: end; }
+    @media (hover: hover) and (pointer: fine) { .pager a:hover { border-color: var(--accent); } }
+    .feedback { margin-top: var(--s-6); font-size: 0.875rem; color: var(--text-3); display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); justify-content: space-between; }
+
+
+    /* reading progress: pure CSS where scroll timelines exist */
+    .progress { position: fixed; top: calc(var(--topbar) - 1px); left: 0; right: 0; height: 2px; z-index: 11; pointer-events: none; display: none; }
+    @supports (animation-timeline: scroll()) {
+      .progress { display: block; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); animation: read linear both; animation-timeline: scroll(root); }
+      @keyframes read { to { transform: scaleX(1); } }
+    }
+
+    /* highlighted lines */
+    pre { --px: var(--s-5); }
+    .hl { display: inline-block; min-width: calc(100% + 2 * var(--px)); margin: 0 calc(-1 * var(--px)); padding: 0 var(--px); background: var(--hl); }
+
+    /* buttons used by the live example */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2); height: 40px; padding: 0 var(--s-4); border-radius: var(--r-md); border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 550 0.9375rem/1 var(--font-sans); cursor: pointer; white-space: nowrap; box-shadow: var(--shadow-sm); position: relative; transition: transform var(--dur-press) var(--ease-out), background-color 150ms ease, border-color 150ms ease; }
+    .btn::after { content: ""; position: absolute; inset: -3px 0; }
+    .btn:active { transform: scale(0.97); }
+    .btn-danger { background: var(--danger); border-color: transparent; color: var(--on-danger); }
+    .btn-danger-quiet { color: var(--danger-text); }
+    .btn-sm { height: 36px; padding: 0 var(--s-3); font-size: 0.875rem; }
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { background: var(--hover); }
+      .btn-danger:hover { background: var(--danger-hover); }
+    }
+
+    /* ---------- live example (signature) ---------- */
+    .demo { margin: 1.75em 0 2em; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+    .demo-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-3); padding: var(--s-3) var(--s-4); border-bottom: 1px solid var(--border); font-size: 0.875rem; color: var(--text-3); }
+    .demo-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text); }
+    .demo-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+    .demo-stage { padding: var(--s-6) var(--s-5); background: var(--surface-2); background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 16px 16px; background-position: -8px -8px; }
+    .proj { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-4); max-width: 520px; margin: 0 auto; padding: var(--s-4); border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-sm); }
+    .proj-main { flex: 1 1 200px; min-width: 0; display: grid; gap: 2px; }
+    .proj b { color: var(--text); font-weight: 620; font-size: 0.9375rem; }
+    .proj span { font-size: 0.875rem; color: var(--text-3); }
+    .proj[data-gone] .proj-main b { text-decoration: line-through; color: var(--text-3); }
+    .prose .trace { list-style: none; margin: 0; padding: var(--s-4) var(--s-4) var(--s-3); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); counter-reset: t; border-top: 1px solid var(--border); }
+    .prose .trace li { margin: 0; position: relative; display: grid; gap: 2px; padding: var(--s-2) var(--s-3); border-radius: var(--r-md); border: 1px solid var(--border); font-size: 0.875rem; line-height: 1.35; color: var(--text-2); counter-increment: t; transition: border-color 180ms var(--ease-out), background-color 180ms var(--ease-out), color 180ms var(--ease-out); }
+    .trace li b { font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+    .trace li b::before { content: counter(t); display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 0.6875rem; font-weight: 650; background: var(--surface-2); color: var(--text-3); flex-shrink: 0; transition: background-color 180ms var(--ease-out), color 180ms var(--ease-out); }
+    .trace li small { font-size: 0.8125rem; color: var(--text-3); }
+    .trace li[data-s="now"] { border-color: var(--accent); background: var(--accent-soft); }
+    .trace li[data-s="now"] b::before { background: var(--accent); color: var(--on-accent); }
+    .trace li[data-s="done"] b::before { background: var(--ok-bg); color: var(--ok-text); content: "✓"; }
+    .prose .log { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); min-height: 44px; padding: var(--s-2) var(--s-4) var(--s-3); font-size: 0.8125rem; color: var(--text-3); }
+    .log code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text); background: var(--inline-code-bg); padding: 2px 6px; border-radius: 5px; }
+    html:not(.js) .log { display: none; }
+    .swap { animation: swap 200ms var(--ease-out); }
+    @keyframes swap { from { opacity: 0; transform: translateY(2px); } }
+
+    dialog.dlg { width: min(440px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--raised); color: var(--text-2); box-shadow: var(--shadow-lg); }
+    dialog.dlg::backdrop { background: var(--backdrop); }
+    .dlg form { display: grid; gap: var(--s-3); padding: var(--s-5); }
+    .dlg h2 { margin: 0; font-size: 1.125rem; font-weight: 650; letter-spacing: -0.01em; }
+    .dlg p { margin: 0; font-size: 0.9375rem; line-height: 1.55; }
+    .dlg .foot { display: flex; justify-content: flex-end; gap: var(--s-2); padding-top: var(--s-3); }
+    dialog.dlg.nudge { animation: nudge 260ms var(--ease-out); }
+    @keyframes nudge { 40% { transform: scale(1.015); } }
+    @media (prefers-reduced-motion: no-preference) {
+      dialog.dlg { opacity: 0; transform: scale(0.96); transition: opacity 200ms var(--ease-out), transform 220ms var(--ease-out), overlay 220ms allow-discrete, display 220ms allow-discrete; }
+      dialog.dlg[open] { opacity: 1; transform: none; }
+      @starting-style { dialog.dlg[open] { opacity: 0; transform: scale(0.96); } }
+      dialog.dlg::backdrop { opacity: 0; transition: opacity 200ms ease, overlay 220ms allow-discrete, display 220ms allow-discrete; }
+      dialog.dlg[open]::backdrop { opacity: 1; }
+      @starting-style { dialog.dlg[open]::backdrop { opacity: 0; } }
+    }
+    @media (prefers-reduced-motion: reduce) { dialog.dlg.nudge { animation: none; } .swap { animation: none; } }
+
+    /* checklist */
+    .prose .checks { list-style: none; padding: 0; margin: 1.25em 0 0; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); counter-reset: c; }
+    .prose .checks li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 2px var(--s-3); align-items: baseline; margin: 0; padding: var(--s-3) var(--s-4); border-top: 1px solid var(--border); counter-increment: c; font-size: 1rem; line-height: 1.55; }
+    .checks li:first-child { border-top: 0; }
+    .checks li::before { content: counter(c); font: 600 0.8125rem/1 var(--font-sans); color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .checks li a { padding: 8px 0; margin: -8px 0; font-size: 0.875rem; white-space: nowrap; color: var(--text-3); text-decoration: none; }
+    @media (hover: hover) and (pointer: fine) { .checks li a:hover { color: var(--accent-text); text-decoration: underline; } }
+
+    /* helpful? */
+    .helpful { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); margin-top: var(--s-7); padding: var(--s-4) var(--s-5); border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); font-size: 0.9375rem; color: var(--text); }
+    .helpful .q { font-weight: 550; margin-right: auto; }
+    .helpful .thanks { color: var(--text-2); }
+    html:not(.js) .helpful { display: none; }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 1240px) {
+      .layout { grid-template-columns: 220px minmax(0, 1fr); gap: var(--s-7); }
+      .rail-right { display: none; }
+      .mobile-toc { display: block; margin: 0 0 var(--s-5); }
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: minmax(0, 1fr); padding: 0 var(--s-4); }
+      .rail-left { display: none; }
+      .mobile-nav { display: block; margin-bottom: var(--s-5); }
+      main { padding-top: var(--s-4); }
+      .topbar-inner { padding: 0 var(--s-4); gap: var(--s-3); }
+      .topnav { display: none; }
+      .search { margin-left: auto; max-width: none; }
+      .brand small { display: none; }
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      .lede { font-size: 1.0625rem; }
+      .prose { font-size: 1.0625rem; }
+      .prose h2 { font-size: 1.375rem; }
+      .prose h3 { font-size: 1.125rem; }
+      pre { padding: var(--s-4); }
+      pre code { font-size: 0.8125rem; }
+      .pager { grid-template-columns: minmax(0, 1fr); }
+      .search kbd { display: none; }
+      .search input { padding-right: 12px; }
+      pre { --px: var(--s-4); }
+      .prose .trace { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .demo-stage { padding: var(--s-5) var(--s-4); }
+      .proj .btn { width: 100%; }
+      .table-wrap { overflow: visible; border: 0; background: none; }
+      .table-wrap table { min-width: 0; }
+      .table-wrap caption, .table-wrap thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      .table-wrap tbody, .table-wrap tr, .table-wrap td { display: block; }
+      .table-wrap tr { border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); padding: var(--s-3) var(--s-4); }
+      .table-wrap tr + tr { margin-top: var(--s-3); }
+      .table-wrap td, .table-wrap td.desc, .table-wrap td.def { padding: 2px 0; border: 0; min-width: 0; white-space: normal; }
+      .table-wrap td:first-child { padding-bottom: var(--s-2); font-size: 1rem; }
+      .table-wrap td.type, .table-wrap td.def { display: inline-block; margin-right: var(--s-3); font-size: 0.875rem; }
+      .table-wrap td.type::before, .table-wrap td.def::before { content: attr(data-label) " "; color: var(--text-3); font-size: 0.8125rem; }
+      .table-wrap td.desc { padding-top: var(--s-2); color: var(--text-2); }
+      .prose .checks li { grid-template-columns: 20px minmax(0, 1fr); }
+      .checks li a { grid-column: 2; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .copy:active, .pager a:active { transform: none; }
+      .disclosure summary .chev { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></symbol>
+  </svg>
+  <a class="skip" href="#content">Skip to article</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="Grain UI docs home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--accent)"/><g fill="var(--on-accent)"><circle cx="8" cy="8" r="1.6"/><circle cx="12" cy="8" r="1.6"/><circle cx="16" cy="8" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="8" cy="16" r="1.6"/></g></svg>
+        Grain UI <small>Docs</small>
+      </a>
+      <form class="search" role="search" action="#" onsubmit="return false">
+        <label class="sr-only" for="q">Search docs</label>
+        <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="q" type="search" placeholder="Search docs" autocomplete="off" />
+        <kbd aria-hidden="true">⌘K</kbd>
+      </form>
+      <nav class="topnav" aria-label="Primary">
+        <a href="#top" aria-current="page">Docs</a>
+        <a href="/demo/component-library/after">Components</a>
+        <a href="#top">Themes</a>
+        <a href="#top">Changelog</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="progress" aria-hidden="true"></div>
+
+  <div class="layout" id="top">
+    <aside class="rail rail-left" aria-label="Documentation">
+      <nav class="docnav" aria-label="Docs sections">
+        <section><h2>Getting started</h2><ul><li><a href="#top">Installation</a></li><li><a href="#top">Theming</a></li><li><a href="#top">Dark mode</a></li></ul></section>
+        <section><h2>Guides</h2><ul><li><a href="#top">Building a form</a></li><li><a href="#top">Popover</a></li><li><a href="#top" aria-current="page">Accessible dialog</a></li><li><a href="#top">Toast notifications</a></li><li><a href="#top">Data tables</a></li></ul></section>
+        <section><h2>Reference</h2><ul><li><a href="#top">Tokens</a></li><li><a href="#top">Motion</a></li><li><a href="#top">Accessibility</a></li></ul></section>
+      </nav>
+    </aside>
+
+    <main id="content">
+      <details class="disclosure mobile-nav">
+        <summary>Docs menu<svg class="icon chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+        <div class="panel">
+          <nav class="docnav" aria-label="Docs sections (mobile)">
+            <section><h2>Getting started</h2><ul><li><a href="#top">Installation</a></li><li><a href="#top">Theming</a></li><li><a href="#top">Dark mode</a></li></ul></section>
+            <section><h2>Guides</h2><ul><li><a href="#top">Building a form</a></li><li><a href="#top">Popover</a></li><li><a href="#top" aria-current="page">Accessible dialog</a></li><li><a href="#top">Toast notifications</a></li><li><a href="#top">Data tables</a></li></ul></section>
+          </nav>
+        </div>
+      </details>
+
+      <article>
+        <ol class="crumbs" aria-label="Breadcrumb"><li><a href="#top">Docs</a></li><li><a href="#top">Guides</a></li><li aria-current="page">Accessible dialog</li></ol>
+        <h1>Building an accessible dialog</h1>
+        <p class="lede">Grain UI’s <code>&lt;Dialog&gt;</code> wraps the native <code>&lt;dialog&gt;</code> element, so focus trapping, <kbd>Esc</kbd> to close, and the top layer come from the browser. This guide builds a delete confirmation and covers the four things custom dialogs most often get wrong.</p>
+        <div class="byline"><span>Updated <time datetime="2026-10-14">Oct 14, 2026</time></span><span>8 min read</span><span>Grain UI 2.4</span></div>
+
+        <details class="disclosure mobile-toc">
+          <summary>On this page<svg class="icon chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="panel">
+            <nav class="toc" aria-label="On this page (compact)">
+              <ul>
+                <li><a href="#when">When to use a dialog</a></li>
+                <li><a href="#usage">Basic usage</a></li>
+                <li><a href="#focus">Focus management</a></li>
+                <li><a href="#closing">Closing behavior</a></li>
+                <li><a href="#motion">Motion</a></li>
+                <li><a href="#props">Props</a></li>
+                <li><a href="#checklist">Accessibility checklist</a></li>
+              </ul>
+            </nav>
+          </div>
+        </details>
+
+        <div class="prose">
+          <h2 class="anchor" id="when"><a class="hash" href="#when" aria-label="Link to this section">#</a>When to use a dialog</h2>
+          <p>A modal dialog interrupts. Use one only when the person must decide something before they continue, or when the task needs their full attention. If they can keep working around it, use a popover or an inline panel instead.</p>
+          <ul>
+            <li><strong>Good fit:</strong> confirming a destructive action, a short form that blocks the next step, a session about to expire.</li>
+            <li><strong>Poor fit:</strong> announcements, onboarding tips, anything with a “Don’t show again” checkbox.</li>
+          </ul>
+
+          <h2 class="anchor" id="usage"><a class="hash" href="#usage" aria-label="Link to this section">#</a>Basic usage</h2>
+          <p>Compose the dialog from its parts. <code>Dialog.Title</code> and <code>Dialog.Description</code> wire up <code>aria-labelledby</code> and <code>aria-describedby</code> for you, so a screen reader announces both when the dialog opens.</p>
+          <figure class="code">
+            <figcaption class="code-head"><span>DeleteProject.tsx</span><button class="copy" type="button" aria-label="Copy code: DeleteProject.tsx"><svg class="icon idle" aria-hidden="true"><use href="#i-copy"/></svg><svg class="icon done" aria-hidden="true"><use href="#i-check"/></svg><span class="idle">Copy</span><span class="done">Copied</span></button></figcaption>
+            <pre><code set:html={basic} /></pre>
+          </figure>
+          <figure class="demo" id="try-it" aria-labelledby="demo-cap">
+            <div class="demo-head"><span class="demo-tag" id="demo-cap">Live example</span><span>The dialog above, running. Open it, then try <kbd>Tab</kbd>, <kbd>Esc</kbd> or a click outside.</span></div>
+            <div class="demo-stage">
+              <div class="proj" id="proj">
+                <div class="proj-main"><b>atlas-web</b><span id="proj-meta">Production · 14 deployments · 3 domains</span></div>
+                <button class="btn btn-sm btn-danger-quiet" type="button" id="demo-trigger" commandfor="demo-dlg" command="show-modal">Delete atlas-web…</button>
+              </div>
+            </div>
+            <ol class="trace" aria-label="Where focus goes">
+              <li data-n="trigger"><b>Trigger</b><small>Delete atlas-web…</small></li>
+              <li data-n="cancel"><b>Cancel</b><small>initialFocus</small></li>
+              <li data-n="confirm"><b>Delete project</b><small><kbd>Tab</kbd> stays inside</small></li>
+              <li data-n="return"><b id="ret-name">Back to trigger</b><small id="ret-why">returnFocus</small></li>
+            </ol>
+            <p class="log" aria-live="polite"><span>Last close</span><code id="log">nothing yet</code></p>
+          </figure>
+          <div class="callout" role="note">
+            <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+            <div><p><strong>Name the action, not “OK”</strong>The confirm button repeats the verb from the title: “Delete project”, not “OK” or “Yes”. People who skim the buttons still know what will happen.</p></div>
+          </div>
+
+          <h2 class="anchor" id="focus"><a class="hash" href="#focus" aria-label="Link to this section">#</a>Focus management</h2>
+          <h3 class="anchor" id="initial-focus"><a class="hash" href="#initial-focus" aria-label="Link to this section">#</a>Initial focus</h3>
+          <p>By default, focus moves to the first focusable element inside the dialog. For destructive confirmations, start on the safe action instead, so an accidental <kbd>Enter</kbd> cancels rather than deletes.</p>
+          <figure class="code">
+            <figcaption class="code-head"><span>initial-focus.tsx</span><button class="copy" type="button" aria-label="Copy code: initial-focus.tsx"><svg class="icon idle" aria-hidden="true"><use href="#i-copy"/></svg><svg class="icon done" aria-hidden="true"><use href="#i-check"/></svg><span class="idle">Copy</span><span class="done">Copied</span></button></figcaption>
+            <pre><code set:html={focus} /></pre>
+          </figure>
+          <h3 class="anchor" id="return-focus"><a class="hash" href="#return-focus" aria-label="Link to this section">#</a>Returning focus</h3>
+          <p>When the dialog closes, focus goes back to the element that opened it. If that element no longer exists, because the row was just deleted, pass <code>returnFocus=&#123;listRef&#125;</code> so keyboard users land somewhere sensible instead of the top of the page.</p>
+
+          <h2 class="anchor" id="closing"><a class="hash" href="#closing" aria-label="Link to this section">#</a>Closing behavior</h2>
+          <p>Every dialog closes three ways: the <kbd>Esc</kbd> key, a visible close or cancel button, and, by default, a click on the backdrop. All three call <code>onOpenChange(false)</code>, so you handle closing in one place.</p>
+          <div class="callout warning" role="note">
+            <svg class="icon" aria-hidden="true"><use href="#i-warn"/></svg>
+            <div><p><strong>Turn off backdrop close for forms and destructive actions</strong>A stray click outside a half-filled form throws away the person’s work. Set <code>closeOnBackdrop=&#123;false&#125;</code>; <kbd>Esc</kbd> and the Cancel button still work.</p></div>
+          </div>
+
+          <h2 class="anchor" id="motion"><a class="hash" href="#motion" aria-label="Link to this section">#</a>Motion</h2>
+          <p>The dialog fades and scales from 96% over 220ms with an ease-out curve, and the backdrop fades on the same timing so they read as one surface. It stays centered rather than growing from the trigger. Under <code>prefers-reduced-motion</code>, the scale is dropped and only the fade remains.</p>
+          <figure class="code">
+            <figcaption class="code-head"><span>dialog.css</span><button class="copy" type="button" aria-label="Copy code: dialog.css"><svg class="icon idle" aria-hidden="true"><use href="#i-copy"/></svg><svg class="icon done" aria-hidden="true"><use href="#i-check"/></svg><span class="idle">Copy</span><span class="done">Copied</span></button></figcaption>
+            <pre><code set:html={css} /></pre>
+          </figure>
+
+          <h2 class="anchor" id="props"><a class="hash" href="#props" aria-label="Link to this section">#</a>Props</h2>
+          <p>Props for <code>Dialog.Content</code>. <code>Dialog.Root</code> accepts <code>open</code>, <code>defaultOpen</code>, and <code>onOpenChange</code>.</p>
+          <div class="table-wrap" tabindex="0" role="region" aria-label="Dialog.Content props, scrollable">
+            <table>
+              <thead><tr><th scope="col">Prop</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col">Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>modal</code></td><td class="type" data-label="Type"><code>boolean</code></td><td class="def" data-label="Default"><code>true</code></td><td class="desc">When false, renders a non-modal dialog that doesn’t trap focus or block the page.</td></tr>
+                <tr><td><code>initialFocus</code></td><td class="type" data-label="Type"><code>RefObject</code></td><td class="def" data-label="Default">First focusable</td><td class="desc">Element that receives focus when the dialog opens.</td></tr>
+                <tr><td><code>returnFocus</code></td><td class="type" data-label="Type"><code>boolean | RefObject</code></td><td class="def" data-label="Default"><code>true</code></td><td class="desc">Where focus goes on close. <code>true</code> means the trigger.</td></tr>
+                <tr><td><code>closeOnBackdrop</code></td><td class="type" data-label="Type"><code>boolean</code></td><td class="def" data-label="Default"><code>true</code></td><td class="desc">Set to <code>false</code> for forms and destructive confirmations.</td></tr>
+                <tr><td><code>closeOnEsc</code></td><td class="type" data-label="Type"><code>boolean</code></td><td class="def" data-label="Default"><code>true</code></td><td class="desc">Leave this on. Only disable it while a save is in flight.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="anchor" id="checklist"><a class="hash" href="#checklist" aria-label="Link to this section">#</a>Accessibility checklist</h2>
+          <ol class="checks">
+            <li><span>The dialog has a visible title, wired to <code>aria-labelledby</code>.</span><a href="#usage">Basic usage</a></li>
+            <li><span>Focus moves into the dialog on open and returns on close.</span><a href="#focus">Focus</a></li>
+            <li><span><kbd>Tab</kbd> and <kbd>Shift</kbd> + <kbd>Tab</kbd> stay inside while it’s open.</span><a href="#try-it">Try it</a></li>
+            <li><span><kbd>Esc</kbd> closes it, except while a save is in flight.</span><a href="#closing">Closing</a></li>
+            <li><span>Buttons name their action; the destructive one uses the danger variant.</span><a href="#usage">Basic usage</a></li>
+            <li><span>Content behind the dialog is inert to pointer, keyboard, and screen readers.</span><a href="#props">modal</a></li>
+          </ol>
+
+          <div class="helpful" id="helpful">
+            <span class="q" id="helpful-q">Was this guide helpful?</span>
+            <button class="btn btn-sm" type="button" data-vote="yes">Yes</button>
+            <button class="btn btn-sm" type="button" data-vote="no">No</button>
+            <span class="thanks" aria-live="polite" id="helpful-a"></span>
+          </div>
+
+          <nav class="pager" aria-label="Previous and next guide">
+            <a href="#top" rel="prev"><small><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg>Previous</small><span>Popover</span></a>
+            <a class="next" href="#top" rel="next"><small>Next<svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></small><span>Toast notifications</span></a>
+          </nav>
+          <div class="feedback"><span>Found a mistake? <a href="#top">Edit this page</a></span><span>Grain UI 2.4.0 · MIT</span></div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="rail rail-right" aria-label="On this page">
+      <nav class="toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <ul>
+          <li><a href="#when">When to use a dialog</a></li>
+          <li><a href="#usage">Basic usage</a></li>
+          <li><a href="#focus">Focus management</a></li>
+          <li class="sub"><a href="#initial-focus">Initial focus</a></li>
+          <li class="sub"><a href="#return-focus">Returning focus</a></li>
+          <li><a href="#closing">Closing behavior</a></li>
+          <li><a href="#motion">Motion</a></li>
+          <li><a href="#props">Props</a></li>
+          <li><a href="#checklist">Accessibility checklist</a></li>
+        </ul>
+        <div class="toc-foot">
+          <a href="#top"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg>Edit this page</a>
+          <a href="#top"><svg class="icon" aria-hidden="true"><use href="#i-left" style="transform:rotate(90deg);transform-origin:center"/></svg>Back to top</a>
+        </div>
+      </nav>
+    </aside>
+  </div>
+
+  <script is:inline>
+    (() => {
+      document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
+        const text = b.closest('figure').querySelector('pre').innerText;
+        try { await navigator.clipboard.writeText(text); } catch { return; }
+        const label = b.getAttribute('aria-label');
+        b.dataset.copied = ''; b.setAttribute('aria-label', 'Copied');
+        setTimeout(() => { delete b.dataset.copied; b.setAttribute('aria-label', label); }, 1600);
+      }));
+
+
+      /* live example: the real dialog, with its focus path traced */
+      const dlg = document.getElementById('demo-dlg');
+      const trigger = document.getElementById('demo-trigger');
+      const proj = document.getElementById('proj');
+      const log = document.getElementById('log');
+      const nodes = Object.fromEntries([...document.querySelectorAll('.trace li')].map((li) => [li.dataset.n, li]));
+      const mark = (now) => {
+        const order = ['trigger', 'cancel', 'confirm', 'return'];
+        const i = order.indexOf(now);
+        order.forEach((n, j) => { nodes[n].dataset.s = j < i ? 'done' : j === i ? 'now' : ''; });
+      };
+      const say = (t) => { log.textContent = t; log.classList.remove('swap'); void log.offsetWidth; log.classList.add('swap'); };
+      let reason = 'cancel';
+      if (!('command' in HTMLButtonElement.prototype)) trigger.addEventListener('click', () => dlg.showModal());
+      trigger.addEventListener('focus', () => { if (!dlg.open) mark('trigger'); });
+      dlg.addEventListener('focusin', (e) => { const n = e.target.dataset.n; if (n) mark(n); });
+      dlg.addEventListener('cancel', () => { reason = 'escape'; });
+      dlg.addEventListener('click', (e) => {
+        if (e.target !== dlg) return;
+        const r = dlg.getBoundingClientRect();
+        if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) return;
+        dlg.classList.remove('nudge'); void dlg.offsetWidth; dlg.classList.add('nudge');
+        say('backdrop click ignored · closeOnBackdrop={false}');
+      });
+      dlg.addEventListener('close', () => {
+        const deleted = dlg.returnValue === 'delete';
+        const why = deleted ? 'delete' : reason;
+        reason = 'cancel'; dlg.returnValue = '';
+        if (deleted) {
+          proj.dataset.gone = '';
+          document.getElementById('proj-meta').textContent = 'Deleted just now';
+          trigger.textContent = 'Undo delete'; trigger.classList.remove('btn-danger-quiet');
+          document.getElementById('ret-name').textContent = 'Undo delete';
+          document.getElementById('ret-why').textContent = 'returnFocus={listRef}';
+          say('onDelete() · onOpenChange(false)');
+        } else say(`onOpenChange(false) · reason: "${why}"`);
+        trigger.focus(); mark('return');
+      });
+      trigger.addEventListener('click', (e) => {
+        if (!proj.hasAttribute('data-gone')) return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        delete proj.dataset.gone;
+        document.getElementById('proj-meta').textContent = 'Production · 14 deployments · 3 domains';
+        trigger.textContent = 'Delete atlas-web…'; trigger.classList.add('btn-danger-quiet');
+        document.getElementById('ret-name').textContent = 'Back to trigger';
+        document.getElementById('ret-why').textContent = 'returnFocus';
+        say('restored · 14 deployments');
+        Object.values(nodes).forEach((n) => { n.dataset.s = ''; });
+      }, true);
+
+      const helpful = document.getElementById('helpful');
+      helpful.addEventListener('click', (e) => {
+        const v = e.target.closest('[data-vote]')?.dataset.vote;
+        if (!v) return;
+        helpful.querySelectorAll('[data-vote]').forEach((b) => b.remove());
+        document.getElementById('helpful-a').textContent = v === 'yes' ? 'Thanks. Glad it helped.' : 'Thanks. Tell us what was missing on GitHub Discussions.';
+      });
+
+      const q = document.getElementById('q');
+      addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); q.focus(); } });
+
+      const links = [...document.querySelectorAll('.rail-right .toc li a')];
+      const heads = links.map((l) => document.querySelector(l.hash));
+      let ticking = false;
+      const sync = () => {
+        ticking = false;
+        let i = 0;
+        heads.forEach((h, j) => { if (h.getBoundingClientRect().top < 120) i = j; });
+        if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) i = heads.length - 1;
+        links.forEach((l, j) => l.setAttribute('aria-current', j === i ? 'true' : 'false'));
+      };
+      addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(sync); } }, { passive: true });
+      sync();
+    })();
+  </script>
+</body>
+</html>

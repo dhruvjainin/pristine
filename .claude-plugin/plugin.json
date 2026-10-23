@@ -1,0 +1,14 @@
+{
+  "name": "pristine",
+  "version": "0.1.0",
+  "description": "Make web UI pristine: write DESIGN.md, critique any page out of 10 through your users' eyes, design new pages, and polish existing ones with real screenshots before and after.",
+  "author": {
+    "name": "maddhruv",
+    "url": "https://github.com/maddhruv"
+  },
+  "homepage": "https://pristine.pages.dev",
+  "repository": "https://github.com/maddhruv/pristine",
+  "license": "Apache-2.0",
+  "keywords": ["design", "ui", "ux", "frontend", "accessibility", "critique", "polish", "skills"],
+  "skills": ["./skills/pristine"]
+}

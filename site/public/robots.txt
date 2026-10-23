@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /demo/
+Sitemap: https://pristine.pages.dev/sitemap.xml

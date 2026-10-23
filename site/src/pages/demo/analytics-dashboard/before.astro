@@ -1,0 +1,273 @@
+---
+import { weeks, signups, activated, mrr, funnel, cohorts, events, fmt, usd } from "../../../components/demo/analytics-dashboard/data";
+
+const W = 600, H = 220;
+const smooth = (vals: number[], min: number, max: number) => {
+  const pts = vals.map((v, i) => [(i / (vals.length - 1)) * W, H - ((v - min) / (max - min)) * (H - 20) - 10]);
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[Math.max(0, i - 1)], [x1, y1] = pts[i], [x2, y2] = pts[i + 1], [x3, y3] = pts[Math.min(pts.length - 1, i + 2)];
+    d += ` C${x1 + (x2 - x0) / 6},${y1 + (y2 - y0) / 6} ${x2 - (x3 - x1) / 6},${y2 - (y3 - y1) / 6} ${x2},${y2}`;
+  }
+  return d;
+};
+const visitors = funnel[0].count;
+const chart = ["hsl(12 76% 61%)", "hsl(173 58% 39%)", "hsl(197 37% 24%)", "hsl(43 74% 66%)", "hsl(27 87% 67%)"];
+const series = [
+  { name: "Signups", color: chart[0], d: smooth(signups, 0, 1400) },
+  { name: "Activated", color: chart[1], d: smooth(activated, 0, 1400) },
+  { name: "Visitors", color: chart[2], d: smooth(signups.map((s) => s * 5.2), 0, 7600) },
+  { name: "MRR", color: chart[3], d: smooth(mrr, 40000, 50000) },
+];
+const last = signups.length - 1;
+const icons = {
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  plus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  activity: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  dollar: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  trend: '<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
+  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  card: '<rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>',
+};
+const kpis = [
+  { icon: icons.users, label: "Total Users", value: "24,812", delta: "+12.4% from last month" },
+  { icon: icons.plus, label: "Signups", value: `+${fmt.format(signups[last])}`, delta: "+6.1% from last month" },
+  { icon: icons.activity, label: "Activation", value: "41.8%", delta: "+22.2% from last month" },
+  { icon: icons.dollar, label: "MRR", value: usd.format(mrr[last]), delta: "+2.3% from last month" },
+  { icon: icons.trend, label: "Growth", value: "+24.5%", delta: "+4.2% from last month" },
+  { icon: icons.target, label: "Conversion", value: "18.5%", delta: "+3.1% from last month" },
+  { icon: icons.plus, label: "New Signups", value: `+${fmt.format(signups[last])}`, delta: "+6.1% from last month" },
+  { icon: icons.card, label: "Revenue", value: usd.format(mrr[last]), delta: "+2.3% from last month" },
+];
+const nav = [
+  { label: "Dashboard", d: '<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>' },
+  { label: "Analytics", d: '<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>' },
+  { label: "Users", d: icons.users },
+  { label: "Funnels", d: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>' },
+  { label: "Retention", d: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
+  { label: "Revenue", d: icons.dollar },
+  { label: "Events", d: icons.activity },
+  { label: "AI Insights", d: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>' },
+  { label: "Settings", d: '<circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>' },
+];
+const tick = [0, 3, 6, 9, 11];
+---
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Tidepool Dashboard</title>
+  <style is:global>
+    * { box-sizing: border-box; margin: 0; padding: 0; border-color: hsl(240 5.9% 90%); }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #fff; color: hsl(240 10% 3.9%); font-size: 14px; -webkit-font-smoothing: antialiased; }
+    svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: hsl(0 0% 98%); border-right: 1px solid hsl(240 5.9% 90%); padding: 12px; flex-shrink: 0; }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 8px; margin-bottom: 12px; }
+    .logo b { width: 32px; height: 32px; border-radius: 8px; background: hsl(240 5.9% 10%); color: #fff; display: grid; place-items: center; font-size: 14px; }
+    .group { font-size: 12px; color: hsl(240 3.8% 46.1%); padding: 8px; font-weight: 500; }
+    .sidebar a { display: flex; align-items: center; gap: 8px; padding: 0 8px; height: 32px; color: hsl(240 5.3% 26.1%); text-decoration: none; border-radius: 6px; font-size: 14px; outline: none; }
+    .sidebar a:hover, .sidebar a.active { background: hsl(240 4.8% 95.9%); color: hsl(240 5.9% 10%); }
+    .sidebar a.active { font-weight: 500; }
+    .main { flex: 1; min-width: 0; }
+    .topbar { height: 56px; border-bottom: 1px solid hsl(240 5.9% 90%); display: flex; align-items: center; gap: 12px; padding: 0 24px; }
+    .search { flex: 1; max-width: 320px; height: 36px; border: 1px solid hsl(240 5.9% 90%); border-radius: 6px; padding: 0 12px; font: inherit; font-size: 14px; color: hsl(240 3.8% 46.1%); background: #fff; }
+    .topbar .avatar { margin-left: auto; margin-right: 0; width: 32px; height: 32px; }
+    .content { padding: 24px; }
+    .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .head h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.025em; }
+    .head p { color: hsl(240 3.8% 46.1%); font-size: 14px; margin-top: 4px; }
+    .actions { display: flex; gap: 8px; }
+    .select, .btn-outline { height: 36px; padding: 0 12px; border: 1px solid hsl(240 5.9% 90%); background: #fff; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 500; color: inherit; }
+    .btn-primary { height: 36px; padding: 0 16px; border: 0; border-radius: 6px; background: hsl(240 5.9% 10%); color: hsl(0 0% 98%); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
+    .btn-primary:hover { background: hsl(240 5.9% 10% / .9); }
+    button:focus-visible, select:focus-visible { outline: 2px solid hsl(240 5.9% 10%); outline-offset: 2px; }
+    .tabs { display: inline-flex; background: hsl(240 4.8% 95.9%); border-radius: 6px; padding: 4px; margin-bottom: 16px; max-width: 100%; overflow-x: auto; }
+    .tabs span { padding: 6px 12px; border-radius: 4px; font-size: 14px; font-weight: 500; color: hsl(240 3.8% 46.1%); white-space: nowrap; }
+    .tabs span.on { background: #fff; color: hsl(240 10% 3.9%); box-shadow: 0 1px 2px rgb(0 0 0 / .05); }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+    .card { background: #fff; border: 1px solid hsl(240 5.9% 90%); border-radius: 12px; box-shadow: 0 1px 2px rgb(0 0 0 / .05); min-width: 0; }
+    .kpi { padding: 24px; }
+    .kpi .top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; color: hsl(240 3.8% 46.1%); }
+    .kpi .label { font-size: 14px; font-weight: 500; color: hsl(240 10% 3.9%); }
+    .kpi .value { font-size: 24px; font-weight: 700; }
+    .kpi .delta { font-size: 12px; color: hsl(240 3.8% 46.1%); margin-top: 2px; }
+    .row { display: grid; grid-template-columns: 4fr 3fr; gap: 16px; margin-bottom: 16px; }
+    .card-h { padding: 24px 24px 0; }
+    .card-h h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .card-h .sub { font-size: 14px; color: hsl(240 3.8% 46.1%); margin-top: 4px; }
+    .card-c { padding: 24px; }
+    .xaxis { display: flex; justify-content: space-between; font-size: 12px; color: hsl(240 3.8% 46.1%); margin-top: 8px; }
+    .legend { display: flex; gap: 16px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .legend span { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+    .bar-row { margin-bottom: 16px; }
+    .bar-row .lbl { font-size: 14px; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 8px; }
+    .bar-row .lbl span:last-child { color: hsl(240 3.8% 46.1%); }
+    .track { height: 8px; border-radius: 4px; background: hsl(240 4.8% 95.9%); }
+    .bar { height: 8px; border-radius: 4px; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; color: hsl(240 3.8% 46.1%); height: 40px; padding: 0 8px; font-weight: 500; border-bottom: 1px solid hsl(240 5.9% 90%); white-space: nowrap; }
+    td { padding: 8px; border-bottom: 1px solid hsl(240 5.9% 90%); white-space: nowrap; }
+    tbody tr:hover { background: hsl(240 4.8% 95.9% / .5); }
+    .who { display: flex; align-items: center; }
+    .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: hsl(240 4.8% 95.9%); color: hsl(240 5.9% 10%); }
+    .muted { color: hsl(240 3.8% 46.1%); }
+    .btn-sm { height: 32px; padding: 0 12px; border: 1px solid hsl(240 5.9% 90%); background: #fff; border-radius: 6px; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: background-color .15s; }
+    .btn-sm:hover { background: hsl(240 4.8% 95.9%); }
+    .btn-ghost { height: 32px; width: 32px; border: 0; background: transparent; border-radius: 6px; cursor: pointer; display: inline-grid; place-items: center; vertical-align: middle; color: hsl(240 3.8% 46.1%); }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: hsl(240 4.8% 95.9%); color: hsl(240 5.9% 10%); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; margin-right: 12px; flex-shrink: 0; }
+    .footer-total { font-size: 12px; color: hsl(240 3.8% 46.1%); padding: 0 24px 24px; }
+    .heat td { text-align: center; font-size: 12px; border: 2px solid #fff; padding: 8px 4px; }
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .content { padding: 16px; }
+      .topbar { padding: 0 16px; }
+      .grid { gap: 12px; }
+      .kpi { padding: 16px; }
+      .kpi .value { font-size: 20px; }
+      .head h1 { font-size: 24px; }
+      .card-h { padding: 16px 16px 0; }
+      .card-c { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo"><b>T</b>Tidepool</div>
+      <div class="group">Platform</div>
+      {nav.map((n, i) => (
+        <a href="#" class={i === 0 ? "active" : ""}><svg class="i" viewBox="0 0 24 24" set:html={n.d} />{n.label}</a>
+      ))}
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <input class="search" type="search" placeholder="Search..." />
+        <span class="avatar">SO</span>
+      </div>
+      <div class="content">
+        <div class="head">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, Sam! Here's what's happening with your product today.</p>
+          </div>
+          <div class="actions">
+            <select class="select" aria-label="Range">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+            <button class="btn-primary">Download</button>
+          </div>
+        </div>
+
+        <div class="tabs"><span class="on">Overview</span><span>Analytics</span><span>Reports</span><span>Notifications</span></div>
+
+        <div class="grid">
+          {kpis.map((k) => (
+            <div class="card kpi">
+              <div class="top"><span class="label">{k.label}</span><svg class="i" viewBox="0 0 24 24" set:html={k.icon} /></div>
+              <div class="value">{k.value}</div>
+              <div class="delta">{k.delta}</div>
+            </div>
+          ))}
+        </div>
+
+        <div class="row">
+          <div class="card">
+            <div class="card-h">
+              <h2>Overview</h2>
+              <div class="sub">Signups: {fmt.format(signups[last])} this week</div>
+            </div>
+            <div class="card-c">
+              <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="220" preserveAspectRatio="none">
+                {[0.25, 0.5, 0.75].map((y) => <line x1="0" x2={W} y1={H * y} y2={H * y} stroke="hsl(240 5.9% 90%)" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" />)}
+                {series.map((s) => <path d={`${s.d} L${W},${H} L0,${H} Z`} fill={s.color} fill-opacity="0.1" />)}
+                {series.map((s) => <path d={s.d} fill="none" stroke={s.color} stroke-width="2" vector-effect="non-scaling-stroke" />)}
+              </svg>
+              <div class="xaxis">{tick.map((t) => <span>{weeks[t]}</span>)}</div>
+              <div class="legend">
+                {series.map((s) => <span><i style={`background:${s.color}`}></i>{s.name}</span>)}
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Conversion Funnel</h2>
+              <div class="sub">Track your users' journey</div>
+            </div>
+            <div class="card-c">
+              {funnel.map((f, i) => (
+                <div class="bar-row">
+                  <div class="lbl"><span>{f.step}</span><span>{fmt.format(f.count)}</span></div>
+                  <div class="track"><div class="bar" style={`width:${Math.max(4, (f.count / visitors) * 100)}%;background:${chart[i]}`}></div></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="card">
+            <div class="card-h">
+              <h2>Recent Events</h2>
+              <div class="sub">Real-time activity from your users</div>
+            </div>
+            <div class="card-c">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>User</th><th>Email</th><th>Event</th><th>Properties</th><th>Plan</th><th>Time</th><th></th></tr></thead>
+                  <tbody>
+                    {events.map((e) => (
+                      <tr>
+                        <td><span class="who"><span class="avatar">{e.name.charAt(0)}{e.name.split(" ")[1]?.charAt(0) ?? ""}</span>{e.name}</span></td>
+                        <td class="muted">{e.email}</td>
+                        <td><span class="badge">{e.event}</span></td>
+                        <td class="muted">{e.props}</td>
+                        <td>{e.plan}</td>
+                        <td class="muted">{e.ago}</td>
+                        <td><button class="btn-sm">View</button> <button class="btn-sm">Edit</button> <button class="btn-ghost"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="footer-total">Total signups this week: {fmt.format(signups[last])}</div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Retention</h2>
+              <div class="sub">Weekly cohorts</div>
+            </div>
+            <div class="card-c">
+              <div class="table-wrap">
+                <table class="heat">
+                  <thead><tr><th>Cohort</th><th>W0</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th></tr></thead>
+                  <tbody>
+                    {cohorts.map((c) => (
+                      <tr>
+                        <td style="text-align:left">{c.week}</td>
+                        {c.values.slice(0, 5).map((v) => (
+                          <td style={v == null ? "" : `background:hsl(240 5.9% 10% / ${(0.08 + (v as number) / 115).toFixed(2)});color:${(v as number) > 50 ? "#fff" : "hsl(240 10% 3.9%)"}`}>{v == null ? "" : `${Math.round(v as number)}%`}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,198 @@
+---
+import Base from "../../layouts/Base.astro";
+import Compare from "../../components/Compare.astro";
+import Copy from "../../components/Copy.astro";
+import { examples } from "../../data/examples";
+import type { Example } from "../../data/schema";
+
+export function getStaticPaths() {
+  return examples.map((e) => ({ params: { slug: e.slug }, props: { e } }));
+}
+const { e } = Astro.props as { e: Example };
+const i = examples.findIndex((x) => x.slug === e.slug);
+const prev = examples[(i - 1 + examples.length) % examples.length];
+const next = examples[(i + 1) % examples.length];
+const lenses = [...new Set(e.changes.map((c) => c.lens))];
+---
+<Base title={`${e.title}: before and after Pristine`} description={`${e.blurb} Scored ${e.before.score}/10 before and ${e.after.score}/10 after one Pristine run.`}>
+  <article class="ex">
+    <header class="container ex__head">
+      <a class="ex__back mono" href="/#examples">All examples</a>
+      <p class="eyebrow">{e.mode} · {e.product}</p>
+      <h1>{e.title}</h1>
+      <p class="lede">{e.blurb}</p>
+      <dl class="ex__facts">
+        <div><dt>Persona</dt><dd>{e.persona.name}, {e.persona.role}</dd></div>
+        <div><dt>Their goal</dt><dd>{e.persona.goal}</dd></div>
+        <div><dt>Lenses applied</dt><dd class="mono">{lenses.join(", ")}</dd></div>
+      </dl>
+      <Copy cmd={e.command} label="Copy the command used" />
+    </header>
+
+    <div class="container ex__cmp">
+      <Compare slug={e.slug} title={e.title} before={e.before.score} after={e.after.score} hasDark={e.hasDark} eager />
+      <div class="ex__live">
+        <a class="btn btn--ghost" href={`/demo/${e.slug}/before`} target="_blank" rel="noopener">Open before live<span class="visually-hidden"> (new tab)</span></a>
+        <a class="btn" href={`/demo/${e.slug}/after`} target="_blank" rel="noopener">Open after live<span class="visually-hidden"> (new tab)</span></a>
+      </div>
+    </div>
+
+    <section class="container ex__grid" aria-labelledby="verdict-h">
+      <h2 id="verdict-h" class="visually-hidden">Verdict</h2>
+      <div class="verdict verdict--before">
+        <p class="verdict__score mono num"><span class="pen">{e.before.score.toFixed(1)}</span><span class="of">/10</span> <span class="lvl">Level {e.before.level}</span></p>
+        <p class="verdict__t">{e.before.verdict}</p>
+      </div>
+      <div class="verdict verdict--after">
+        <p class="verdict__score mono num"><span class="ok">{e.after.score.toFixed(1)}</span><span class="of">/10</span> <span class="lvl">Level {e.after.level}</span></p>
+        <p class="verdict__t">{e.after.verdict}</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="dims-h">
+      <div class="container two">
+        <div>
+          <p class="eyebrow">Scores</p>
+          <h2 id="dims-h">Every Dimension, before and after.</h2>
+        </div>
+        <table class="dims">
+          <caption class="visually-hidden">Dimension scores out of 10</caption>
+          <thead><tr><th scope="col">Dimension</th><th scope="col" class="r">Before</th><th scope="col" class="r">After</th><th scope="col"><span class="visually-hidden">Change</span></th></tr></thead>
+          <tbody>
+            {e.dimensions.map((d) => (
+              <tr>
+                <th scope="row">{d.name}</th>
+                <td class="r mono num pen">{d.before}</td>
+                <td class="r mono num ok">{d.after}</td>
+                <td class="bar" aria-hidden="true"><span style={`--b:${d.before * 10}%;--a:${d.after * 10}%`}></span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="crit-h">
+      <div class="container two">
+        <div>
+          <p class="eyebrow">The critique</p>
+          <h2 id="crit-h">What the red pen found.</h2>
+          {e.tells.length > 0 && (
+            <div class="tells">
+              <h3 class="eyebrow">Vibe-code tells</h3>
+              <ul>{e.tells.map((t) => <li>{t}</li>)}</ul>
+            </div>
+          )}
+        </div>
+        <ol class="crit">
+          {e.critique.map((c) => (
+            <li>
+              <p class="crit__meta mono"><span class="crit__p">{c.priority}</span> Lens: {c.lens}</p>
+              <h3>{c.title}</h3>
+              <p>{c.detail}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="chg-h">
+      <div class="container">
+        <div class="section__head">
+          <p class="eyebrow">The changes</p>
+          <h2 id="chg-h">Before, after, and why.</h2>
+          <p class="lede">The report Pristine hands back after a run, with the real values from the two pages above.</p>
+        </div>
+        <div class="tbl-wrap" role="region" aria-labelledby="chg-h" tabindex="0">
+          <table class="chg">
+            <thead><tr><th scope="col">Lens</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Why</th></tr></thead>
+            <tbody>
+              {e.changes.map((c) => (
+                <tr>
+                  <td class="mono lens">{c.lens}</td>
+                  <td><code class="code code--b">{c.before}</code></td>
+                  <td><code class="code code--a">{c.after}</code></td>
+                  <td class="why">{c.why}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <nav class="section pn" aria-label="More examples">
+      <div class="container pn__inner">
+        <a href={`/examples/${prev.slug}`} class="pn__a"><span class="eyebrow">Previous</span><span class="pn__t">{prev.title}</span></a>
+        <a href={`/examples/${next.slug}`} class="pn__a pn__a--next"><span class="eyebrow">Next</span><span class="pn__t">{next.title}</span></a>
+      </div>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .ex__head { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); padding-block: var(--s-8) var(--s-6); }
+  .ex__head > * { max-width: 900px; }
+  .ex__back { justify-self: start; font-size: var(--text-xs); color: var(--ink-2); text-decoration: none; padding-block: var(--s-2); }
+  .ex__back::before { content: "\2190  "; }
+  .ex h1 { font-size: var(--text-4xl); font-weight: 380; }
+  .ex__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); margin: var(--s-2) 0; }
+  .ex__facts div { border-top: 1px solid var(--rule); padding-top: var(--s-2); }
+  .ex__facts dt { font: 500 var(--text-xs)/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+  .ex__facts dd { margin: var(--s-1) 0 0; font-size: var(--text-sm); }
+  .ex__head :global(.copy) { max-width: 560px; }
+  @media (max-width: 760px) { .ex__facts { grid-template-columns: 1fr; gap: var(--s-3); } }
+  .ex__cmp { display: grid; gap: var(--s-4); }
+  .ex__live { display: flex; flex-wrap: wrap; gap: var(--s-3); justify-content: flex-end; }
+  .ex__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); padding-block: var(--s-8); }
+  @media (max-width: 760px) { .ex__grid { grid-template-columns: 1fr; } }
+  .verdict { display: grid; gap: var(--s-3); padding: var(--s-5) 0 0; border-top: 2px solid var(--pen); }
+  .verdict--after { border-color: var(--ok); }
+  .verdict__score { display: flex; align-items: baseline; gap: var(--s-1); font-size: var(--text-3xl); font-weight: 600; line-height: 1; }
+  .verdict__score .of { font-size: var(--text-md); color: var(--ink-3); }
+  .verdict__score .lvl { margin-left: var(--s-3); font-size: var(--text-xs); font-weight: 500; color: var(--ink-2); padding: 3px 7px; border: 1px solid var(--rule); border-radius: 4px; }
+  .verdict__t { font-size: var(--text-lg); line-height: 1.5; color: var(--ink); max-width: 56ch; text-wrap: pretty; }
+
+  .two { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: var(--s-8); align-items: start; }
+  .two h2 { font-size: var(--text-3xl); margin-top: var(--s-3); }
+  @media (max-width: 960px) { .two { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); } }
+
+  .dims { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .dims th, .dims td { padding: var(--s-3) 0; border-bottom: 1px solid var(--rule); text-align: left; font-weight: 400; }
+  .dims thead th { font: 500 var(--text-xs)/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+  .dims .r { text-align: right; padding-inline: var(--s-3); width: 4.5em; }
+  .dims td.mono { font-weight: 600; font-size: var(--text-md); }
+  .dims td.bar { width: 34%; padding-left: var(--s-4); }
+  .bar span { display: block; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--pen) 0 var(--b), var(--ok) var(--b) var(--a), var(--surface-2) var(--a)); }
+  @media (max-width: 520px) { .bar { display: none; } }
+
+  .tells { margin-top: var(--s-6); }
+  .tells h3 { margin-bottom: var(--s-3); }
+  .tells ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tells li { overflow-wrap: anywhere; font-size: var(--text-xs); padding: 4px 8px; border: 1px dashed color-mix(in oklab, var(--pen) 50%, var(--rule)); border-radius: 4px; color: var(--ink-2); }
+  .crit { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+  .crit li { display: grid; grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; gap: var(--s-2); padding-left: var(--s-5); border-left: 2px solid var(--pen); }
+  .crit h3 { font: italic 400 var(--text-xl)/1.3 var(--font-display); }
+  .crit p:last-child { color: var(--ink-2); max-width: 64ch; }
+  .crit__meta { font-size: var(--text-xs); color: var(--ink-3); display: flex; gap: var(--s-3); align-items: center; }
+  .crit__p { font-weight: 600; color: var(--pen); }
+
+  .tbl-wrap { overflow-x: auto; border-top: 1px solid var(--ink); }
+  .tbl-wrap:focus-visible { outline-offset: 4px; }
+  .chg { width: 100%; min-width: 860px; border-collapse: collapse; font-size: var(--text-sm); }
+  .chg th { text-align: left; font: 500 var(--text-xs)/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); padding: var(--s-3) var(--s-3) var(--s-3) 0; border-bottom: 1px solid var(--rule); }
+  .chg td { padding: var(--s-4) var(--s-4) var(--s-4) 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .chg .lens { font-size: var(--text-xs); color: var(--ink-2); white-space: nowrap; }
+  .code { display: inline; font-size: 12.5px; line-height: 1.7; padding: 2px 5px; border-radius: 4px; overflow-wrap: anywhere; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .code--b { background: color-mix(in oklab, var(--pen) 10%, var(--surface)); color: color-mix(in oklab, var(--pen) 70%, var(--ink)); }
+  .code--a { background: color-mix(in oklab, var(--ok) 10%, var(--surface)); color: color-mix(in oklab, var(--ok) 70%, var(--ink)); }
+  .chg td:nth-child(2), .chg td:nth-child(3) { width: 27%; }
+  .why { color: var(--ink-2); }
+
+  .pn__inner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
+  @media (max-width: 560px) { .pn__inner { grid-template-columns: minmax(0, 1fr); gap: var(--s-3); } .pn__a { padding: var(--s-4); } }
+  .pn__a { display: grid; gap: var(--s-2); padding: var(--s-5); border: 1px solid var(--rule); border-radius: var(--radius); text-decoration: none; transition: background-color var(--dur-state) var(--ease-out); }
+  .pn__a--next { text-align: right; }
+  .pn__t { font: 400 var(--text-xl)/1.2 var(--font-display); }
+  @media (hover: hover) and (pointer: fine) { .pn__a:hover { background: var(--surface); } .ex__back:hover { color: var(--ink); } }
+</style>

@@ -1,0 +1,64 @@
+/* Design tokens: light, then designed dark. */
+:root {
+  color-scheme: light dark;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces Variable", ui-serif, Georgia, serif;
+
+  --bg: #FAF8F3;
+  --surface: #FFFFFF;
+  --surface-2: #F3F0E8;
+  --line: #E4DFD3;
+  --line-strong: #8A8476;
+  --ink: #1E201C;
+  --ink-2: #4D5048;
+  --ink-3: #66695F;
+  --accent: #2B5B84;
+  --accent-hover: #346A97;
+  --accent-press: #234C6E;
+  --on-accent: #F7FAFD;
+  --accent-soft: #E8EFF6;
+  --accent-ink: #234C6E;
+  --success: #2E6E46;
+  --success-soft: #E7F2EA;
+  --danger: #B3261E;
+  --danger-soft: #FBEAE8;
+  --warning: #8A5A00;
+  --warning-soft: #F8EFD9;
+  --focus: #2B5B84;
+  --bar-1: #2E3A44; --bar-2: #6E7B86; --bar-3: #B5BEC6;
+  --shadow-paper: 0 1px 2px rgb(40 35 20 / 0.06), 0 12px 32px -12px rgb(40 35 20 / 0.18);
+
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+  --r-sm: 8px; --r-md: 10px; --r-lg: 14px; --r-xl: 18px;
+  --t-micro: 0.75rem; --t-meta: 0.8125rem; --t-label: 0.9375rem; --t-body: 1rem; --t-lead: 1.125rem; --t-h3: 1.25rem; --t-h2: 1.75rem; --t-h1: clamp(2rem, 1.4rem + 2.2vw, 2.75rem);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 140ms; --dur-small: 180ms; --dur-medium: 240ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161714;
+    --surface: #1E201C;
+    --surface-2: #282A25;
+    --line: #353831;
+    --line-strong: #767A6E;
+    --ink: #ECEAE2;
+    --ink-2: #BDBBB2;
+    --ink-3: #A3A198;
+    --accent: #8EB6DA;
+    --accent-hover: #A4C5E3;
+    --accent-press: #7AA5CC;
+    --on-accent: #10202E;
+    --accent-soft: #1F2B36;
+    --accent-ink: #A9CBE9;
+    --success: #86C79C;
+    --success-soft: #1D2B21;
+    --danger: #F2958C;
+    --danger-soft: #3A2220;
+    --warning: #E6B85C;
+    --warning-soft: #33291A;
+    --focus: #A4C5E3;
+    --bar-1: #D5DCE2; --bar-2: #8C98A3; --bar-3: #4E5761;
+    --shadow-paper: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.6);
+  }
+}

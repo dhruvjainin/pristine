@@ -1,0 +1,30 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="Page not found · Pristine" description="This page doesn't exist.">
+  <section class="nf container">
+    <p class="nf__score mono num"><span class="pen">0.0</span><span class="nf__of">/10</span></p>
+    <h1>Nothing here to critique.</h1>
+    <p class="lede">This page doesn't exist, or it moved. The before-and-afters are still where they were.</p>
+    <ul class="nf__notes">
+      <li><span class="mono pen">P0</span> The link you followed points nowhere. <span class="nf__fix">Fix: go somewhere real.</span></li>
+    </ul>
+    <div class="nf__cta">
+      <a class="btn" href="/#examples">See the examples</a>
+      <a class="btn btn--ghost" href="/">Home</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { display: grid; gap: var(--s-5); justify-items: start; padding-block: var(--s-9) var(--s-10); }
+  .nf__score { font-size: var(--text-4xl); font-weight: 600; line-height: 1; }
+  .nf__of { font-size: var(--text-lg); color: var(--ink-3); font-weight: 500; }
+  .nf h1 { font-size: var(--text-3xl); }
+  .nf__notes { list-style: none; margin: 0; padding: 0 0 0 var(--s-4); border-left: 2px solid var(--pen); max-width: 60ch; }
+  .nf__notes li { font: italic 400 var(--text-lg)/1.4 var(--font-display); }
+  .nf__notes .mono { font: 600 var(--text-xs) var(--font-mono); margin-right: var(--s-2); vertical-align: 0.15em; }
+  .nf__fix { display: block; margin-top: var(--s-1); font: 400 var(--text-sm)/1.5 var(--font-body); color: var(--ink-2); }
+  .nf__cta { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-2); }
+  @media (max-width: 640px) { .nf { padding-block: var(--s-8) var(--s-9); } }
+</style>

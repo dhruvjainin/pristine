@@ -1,0 +1,192 @@
+{
+  "slug": "docs-article",
+  "order": 7,
+  "title": "Docs article",
+  "product": "Grain UI",
+  "blurb": "The 'Building an accessible dialog' guide went from a stock Docusaurus page with 105-character lines and five admonitions to a 70ch reading page whose dialog example actually runs, tracing focus and logging every close reason as you use it.",
+  "mode": "Read",
+  "persona": {
+    "name": "Leo Marchetti",
+    "role": "Frontend lead implementing a delete confirmation",
+    "goal": "Read the dialog guide once, copy the right snippet and understand the focus and closing rules without hunting."
+  },
+  "command": "/pristine polish src/pages/docs/dialog.mdx",
+  "hasDark": true,
+  "before": {
+    "score": 5.5,
+    "level": 6,
+    "verdict": "Readable, but it is every Docusaurus site: stock green, stock Prism, and five admonitions where one belongs. Lines run past 100 characters on a laptop, the one real warning about backdrop close sits between filler notes and a 'Danger' that contradicts the props table, and the focus rules can only be read about, not tried."
+  },
+  "after": {
+    "score": 9.5,
+    "level": 10,
+    "verdict": "A docs page built for reading and for trying. The snippet runs right under the code: open it, Tab, press Esc or click outside, and a four-step trace shows where focus went while a log names the close reason. The props table becomes cards on a phone, and the checklist links back to the section that covers each rule."
+  },
+  "dimensions": [
+    {
+      "name": "Persona fit",
+      "before": 5,
+      "after": 10
+    },
+    {
+      "name": "Hierarchy & clarity",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "name": "Layout & spacing",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Typography",
+      "before": 5,
+      "after": 10
+    },
+    {
+      "name": "Color & theming",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Consistency",
+      "before": 7,
+      "after": 9
+    },
+    {
+      "name": "Responsiveness",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "name": "Motion & interaction",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Accessibility",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "name": "Copy",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "name": "Robustness & performance",
+      "before": 6,
+      "after": 9
+    }
+  ],
+  "critique": [
+    {
+      "priority": "P1",
+      "title": "Lines too long to read",
+      "detail": "The doc column is Docusaurus's `max-width: 75%` of a 1320px container, so body lines run to ~105 characters at 1440px. Readers lose their place at every line break on a Read page.",
+      "lens": "typeset"
+    },
+    {
+      "priority": "P1",
+      "title": "Admonition overload",
+      "detail": "Note, tip, info, warning and danger all appear in one guide, each with an icon and a 5px coloured border-left. Two are filler ('Focus is trapped automatically'), the danger box contradicts the closeOnEsc row in the props table, and the one real warning about backdrop close gets lost.",
+      "lens": "quieter"
+    },
+    {
+      "priority": "P1",
+      "title": "Could be any Docusaurus site",
+      "detail": "Default #2e8555 green, the stock navbar, stock Prism github theme and stock footer. Nothing says Grain UI; Leo can't tell this guide from the last five library docs he read.",
+      "lens": "colorize"
+    },
+    {
+      "priority": "P1",
+      "title": "Focus rules you can only imagine",
+      "detail": "Initial focus, focus return and close reasons are explained in static snippets. The guide is about behaviour, but there is nothing to open, Tab through or press Esc on.",
+      "lens": "delight"
+    },
+    {
+      "priority": "P2",
+      "title": "Props table crushed on phones",
+      "detail": "The four-column table is `display: block; overflow: auto`, so at 390px the Description column wraps to one or two words per line and Default sits in a narrow strip.",
+      "lens": "adapt"
+    },
+    {
+      "priority": "P2",
+      "title": "Emoji headings and a fake checklist",
+      "detail": "The h1 ends in 🚀, the last h2 in ✅, and the checklist is six ✅ lines joined with <br>, so screen readers announce 'check mark button' six times and there is no list to navigate. The copy button stays at opacity 0 until hover, so touch users never see it.",
+      "lens": "clarify"
+    }
+  ],
+  "changes": [
+    {
+      "lens": "typeset",
+      "before": ".doc { flex: 0 0 75%; max-width: 75% } inside a 1320px container (~105ch lines at 1440px)",
+      "after": "article { max-width: var(--measure) } with --measure: 70ch",
+      "why": "Lines stay at a comfortable 65–72 characters at every viewport width."
+    },
+    {
+      "lens": "typeset",
+      "before": "Docusaurus defaults: h1 3rem, h2 2rem, h3 1.5rem, all weight 700 in the system font stack",
+      "after": "h1 clamp(2.25rem, 1.7rem + 1.6vw, 3rem) at weight 680, -0.032em; h2 1.625rem; h3 1.25rem; Inter with font-optical-sizing: auto",
+      "why": "A clear scale makes the guide skimmable, and optical sizing keeps the big title tight and the body open."
+    },
+    {
+      "lens": "colorize",
+      "before": "Stock Prism github theme: pre { background: #f6f8fa; font-size: 90% }, copy button opacity: 0 until hover",
+      "after": "pre code { font-size: 0.875rem; line-height: 1.7; color: #26242f on #f5f4f9 } (dark: #e4e2ee on #1a1922)",
+      "why": "Code is the most-copied part of the page, so it gets a readable size, tuned token colours for each theme and a copy button you can see."
+    },
+    {
+      "lens": "quieter",
+      "before": "5 admonition kinds (note, tip, info, warning, danger), each with an icon and border-left: 5px solid in its own colour",
+      "after": "Two styles: neutral note on --surface-2, semantic warning only for real risk, icon plus title, no stripe",
+      "why": "When warnings are rare, the one about backdrop close actually gets read."
+    },
+    {
+      "lens": "adapt",
+      "before": "Docusaurus defaults: sidebar behind a hamburger drawer, TOC as a collapsed 'On this page' box",
+      "after": "Rails are position: sticky; top: var(--topbar). ≤1240px: TOC becomes <details>. ≤900px: nav becomes a <details> 'Docs menu'",
+      "why": "The article stays first on every screen size, and navigation and the TOC are one tap away without leaving the page."
+    },
+    {
+      "lens": "harden",
+      "before": "Icon-only search pill on mobile; props table as display: block; overflow: auto with no label",
+      "after": ":focus-visible rings, sr-only search label with ⌘K, props table in a labelled scroll region",
+      "why": "The page works by keyboard, and the props table scrolls on small screens instead of crushing its columns."
+    },
+    {
+      "lens": "delight",
+      "before": "Static code block; the reader has to imagine what focus does",
+      "after": "Live example under the snippet: 'Delete atlas-web…' opens a real <dialog>, a 4-node trace (Trigger → Cancel → Delete project → Back to trigger) lights up as focus moves, and a log reads onOpenChange(false) · reason: \"escape\"",
+      "why": "The rules the article explains (initial focus, trap, return focus, close reasons) can be checked by hand in five seconds."
+    },
+    {
+      "lens": "harden",
+      "before": "Backdrop-close advice in prose only",
+      "after": "In the example, a backdrop click is ignored with a 2px nudge and the log 'backdrop click ignored · closeOnBackdrop={false}'; deleting strikes the row and focus lands on 'Undo delete' (returnFocus={listRef})",
+      "why": "The warning callout and the returnFocus section are shown working, not just described."
+    },
+    {
+      "lens": "adapt",
+      "before": "Props table scrolls sideways on phones",
+      "after": "≤600px: each prop becomes a card with labelled Type and Default (data-label); no horizontal scroll at 320px",
+      "why": "Leo can read the API on his phone without panning a table."
+    },
+    {
+      "lens": "clarify",
+      "before": "Checklist as six ✅ emoji lines joined with <br>",
+      "after": "Numbered checklist cards that each link to their section, plus a 'Was this guide helpful?' Yes/No with a live thank-you",
+      "why": "Each rule points to where it's explained, so the list doubles as a review tool."
+    }
+  ],
+  "tells": [
+    "Default Docusaurus green instead of the product's own brand",
+    "No max-width measure on prose (~105ch lines)",
+    "Five admonition types on one page",
+    "Filler admonitions that restate the prose",
+    "Emoji in headings",
+    "Checklist faked with ✅ emoji and <br>",
+    "Copy button hidden until hover",
+    "Props table squeezed on mobile"
+  ]
+}

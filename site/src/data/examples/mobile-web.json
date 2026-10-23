@@ -1,0 +1,197 @@
+{
+  "slug": "mobile-web",
+  "order": 8,
+  "title": "Mobile web app",
+  "product": "Platform",
+  "blurb": "A transit ticket app rebuilt for the phone in your hand: live service status and the active ticket up top, zone prices in context, a ride counter that shows when a day pass pays off, a pay bar in thumb reach, and a ticket that proves it isn't a screenshot.",
+  "mode": "Operate",
+  "persona": {
+    "name": "Mira Okafor-Lindqvist",
+    "role": "Daily commuter",
+    "goal": "Buy the right ticket for herself and her son with one thumb on a moving platform, then show it at the gate in seconds."
+  },
+  "command": "/pristine polish src/pages/tickets.astro",
+  "hasDark": true,
+  "before": {
+    "score": 3,
+    "level": 2,
+    "verdict": "A stock teal mobile-app template: pill filters, white cards and an orange badge on everything, so it looks like a phone app but behaves like a demo. Prices only show on hover, 14px inputs zoom the page, and the Buy bar and 52px tab bar sit on top of the ticket's own buttons and under the home indicator. Mira can't see what she's paying until the alert says it worked."
+  },
+  "after": {
+    "score": 9.5,
+    "level": 10,
+    "verdict": "Mira opens to everything she needs on one screen: the F1 ferry is running late, her current ticket has 72 minutes left, and zone prices sit on the tiles. She taps how many rides she'll take and a small chart shows singles cost less than a day pass until ride 3. Pay sits above the tab bar, and the ticket screen shows a moving band and a ticking clock that an inspector can trust. On a laptop it's a proper two-column page, not a phone floating in empty space."
+  },
+  "dimensions": [
+    {
+      "name": "Persona fit",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Hierarchy & clarity",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Layout & spacing",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Typography",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Color & theming",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Consistency",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Responsiveness",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Motion & interaction",
+      "before": 3,
+      "after": 9
+    },
+    {
+      "name": "Accessibility",
+      "before": 2,
+      "after": 9
+    },
+    {
+      "name": "Copy",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Robustness & performance",
+      "before": 3,
+      "after": 9
+    }
+  ],
+  "critique": [
+    {
+      "priority": "P0",
+      "title": "Prices are hover-only",
+      "detail": "The Single / Day Pass / 7-Day pills hide their price in a tooltip that appears on :hover. On a phone there is no hover, so Mira picks a ticket without seeing what it costs.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P0",
+      "title": "Inputs zoom and targets are tiny",
+      "detail": "Selects and inputs use `font-size: 14px`, so iOS zooms the page on focus. The pills are 12px text with 5px padding, the tab labels are 9px, and Refund, Share and Delete are 11px pills side by side, all well under 44px.",
+      "lens": "adapt"
+    },
+    {
+      "priority": "P1",
+      "title": "Stacked fixed bars cover the content",
+      "detail": "`.fixed-bar { bottom: 52px }` sits on a `.tabbar { position: fixed; bottom: 0; height: 52px }` with no safe-area padding and no bottom padding on the page, so the ticket's Refund, Share and Delete hide behind the bars and the tab labels sit under the home indicator.",
+      "lens": "adapt"
+    },
+    {
+      "priority": "P1",
+      "title": "Template sameness, nothing leads",
+      "detail": "Every block is the same white rounded-2xl card with shadow-md, every choice is the same teal-50 pill, and orange-500 marks NEW, Soon and ACTIVE alike, so a valid ticket looks like a promo. A marketing card for 'Get Started' takes the top of the screen while service status is nowhere.",
+      "lens": "distill"
+    },
+    {
+      "priority": "P1",
+      "title": "No ticket to show",
+      "detail": "After paying, Mira gets `alert(\"Payment successful!\")` and no clear place to find the ticket or see how long it's valid.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P2",
+      "title": "Slow, desktop-style feedback",
+      "detail": "`transition: all 0.3s ease-in` and focus outlines removed. Taps feel late, the gray tap flash shows, and there's no pressed state.",
+      "lens": "animate"
+    }
+  ],
+  "changes": [
+    {
+      "lens": "adapt",
+      "before": ".fixed-bar { position: fixed; bottom: 52px; padding: 8px 16px } over .tabbar { position: fixed; bottom: 0; height: 52px }",
+      "after": ".app { height: 100dvh; display: flex } with .scroller { overflow-y: auto; overscroll-behavior: contain }, .paybar { position: sticky; bottom: 0 } and a tab bar padded with env(safe-area-inset-bottom)",
+      "why": "The total and Pay sit above the tab bar and clear of the home indicator, and nothing slides under them as the URL bar shows and hides."
+    },
+    {
+      "lens": "delight",
+      "before": "Ticket type picked blind; no way to compare",
+      "after": "\"How many rides today?\" chart: four tappable bars (singles add up per ride) under a dashed day-pass line at €12.30, overspend shaded red, with \"2 rides on singles: €8.40, €3.90 less than a day pass. It pays off from ride 3.\" and a Switch link when the other ticket is cheaper",
+      "why": "Mira sees the break-even point instead of doing fare maths on a platform."
+    },
+    {
+      "lens": "clarify",
+      "before": ".price-tip { opacity: 0 } shown on .type:hover over rounded-full pills",
+      "after": "Three zone tiles (A / A + B / A + B + C) with ring diagrams and the price on each tile, which switches between single and day-pass fares",
+      "why": "Price is visible before the choice, with no hover needed."
+    },
+    {
+      "lens": "clarify",
+      "before": "No service information",
+      "after": "Status line under the title: \"Trams and buses on time · F1 ferry about 10 min late\", repeated on the matching route in Plan trip",
+      "why": "The one thing likely to change Mira's trip is visible before she pays."
+    },
+    {
+      "lens": "harden",
+      "before": "alert(\"Payment successful!\")",
+      "after": "Pay shows a spinner and \"Paying\" for 900ms, then the Tickets view opens with a moving striped band, an HH:MM:SS clock that ticks every second, a large QR and a validity meter",
+      "why": "The ticket is one tap away, and a live band and clock let an inspector tell it from a screenshot."
+    },
+    {
+      "lens": "harden",
+      "before": "Card problems surface only when a payment fails",
+      "after": "Amber dot on the Account tab, \"Visa ··4417 · expires 10/26\" by the Pay button, and an inline expiry form that rejects 10/26 and 13/29 with specific messages",
+      "why": "The problem shows up while it's still cheap to fix, not at the gate."
+    },
+    {
+      "lens": "adapt",
+      "before": ".form select, .form input { font-size: 14px; padding: 6px 10px; }; .mini pills at 11px; .tabbar a { font-size: 9px }",
+      "after": "16px inputs with inputmode=\"numeric\" enterkeyhint=\"done\"; 44×44 steppers and min-height: 44px on every control",
+      "why": "iOS doesn't zoom on focus, the number pad opens for rider counts, and every target works one-handed on a moving tram."
+    },
+    {
+      "lens": "layout",
+      "before": "5 icon tabs with 9px labels plus a hamburger and Login in the app bar; desktop stretches the phone app bar and tab bar to 1440px",
+      "after": "4-item bottom tab bar on phones; from 960px a sticky top nav, a buy form on the left and a sticky 360px order summary with line items and Pay on the right",
+      "why": "Each screen size gets a layout built for it, not a phone column floating in empty space."
+    },
+    {
+      "lens": "animate",
+      "before": "transition: all 0.3s ease-in; default gray tap flash",
+      "after": "-webkit-tap-highlight-color: transparent; :active { transform: scale(0.97) } over 120ms cubic-bezier(0.23, 1, 0.32, 1); chart bars grow via scaleY with a 60ms stagger; band and bar growth stop under prefers-reduced-motion",
+      "why": "Taps feel immediate, motion animates only transform and opacity, and the only constant motion is the band, which has a job."
+    },
+    {
+      "lens": "colorize",
+      "before": "No theme-color meta; hover colors stick after a tap",
+      "after": "Two theme-color metas (#F6F7F5 light, #121514 dark); hover styles inside @media (hover: hover); amber --warning only for the ferry delay and the card expiry",
+      "why": "The browser chrome matches the app, touch doesn't leave stale hovers, and amber always means something needs attention."
+    }
+  ],
+  "tells": [
+    "Stock mobile-app template look",
+    "Teal app bar with hamburger and Login",
+    "Identical white rounded-2xl cards with shadow-md",
+    "Marketing 'NEW' promo card above the task",
+    "Orange badge for NEW, Soon and ACTIVE alike",
+    "Hover-only price tooltip",
+    "'Coming soon' dead pill",
+    "14px inputs that zoom on iOS",
+    "Sub-44px tap targets",
+    "Fixed bars ignoring safe areas",
+    "alert() for confirmation",
+    "outline: none on focus",
+    "transition: all 0.3s ease-in"
+  ]
+}

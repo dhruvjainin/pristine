@@ -1,0 +1,191 @@
+{
+  "slug": "pricing",
+  "order": 5,
+  "title": "Pricing page",
+  "product": "Ledgerline",
+  "blurb": "A pricing page that went from five plans, a fake countdown and costs hidden in 10px gray to three plans that price your actual setup: set how many bank accounts you'll connect and every card shows its real total.",
+  "mode": "Persuade",
+  "persona": {
+    "name": "Priya Raman",
+    "role": "Freelance product designer",
+    "goal": "Pick the cheapest plan that does her quarterly taxes, and know exactly what she'll pay, what happens after the trial and how to leave."
+  },
+  "command": "/pristine polish src/pages/pricing.astro",
+  "hasDark": true,
+  "before": {
+    "score": 3,
+    "level": 2,
+    "verdict": "Stock Bootstrap: tidy and readable, but pushy and evasive underneath. A countdown that resets daily, five identical cards with #0d6efd on nearly every button so nothing leads, a guilt-trip decline link, and the real costs (extra bank connections, the trial going read-only, cancelling via support) hidden in 10px #adb5bd fine print."
+  },
+  "after": {
+    "score": 9.5,
+    "level": 10,
+    "verdict": "\"Price it for your setup\": a stepper for bank accounts and a CPA toggle rewrite a receipt in every card ($12 Starter is really $21.98 with 3 accounts), a small chart shows where Business gets cheaper than Pro (9 accounts annual, 11 monthly), and the Best fit badge moves to match. Billing works with JS off, and trial, cancel and refund rules sit right under the plans."
+  },
+  "dimensions": [
+    {
+      "name": "Persona fit",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Hierarchy & clarity",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Layout & spacing",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Typography",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Color & theming",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Consistency",
+      "before": 6,
+      "after": 9
+    },
+    {
+      "name": "Responsiveness",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Motion & interaction",
+      "before": 3,
+      "after": 9
+    },
+    {
+      "name": "Accessibility",
+      "before": 2,
+      "after": 9
+    },
+    {
+      "name": "Copy",
+      "before": 2,
+      "after": 10
+    },
+    {
+      "name": "Robustness & performance",
+      "before": 4,
+      "after": 9
+    }
+  ],
+  "critique": [
+    {
+      "priority": "P0",
+      "title": "Real costs are hidden in the fine print",
+      "detail": "$4.99/mo per extra bank connection, the trial turning read-only, refunds only within 30 days and cancelling via support all sit in a 10px #adb5bd paragraph below the fold. Priya finds out on her first invoice.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P0",
+      "title": "Manipulative patterns",
+      "detail": "A 24h countdown that resets on every visit, \"No thanks, I like doing taxes by hand\" as the decline link, and \"Only $240!\" with an Add to Cart button. Each one tells her the page is working against her.",
+      "lens": "quieter"
+    },
+    {
+      "priority": "P1",
+      "title": "Five plans for one kind of buyer",
+      "detail": "Free and Enterprise don't fit a freelancer, all five are the same Bootstrap card with the same blue or gray button, and the feature lists use different wording per card, so Priya can't tell what Pro adds over Starter without the table.",
+      "lens": "distill"
+    },
+    {
+      "priority": "P1",
+      "title": "The toggle and comparison are inaccessible",
+      "detail": "The billing switch is a div styled like .form-switch with a click listener, so it has no role, state or keyboard access. The table marks features with red ✗ / green ✓ glyphs only, with no text alternative, and `*:focus { outline: none; box-shadow: none !important }` kills Bootstrap's focus ring.",
+      "lens": "harden"
+    },
+    {
+      "priority": "P2",
+      "title": "The add-on is priced out of context",
+      "detail": "The CPA review sits alone under the plans as \"Only $240!\". She has to work out that it's $20/mo and add it to Pro herself.",
+      "lens": "clarify"
+    }
+  ],
+  "changes": [
+    {
+      "lens": "delight",
+      "before": "Sticker prices only; \"$4.99/connection\" in 10px #adb5bd fine print",
+      "after": "Setup panel: accounts stepper (1–12, 44px buttons) + CPA checkbox; each card gets a receipt: \"Starter plan $12 · 2 extra accounts × $4.99 $9.98 · Your total $21.98/mo · $263.76 a year at checkout\"",
+      "why": "The price she sees is the price she'll pay, worked out for her setup."
+    },
+    {
+      "lens": "clarify",
+      "before": "bg-warning \"Most popular\" badge on Pro, always",
+      "after": "bestFit(accounts, period): cheapest plan with tax estimates. At 9 accounts annual Pro is $57.94 vs Business $56, so the \"Best fit for you\" badge and primary CTA move to Business, with the reason in a sentence",
+      "why": "A recommendation that changes with her answers is one she can trust."
+    },
+    {
+      "lens": "delight",
+      "before": "No way to compare plans as usage grows",
+      "after": "SVG cost curve, 1–12 accounts: Starter dashed, Pro and Business solid, a marker at the crossover (\"Business cheaper from 9 accounts\") and dots that slide to her count over 260ms",
+      "why": "Shows the break-even point instead of making her do the arithmetic."
+    },
+    {
+      "lens": "quieter",
+      "before": ".alert-bar (alert-warning) \"Limited time: 20% off annual plans! Offer ends in 23:59:58\"",
+      "after": "Removed. Annual billing is a plain 20% discount: \"Plan price, billed yearly. Saves $84 a year.\"",
+      "why": "A fake deadline is a lie. The real saving is persuasive enough on its own."
+    },
+    {
+      "lens": "harden",
+      "before": "<div class=\"switch\" id=\"switch\"></div> with a click listener",
+      "after": "<fieldset> with two radios as a segmented control; body:has(#bill-annual:checked) [data-period=\"monthly\"] { display: none; } so prices, receipts and the chart switch with JS off",
+      "why": "Keyboard and screen-reader users can operate it, and it works without JS."
+    },
+    {
+      "lens": "animate",
+      "before": "v1: price swap animation ran on first page load",
+      "after": "Only changed values animate, via el.animate() (220ms, translateY 3px → 0); CPA line opens with grid-template-rows 0fr → 1fr; reduced motion gets opacity only",
+      "why": "Motion confirms what changed, and nothing moves when the page loads."
+    },
+    {
+      "lens": "distill",
+      "before": "5 plans: Free, Starter, Pro, Business, Enterprise \"Custom\"",
+      "after": "3 plans with \"Everything in Starter, plus\" lists; Starter says plainly \"No quarterly tax estimates or invoice reminders\"",
+      "why": "Fewer choices that differ in clear steps, with the gap named on the cheap plan."
+    },
+    {
+      "lens": "clarify",
+      "before": ".fine { font-size: .65rem; color: #adb5bd; }",
+      "after": "\"No surprises on your card\": trial (\"Start today and it runs until Nov 21\"), one-click cancel, 30-day annual refunds",
+      "why": "The facts that cause refunds and churn are read before signing up."
+    },
+    {
+      "lens": "adapt",
+      "before": "Red ✗ / green ✓ glyphs with no text; .table-responsive scrolls six columns sideways at 390px",
+      "after": "Labelled check/minus icons, <caption>, scope headers; under 640px each row becomes the feature name over three values labelled via td::before { content: attr(data-plan) }",
+      "why": "The comparison stays readable on a phone without sideways scrolling."
+    },
+    {
+      "lens": "colorize",
+      "before": "Stock Bootstrap: #0d6efd on nearly every button, warning-yellow banner and badge; v1 accent #4b3bc4",
+      "after": "Shared Ledgerline tokens: --accent: #1d5a85 on #f8f7f3; dark --bg: #101417, --accent: #86bde3",
+      "why": "Gives Ledgerline its own colour, matches the landing page, and lets one action lead."
+    }
+  ],
+  "tells": [
+    "Fake resetting countdown banner",
+    "Five tiers including Free and Enterprise",
+    "Stock Bootstrap look: every plan the same card, #0d6efd on every primary action",
+    "bg-warning \"Most popular\" badge on a blue-header card",
+    "Confirmshaming decline link",
+    "Hidden costs in 10px light-gray fine print",
+    "Colour-only ✓/✗ comparison cells",
+    "Div-based toggle switch styled like .form-switch",
+    "\"Only $240!\" add-on out of context",
+    "\"Choose\" and \"Submit\" button labels",
+    "transition: all .3s ease-in on cards",
+    "*:focus { outline: none; box-shadow: none !important }",
+    "No dark mode"
+  ]
+}

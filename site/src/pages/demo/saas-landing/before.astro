@@ -1,0 +1,236 @@
+---
+import "@fontsource-variable/inter";
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Ledgerline - AI-Powered Bookkeeping</title>
+<style is:global>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Inter Variable", sans-serif; color: #333; background: #fff; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+  *:focus { outline: none; }
+
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); }
+  .logo { font-size: 22px; font-weight: 800; background: linear-gradient(90deg, #ffffff, #e9d5ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: rgba(255,255,255,0.85); font-size: 15px; transition: all 0.3s ease-in; }
+  .nav-links a:hover { color: #fff; }
+  .nav-btn { background: #fff; color: #7c3aed; padding: 8px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; }
+
+  .hero { height: 100vh; min-height: 640px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 60px; color: #fff; position: relative; overflow: hidden; }
+  .hero::before { content: ""; position: absolute; width: 600px; height: 600px; border-radius: 50%; background: rgba(255,255,255,0.08); top: -200px; right: -150px; }
+  .badge { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 6px 16px; border-radius: 999px; font-size: 13px; margin-bottom: 24px; }
+  .hero h1 { font-size: 64px; font-weight: 800; line-height: 1.1; max-width: 900px; margin-bottom: 20px; }
+  .hero p { font-size: 20px; color: #d1d5db; max-width: 640px; line-height: 1.6; margin-bottom: 36px; }
+  .hero-btns { display: flex; gap: 16px; justify-content: center; }
+  .btn-primary { background: #fff; color: #7c3aed; padding: 16px 36px; border-radius: 12px; font-size: 17px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 0 40px rgba(236,72,153,0.6); transition: all 0.3s ease-in; }
+  .btn-primary:hover { transform: translateY(-3px) scale(1.05); }
+  .btn-secondary { background: transparent; color: #fff; padding: 16px 36px; border-radius: 8px; font-size: 17px; font-weight: 600; border: 2px solid rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s ease-in; }
+  .stats { display: flex; gap: 64px; margin-top: 56px; }
+  .stat-num { font-size: 36px; font-weight: 800; }
+  .stat-label { font-size: 13px; color: #c4b5fd; }
+
+  .logos { padding: 40px 24px; text-align: center; background: #fafafa; }
+  .logos p { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+  .logo-row { display: flex; gap: 48px; justify-content: center; flex-wrap: wrap; font-size: 20px; font-weight: 700; color: #ccc; }
+
+  .preview { padding: 80px 24px; text-align: center; }
+  .preview-card { max-width: 900px; margin: 0 auto; background: linear-gradient(135deg, #ede9fe, #fce7f3); border-radius: 24px; padding: 40px; box-shadow: 0 0 60px rgba(139,92,246,0.35); border: 1px solid #e9d5ff; }
+  .fake-chart { display: flex; align-items: flex-end; gap: 14px; height: 220px; justify-content: center; }
+  .fake-chart div { width: 44px; background: linear-gradient(180deg, #a855f7, #6366f1); border-radius: 12px 12px 0 0; }
+
+  section h2 { font-size: 42px; font-weight: 800; text-align: center; margin-bottom: 12px; }
+  .sub { text-align: center; color: #999; font-size: 18px; margin-bottom: 48px; }
+  .kicker { display: block; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 3px; color: #8b5cf6; margin-bottom: 10px; }
+
+  .features { padding: 96px 24px; background: #f9fafb; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+  .card { background: #fff; padding: 32px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #eee; text-align: center; transition: all 0.3s ease-in; }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(139,92,246,0.25); }
+  .card .emoji { font-size: 40px; margin-bottom: 16px; }
+  .card h3 { font-size: 20px; margin-bottom: 8px; }
+  .card p { color: #999; font-size: 15px; line-height: 1.5; }
+
+  .steps { padding: 96px 24px; }
+  .step-row { display: flex; gap: 32px; max-width: 1000px; margin: 0 auto; }
+  .step { flex: 1; text-align: center; }
+  .step-num { font-size: 56px; font-weight: 900; background: linear-gradient(90deg, #6366f1, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .step h3 { font-size: 20px; margin: 8px 0; }
+  .step p { color: #999; font-size: 15px; }
+
+  .testimonials { padding: 96px 24px; background: #faf5ff; }
+  .t-card { background: #fff; padding: 28px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: left; }
+  .stars { margin-bottom: 12px; }
+  .t-card p { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 20px; font-style: italic; }
+  .who { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .who strong { display: block; font-size: 14px; }
+  .who span { font-size: 12px; color: #aaa; }
+
+  .pricing { padding: 96px 24px; }
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
+  .price-card { border: 1px solid #eee; border-radius: 24px; padding: 36px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+  .price-card.pop { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; transform: scale(1.05); box-shadow: 0 0 50px rgba(139,92,246,0.5); }
+  .price-card .amt { font-size: 48px; font-weight: 800; margin: 12px 0; }
+  .price-card .amt small { font-size: 16px; font-weight: 400; }
+  .price-card ul { list-style: none; margin: 20px 0; font-size: 14px; line-height: 2.2; color: #888; }
+  .price-card.pop ul { color: #ddd; }
+  .price-card button { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #8b5cf6; color: #fff; font-weight: 700; cursor: pointer; transition: all 0.3s ease-in; }
+  .price-card.pop button { background: #fff; color: #7c3aed; }
+
+  .faq { padding: 96px 24px; background: #f9fafb; }
+  .faq-list { max-width: 720px; margin: 0 auto; }
+  .faq-item { background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .faq-q { padding: 20px 24px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; }
+  .faq-a { display: none; padding: 0 24px 20px; color: #999; font-size: 15px; line-height: 1.6; }
+  .faq-item.open .faq-a { display: block; }
+
+  .cta { padding: 100px 24px; text-align: center; background: linear-gradient(135deg, #6366f1, #ec4899); color: #fff; }
+  .cta h2 { color: #fff; }
+  .cta p { color: #d1d5db; margin-bottom: 32px; font-size: 18px; }
+  .cta form { display: flex; gap: 12px; justify-content: center; }
+  .cta input { padding: 14px 18px; border-radius: 10px; border: none; width: 300px; font-size: 14px; }
+
+  footer { padding: 48px 24px; text-align: center; font-size: 12px; color: #bbb; background: #111; }
+  footer .links { display: flex; gap: 24px; justify-content: center; margin-bottom: 12px; }
+
+  @media (max-width: 768px) {
+    .nav { padding: 14px 16px; }
+    .nav-links { display: none; }
+    .hero h1 { font-size: 40px; }
+    .hero p { font-size: 17px; }
+    .stats { gap: 24px; }
+    .stat-num { font-size: 24px; }
+    .grid, .price-grid { grid-template-columns: 1fr; }
+    .step-row { flex-direction: column; }
+    .price-card.pop { transform: none; }
+    .cta form { flex-direction: column; align-items: center; }
+    .cta input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">Ledgerline ✨</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it Works</a>
+      <a href="/demo/pricing/before">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <button class="nav-btn">Sign Up</button>
+  </nav>
+
+  <header class="hero">
+    <span class="badge">✨ New: AI Tax Magic is here!</span>
+    <h1>Supercharge Your Finances with AI-Powered Bookkeeping 🚀</h1>
+    <p>The all-in-one platform that seamlessly unlocks the power of your financial data. Elevate your business to the next level.</p>
+    <div class="hero-btns">
+      <button class="btn-primary">Get Started</button>
+      <button class="btn-secondary">Learn More</button>
+    </div>
+    <div class="stats">
+      <div><div class="stat-num">10,000+</div><div class="stat-label">Happy Users</div></div>
+      <div><div class="stat-num">$2B+</div><div class="stat-label">Tracked</div></div>
+      <div><div class="stat-num">4.9★</div><div class="stat-label">Rating</div></div>
+    </div>
+  </header>
+
+  <div class="logos">
+    <p>Trusted by industry leaders</p>
+    <div class="logo-row"><span>Acmeco</span><span>Globex</span><span>Initech</span><span>Umbrella</span><span>Hooli</span></div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-card">
+      <div class="fake-chart">
+        <div style="height:40%"></div><div style="height:65%"></div><div style="height:50%"></div><div style="height:80%"></div><div style="height:70%"></div><div style="height:95%"></div><div style="height:85%"></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="features" id="features">
+    <span class="kicker">FEATURES</span>
+    <h2>Everything You Need</h2>
+    <p class="sub">Powerful features to supercharge your workflow</p>
+    <div class="grid">
+      <div class="card"><div class="emoji">🏦</div><h3>Bank Sync</h3><p>Seamlessly connect all your accounts in one place.</p></div>
+      <div class="card"><div class="emoji">🤖</div><h3>AI Categorization</h3><p>Let AI magically organize all your expenses.</p></div>
+      <div class="card"><div class="emoji">📧</div><h3>Smart Invoicing</h3><p>Invoices that work as hard as you do.</p></div>
+      <div class="card"><div class="emoji">📊</div><h3>Tax Estimates</h3><p>Never be surprised by taxes ever again.</p></div>
+      <div class="card"><div class="emoji">🔒</div><h3>Bank-Level Security</h3><p>Your data is safe with enterprise-grade security.</p></div>
+      <div class="card"><div class="emoji">⚡</div><h3>Lightning Fast</h3><p>Blazing fast performance for your business.</p></div>
+    </div>
+  </section>
+
+  <section class="steps" id="how">
+    <span class="kicker">HOW IT WORKS</span>
+    <h2>Get Started in 3 Easy Steps</h2>
+    <p class="sub">It's never been easier</p>
+    <div class="step-row">
+      <div class="step"><div class="step-num">01</div><h3>Connect</h3><p>Link your bank account in seconds.</p></div>
+      <div class="step"><div class="step-num">02</div><h3>Automate</h3><p>Let our AI do the heavy lifting.</p></div>
+      <div class="step"><div class="step-num">03</div><h3>Relax</h3><p>Sit back and watch the magic happen.</p></div>
+    </div>
+  </section>
+
+  <section class="testimonials">
+    <span class="kicker">TESTIMONIALS</span>
+    <h2>Loved by Thousands</h2>
+    <p class="sub">Don't just take our word for it</p>
+    <div class="grid">
+      <div class="t-card"><div class="stars">⭐⭐⭐⭐⭐</div><p>"Ledgerline is a total game-changer! It has completely revolutionized how I run my business."</p><div class="who"><div class="avatar">S</div><div><strong>Sarah J.</strong><span>CEO</span></div></div></div>
+      <div class="t-card"><div class="stars">⭐⭐⭐⭐⭐</div><p>"I can't imagine going back. The AI is incredible and saves me so much time every single day!"</p><div class="who"><div class="avatar">M</div><div><strong>Mike T.</strong><span>Founder</span></div></div></div>
+      <div class="t-card"><div class="stars">⭐⭐⭐⭐⭐</div><p>"Best investment I've ever made for my freelance business. 10/10 would recommend!!"</p><div class="who"><div class="avatar">A</div><div><strong>Alex R.</strong><span>Freelancer</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing">
+    <span class="kicker">PRICING</span>
+    <h2>Simple, Transparent Pricing</h2>
+    <p class="sub">Choose the plan that's right for you</p>
+    <div class="price-grid">
+      <div class="price-card"><h3>Starter</h3><div class="amt">$15<small>/mo</small></div><ul><li>✅ 1 bank connection</li><li>✅ Unlimited invoices</li><li>✅ Expense sorting</li></ul><button>Choose</button></div>
+      <div class="price-card pop"><h3>Pro 🔥 Most Popular</h3><div class="amt">$35<small>/mo</small></div><ul><li>✅ 3 bank connections</li><li>✅ Auto-reminders</li><li>✅ Quarterly tax estimates</li></ul><button>Choose</button></div>
+      <div class="price-card"><h3>Business</h3><div class="amt">$70<small>/mo</small></div><ul><li>✅ Unlimited banks</li><li>✅ Up to 15 people</li><li>✅ Priority support</li></ul><button>Choose</button></div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <span class="kicker">FAQ</span>
+    <h2>Frequently Asked Questions</h2>
+    <p class="sub">Got questions? We've got answers.</p>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q">Is it secure? <span>+</span></div><div class="faq-a">Yes! We use bank-level 256-bit encryption to keep your data safe.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you file my taxes? <span>+</span></div><div class="faq-a">Our AI estimates your quarterly taxes so you're always ready.</div></div>
+      <div class="faq-item"><div class="faq-q">Can my accountant use it? <span>+</span></div><div class="faq-a">Absolutely! Invite them anytime.</div></div>
+      <div class="faq-item"><div class="faq-q">Can I cancel? <span>+</span></div><div class="faq-a">Yes, contact support to cancel.</div></div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to Supercharge Your Finances?</h2>
+    <p>Join thousands of happy freelancers today!</p>
+    <form onsubmit="event.preventDefault(); alert('Thanks!')">
+      <input type="email" placeholder="Enter your email" />
+      <button class="btn-primary" type="submit">Submit</button>
+    </form>
+  </section>
+
+  <footer>
+    <div class="links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
+    © 2026 Ledgerline. All rights reserved.
+  </footer>
+
+  <script>
+    document.querySelectorAll(".faq-q").forEach((q) => {
+      q.addEventListener("click", () => q.parentElement.classList.toggle("open"));
+    });
+  </script>
+</body>
+</html>

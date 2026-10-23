@@ -1,0 +1,859 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/fraunces/full.css";
+import "@fontsource-variable/fraunces/full-italic.css";
+import Icon from "../../../components/demo/pricing/Icon.astro";
+import Mark from "../../../components/demo/saas-landing/Mark.astro";
+import { PLANS, CPA, DEFAULT_ACCOUNTS, MIN_ACCOUNTS, MAX_ACCOUNTS, CHART, quote, bestFit, crossover, money, cx, cy } from "../../../components/demo/pricing/model";
+import type { Period } from "../../../components/demo/pricing/model";
+
+const periods: Period[] = ["annual", "monthly"];
+const n0 = DEFAULT_ACCOUNTS;
+const fit0 = bestFit(n0, "annual");
+const q = (i: number, p: Period) => quote(PLANS[i], n0, false, p);
+
+const extrasLabel = (i: number) => {
+  const p = PLANS[i];
+  if (!Number.isFinite(p.included)) return "All accounts included";
+  const x = Math.max(0, n0 - p.included);
+  return x === 0 ? `${n0} of ${p.included} accounts included` : `${x} extra account${x === 1 ? "" : "s"} × $4.99`;
+};
+const extrasValue = (i: number) => {
+  const x = q(i, "annual");
+  return x.extras === 0 ? "Included" : money(x.extraCost);
+};
+
+const ticksX = [1, 3, 6, 9, 12];
+const ticksY = [0, 30, 60, 90];
+const line = (i: number, p: Period) => {
+  const pts: string[] = [];
+  for (let n = MIN_ACCOUNTS; n <= MAX_ACCOUNTS; n++) pts.push(`${cx(n).toFixed(1)},${cy(quote(PLANS[i], n, false, p).total).toFixed(1)}`);
+  return pts.join(" ");
+};
+const cross = Object.fromEntries(periods.map((p) => [p, crossover(p)])) as Record<Period, number>;
+
+const plansCopy: { for: string; feats: string[][]; missing?: string; adds: string }[] = [
+  {
+    for: "For getting your books in order.",
+    feats: [
+      ["1 bank account", "More at $4.99/mo each"],
+      ["Unlimited invoices"],
+      ["Expenses sorted into tax categories, with rules"],
+      ["Free seat for your accountant"],
+    ],
+    missing: "No quarterly tax estimates or invoice reminders",
+    adds: "Includes",
+  },
+  {
+    for: "For freelancers who pay quarterly taxes.",
+    feats: [
+      ["Quarterly tax estimates that update when you're paid"],
+      ["Invoice reminders that stop when the client pays"],
+      ["3 bank accounts", "More at $4.99/mo each"],
+      ["Multi-currency invoices, 2 seats"],
+    ],
+    adds: "Everything in Starter, plus",
+  },
+  {
+    for: "For studios of up to 15 people.",
+    feats: [["Unlimited bank accounts"], ["Up to 15 seats"], ["Priority email and chat support"]],
+    adds: "Everything in Pro, plus",
+  },
+];
+
+type Cell = string | boolean;
+const groups: { title: string; rows: { label: string; note?: string; cells: [Cell, Cell, Cell] }[] }[] = [
+  {
+    title: "Bookkeeping",
+    rows: [
+      { label: "Bank accounts", note: "Each linked checking, savings, or card account", cells: ["1", "3", "Unlimited"] },
+      { label: "Each extra account", cells: ["$4.99/mo", "$4.99/mo", "Included"] },
+      { label: "Expense sorting and rules", cells: [true, true, true] },
+      { label: "Invoices", cells: ["Unlimited", "Unlimited", "Unlimited"] },
+      { label: "Multi-currency invoices", cells: [false, true, true] },
+    ],
+  },
+  {
+    title: "Taxes and getting paid",
+    rows: [
+      { label: "Quarterly tax estimates", note: "Updates each time you're paid", cells: [false, true, true] },
+      { label: "Invoice reminders", note: "Stop the moment the client pays", cells: [false, true, true] },
+      { label: "Year-end CPA review", note: "Optional add-on", cells: ["$240/yr", "$240/yr", "$240/yr"] },
+    ],
+  },
+  {
+    title: "People and support",
+    rows: [
+      { label: "Seats", cells: ["1", "2", "Up to 15"] },
+      { label: "Accountant seat", cells: ["Free", "Free", "Free"] },
+      { label: "Support", cells: ["Email", "Email", "Priority email and chat"] },
+    ],
+  },
+];
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#101417" media="(prefers-color-scheme: dark)" />
+<title>Pricing · Ledgerline</title>
+<meta name="description" content="Three Ledgerline plans priced for your setup, extra bank accounts included. 30-day trial, no card, cancel in one click." />
+<script is:inline>document.documentElement.classList.add("js");</script>
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    --bg: #f8f7f3;
+    --surface: #ffffff;
+    --surface-2: #f2f0eb;
+    --surface-3: #ffffff;
+    --ink: #1a1f24;
+    --ink-2: #434a52;
+    --ink-3: #626a72;
+    --line: #e4e1da;
+    --line-2: #d3cfc6;
+    --line-strong: #8a9097;
+    --accent: #1d5a85;
+    --accent-hover: #236a9a;
+    --accent-press: #174b6f;
+    --accent-ink: #1a5480;
+    --on-accent: #ffffff;
+    --accent-soft: #e5eef4;
+    --seg-2: #6b97b6;
+    --seg-3: #b3cbdc;
+    --success: #1f6b47;
+    --success-soft: #e2f1e8;
+    --warning: #8a5a00;
+    --warning-mark: #c98a12;
+    --warning-soft: #fbf0d9;
+    --error: #b42318;
+    --error-soft: #fbe6e3;
+    --focus: #1d5a85;
+    --shadow-card: 0 1px 2px rgb(26 31 36 / 0.05), 0 18px 40px -20px rgb(26 31 36 / 0.22);
+    --cta-bg: #1a1f24; --cta-ink: #f8f7f3; --cta-btn: #f8f7f3; --cta-btn-ink: #1a1f24; --cta-btn-hover: #ecebe6;
+    --cta-err: #f6a49b; --cta-ok: #9fdcb9;
+
+    --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+
+    --t-xs: 0.8125rem;
+    --t-sm: 0.875rem;
+    --t-md: 0.9375rem;
+    --t-base: 1.0625rem;
+    --t-lg: 1.25rem;
+    --t-xl: 1.5rem;
+    --t-h2: clamp(1.875rem, 1.4rem + 1.6vw, 2.75rem);
+    --t-h1: clamp(2.375rem, 1.6rem + 2.8vw, 4rem);
+
+    --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+    --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+    --gutter: clamp(16px, 4vw, 40px);
+    --max: 1200px;
+    --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --dur-press: 140ms; --dur-small: 180ms; --dur-medium: 260ms;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101417;
+      --surface: #171c20;
+      --surface-2: #1f262b;
+      --surface-3: #232b31;
+      --ink: #e7ebee;
+      --ink-2: #b6bfc6;
+      --ink-3: #8f9aa2;
+      --line: #273036;
+      --line-2: #323c43;
+      --line-strong: #66737c;
+      --accent: #86bde3;
+      --accent-hover: #9bcaea;
+      --accent-press: #74aed8;
+      --accent-ink: #9dcbec;
+      --on-accent: #0c1820;
+      --accent-soft: #19303f;
+      --seg-2: #4f7f9f;
+      --seg-3: #2f4c60;
+      --success: #74cf9c;
+      --success-soft: #16301f;
+      --warning: #e8b65c;
+      --warning-mark: #e0a744;
+      --warning-soft: #33280f;
+      --error: #f2877d;
+      --error-soft: #3a1c19;
+      --focus: #9dcbec;
+      --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 24px 48px -24px rgb(0 0 0 / 0.8);
+      --cta-bg: #1f262b; --cta-ink: #e7ebee; --cta-btn: #86bde3; --cta-btn-ink: #0c1820; --cta-btn-hover: #9bcaea;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; scroll-padding-top: 88px; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink-2);
+    font-family: var(--font-sans);
+    font-size: var(--t-base);
+    line-height: 1.6;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    caret-color: var(--accent);
+    accent-color: var(--accent);
+    overflow-x: clip;
+  }
+  ::selection { background: var(--accent-soft); color: var(--ink); }
+  html { scrollbar-color: var(--line-strong) var(--bg); }
+  h1, h2, h3 { color: var(--ink); margin: 0; text-wrap: balance; }
+  p { margin: 0; text-wrap: pretty; }
+  ul, ol, dl, dd, figure, fieldset { margin: 0; padding: 0; }
+  ul, ol { list-style: none; }
+  fieldset { border: 0; min-width: 0; }
+  a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  button { font: inherit; color: inherit; }
+  .icon { flex-shrink: 0; display: block; }
+  .num { font-variant-numeric: tabular-nums lining-nums; }
+  .wrap { max-width: var(--max); margin-inline: auto; padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right)); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .js-only { display: none !important; }
+  .js .js-only { display: revert !important; }
+  .js .no-js { display: none !important; }
+
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--r-xs); }
+
+  .skip { position: absolute; left: var(--s-4); top: -100px; background: var(--surface); color: var(--ink); padding: var(--s-3) var(--s-4); border-radius: var(--r-sm); z-index: 50; }
+  .skip:focus-visible { top: var(--s-3); }
+
+  /* Status marks: colour marks state only */
+  .mark { display: inline-grid; place-items: center; flex-shrink: 0; width: 14px; height: 14px; --mark-ink: var(--surface); }
+  .mark svg { display: block; }
+  .mark--ok { color: var(--success); }
+  .mark--run { color: var(--accent); }
+  .mark--warn { color: var(--warning-mark); --mark-ink: #1a1f24; }
+  .mark--fail { color: var(--error); }
+  .mark--idle { color: var(--line-strong); }
+  @media (prefers-reduced-motion: no-preference) {
+    .mark-arc { transform-origin: 7px 7px; animation: spin 1.1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+    min-height: 48px; padding: 0 var(--s-5);
+    border-radius: var(--r-sm); border: 1px solid transparent;
+    font: 600 1rem/1.2 var(--font-sans); letter-spacing: -0.006em;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+    touch-action: manipulation; user-select: none; -webkit-user-select: none;
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-small) ease, border-color var(--dur-small) ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: var(--on-accent); }
+  .btn-primary:active { background: var(--accent-press); }
+  .btn-quiet { background: transparent; color: var(--ink); border-color: var(--line-2); }
+  .btn-sm { min-height: 44px; padding: 0 var(--s-4); font-size: var(--t-sm); }
+  .btn[disabled] { opacity: 0.6; cursor: progress; transform: none; }
+  .btn .icon { transition: transform var(--dur-small) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-quiet:hover { border-color: var(--line-strong); background: var(--surface); }
+    .btn:hover .icon-arrow { transform: translateX(2px); }
+    a:hover { text-decoration-thickness: 2px; }
+  }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 94%, transparent); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top); }
+  .nav-inner { display: flex; align-items: center; gap: var(--s-5); height: 64px; }
+  .brand { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ink); text-decoration: none; font-weight: 650; font-size: 1.0625rem; letter-spacing: -0.012em; min-height: 44px; }
+  .brand svg { color: var(--accent); }
+  .nav-links { display: flex; gap: var(--s-1); margin-left: var(--s-4); }
+  .nav-links a { color: var(--ink-2); text-decoration: none; font-size: var(--t-md); font-weight: 500; padding: 10px var(--s-3); border-radius: var(--r-sm); transition: color var(--dur-small) ease, background-color var(--dur-small) ease; }
+  @media (hover: hover) and (pointer: fine) { .nav-links a:hover { color: var(--ink); background: var(--surface-2); } }
+  .nav-actions { margin-left: auto; display: flex; align-items: center; gap: var(--s-2); }
+  .login { color: var(--ink-2); text-decoration: none; font-size: var(--t-md); font-weight: 500; padding: var(--s-3); min-height: 44px; display: inline-flex; align-items: center; }
+  .menu { position: relative; display: none; }
+  .menu summary { list-style: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-sm); color: var(--ink); cursor: pointer; }
+  .menu summary::-webkit-details-marker { display: none; }
+  .menu-panel { position: absolute; right: 0; top: calc(100% + var(--s-2)); width: min(280px, calc(100vw - 2 * var(--gutter))); background: var(--surface-3); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: var(--s-2); transform-origin: top right; }
+  .menu[open] .menu-panel { animation: pop var(--dur-small) var(--ease-out); }
+  .menu-panel a { display: flex; align-items: center; min-height: 44px; padding: 0 var(--s-3); border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 500; }
+  @keyframes pop { from { opacity: 0; transform: scale(0.95); } }
+  .nav-links a[aria-current="page"] { color: var(--ink); background: var(--surface-2); }
+
+  /* Head */
+  .head { padding-block: var(--s-8) var(--s-6); max-width: 760px; }
+  .eyebrow { font-size: var(--t-sm); font-weight: 600; color: var(--ink-3); margin-bottom: var(--s-3); }
+  .head h1 { font-family: var(--font-display); font-optical-sizing: auto; font-variation-settings: "SOFT" 30; font-size: var(--t-h1); font-weight: 540; line-height: 1.03; letter-spacing: -0.028em; }
+  .head h1 em { font-style: italic; font-weight: 460; color: var(--accent-ink); }
+  .head p.lede { margin-top: var(--s-5); font-size: var(--t-lg); line-height: 1.55; max-width: 50ch; }
+
+  /* Signature: price it for your setup */
+  .setup { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--s-6) var(--s-7); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-6); box-shadow: var(--shadow-card); }
+  .controls { display: grid; gap: var(--s-5); align-content: start; }
+  .ctl-label { display: block; font-size: var(--t-sm); font-weight: 600; color: var(--ink); margin-bottom: var(--s-2); padding: 0; }
+  .ctl-help { display: block; margin-top: var(--s-1); font-size: var(--t-xs); color: var(--ink-3); }
+
+  .seg { display: inline-flex; padding: var(--s-1); background: var(--surface-2); border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { display: inline-flex; align-items: center; gap: var(--s-2); min-height: 44px; padding: 0 var(--s-4); border-radius: 7px; font-size: var(--t-md); font-weight: 500; color: var(--ink-2); cursor: pointer; white-space: nowrap; user-select: none; -webkit-user-select: none; transition: background-color var(--dur-small) ease, color var(--dur-small) ease, box-shadow var(--dur-small) ease; }
+  .seg input:checked + label { background: var(--surface-3); color: var(--ink); box-shadow: 0 1px 2px rgb(26 31 36 / 0.1), 0 0 0 1px var(--line); }
+  .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .seg .save { font-size: 0.75rem; font-weight: 600; color: var(--success); }
+  @media (hover: hover) and (pointer: fine) { .seg input:not(:checked) + label:hover { color: var(--ink); } }
+
+  .stepper { display: inline-grid; grid-template-columns: 44px minmax(7ch, auto) 44px; align-items: center; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line-2); background: var(--surface-3); }
+  .stepper button { width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; border-radius: 9px; color: var(--ink); cursor: pointer; touch-action: manipulation; transition: background-color var(--dur-small) ease, transform var(--dur-press) var(--ease-out); }
+  .stepper button:active:not([disabled]) { transform: scale(0.92); }
+  .stepper button[disabled] { color: var(--line-strong); cursor: not-allowed; }
+  @media (hover: hover) and (pointer: fine) { .stepper button:not([disabled]):hover { background: var(--surface-2); } }
+  .stepper output { text-align: center; font-weight: 600; color: var(--ink); font-size: var(--t-base); }
+  .no-js-note { font-size: var(--t-sm); color: var(--ink-2); }
+  .no-js-note b { color: var(--ink); }
+
+  .check { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s-3); cursor: pointer; font-size: var(--t-sm); line-height: 1.5; min-height: 44px; align-items: start; }
+  .check input { width: 20px; height: 20px; margin: 1px 0 0; cursor: pointer; }
+  .check b { display: block; color: var(--ink); font-weight: 600; font-size: var(--t-md); }
+  .check span span { color: var(--ink-3); }
+
+  .verdict { border-top: 1px solid var(--line); padding-top: var(--s-4); display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: var(--s-3); align-items: start; font-size: var(--t-md); color: var(--ink-2); }
+  .verdict .mark { margin-top: 5px; }
+  .verdict b { color: var(--ink); font-weight: 600; }
+
+  .curve { background: var(--surface-2); border-radius: var(--r-md); padding: var(--s-4) var(--s-4) var(--s-3); align-self: stretch; display: flex; flex-direction: column; }
+  .curve figcaption { display: flex; flex-direction: column; }
+  .curve-title { font-size: var(--t-sm); font-weight: 600; color: var(--ink); }
+  .curve-sub { font-size: var(--t-xs); color: var(--ink-3); }
+  .curve svg { display: block; width: 100%; height: auto; margin-top: var(--s-3); overflow: visible; }
+  .curve .grid { stroke: var(--line-2); stroke-dasharray: 2 3; }
+  .curve .axis { stroke: var(--line-strong); }
+  .curve text { fill: var(--ink-3); font: 500 10.5px var(--font-sans); font-variant-numeric: tabular-nums; }
+  .curve polyline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .curve .l-starter { stroke: var(--line-strong); stroke-dasharray: 4 4; }
+  .curve .l-pro { stroke: var(--accent); }
+  .curve .l-business { stroke: var(--ink); }
+  .curve .x-cross { fill: var(--surface-2); stroke: var(--ink-2); stroke-width: 1.5; }
+  .curve .x-cross-label { fill: var(--ink-2); font-weight: 600; }
+  .curve .x-lead { stroke: var(--ink-3); stroke-width: 1; }
+  .curve .cursor line { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 2 2; }
+  .curve .dot { stroke: var(--surface-2); stroke-width: 2; }
+  .curve .dot-starter { fill: var(--line-strong); }
+  .curve .dot-pro { fill: var(--accent); }
+  .curve .dot-business { fill: var(--ink); }
+  .curve .cursor, .curve .dot { transition: transform var(--dur-medium) var(--ease-out); }
+  .curve-legend { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); margin-top: auto; padding-top: var(--s-2); font-size: var(--t-xs); color: var(--ink-3); }
+  .curve-legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; margin-right: 6px; vertical-align: 3px; }
+  .curve-legend .k-starter i { border-top: 2px dashed var(--line-strong); }
+  .curve-legend .k-pro i { border-color: var(--accent); }
+  .curve-legend .k-business i { border-color: var(--ink); }
+
+  /* Period switching works with JS off via :has() */
+  body:has(#bill-annual:checked) [data-period="monthly"],
+  body:has(#bill-monthly:checked) [data-period="annual"] { display: none; }
+
+  /* Plans */
+  .plans { margin-top: var(--s-5); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); align-items: stretch; }
+  .plan { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-6); min-width: 0; transition: border-color var(--dur-medium) ease, box-shadow var(--dur-medium) ease; }
+  .plan[data-fit] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-card); }
+  .plan-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); min-height: 28px; }
+  .plan h2 { font-size: 1.0625rem; font-weight: 650; letter-spacing: -0.005em; }
+  .fit { font-size: 0.75rem; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 3px var(--s-3); white-space: nowrap; opacity: 0; transform: scale(0.9); visibility: hidden; transition: opacity var(--dur-small) ease, transform var(--dur-medium) var(--ease-out), visibility 0s linear var(--dur-small); }
+  .plan[data-fit] .fit { opacity: 1; transform: none; visibility: visible; transition: opacity var(--dur-small) ease, transform var(--dur-medium) var(--ease-out); }
+  .for { margin-top: var(--s-1); font-size: var(--t-sm); color: var(--ink-3); }
+  .price { margin-top: var(--s-5); display: flex; align-items: baseline; gap: var(--s-2); }
+  .amt { font-family: var(--font-display); font-optical-sizing: auto; font-size: clamp(2.5rem, 2.1rem + 1.2vw, 3.25rem); font-weight: 520; letter-spacing: -0.03em; color: var(--ink); line-height: 1; font-feature-settings: "tnum", "lnum"; }
+  .per { font-size: var(--t-sm); color: var(--ink-3); font-weight: 500; }
+  .billed { margin-top: var(--s-2); font-size: var(--t-sm); color: var(--ink-3); }
+  .billed b { color: var(--success); font-weight: 600; }
+
+  .receipt { margin-top: var(--s-5); background: var(--surface-2); border-radius: var(--r-md); padding: var(--s-3) var(--s-4); font-size: var(--t-sm); }
+  .receipt > div { display: flex; justify-content: space-between; gap: var(--s-3); padding-block: 5px; }
+  .receipt dt { color: var(--ink-2); min-width: 0; }
+  .receipt dd { color: var(--ink); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .receipt dd.inc { color: var(--ink-3); }
+  .receipt > .r-cpa { display: grid; grid-template-rows: 0fr; padding-block: 0; opacity: 0; visibility: hidden; transition: grid-template-rows var(--dur-medium) var(--ease-out), opacity var(--dur-small) ease, visibility 0s linear var(--dur-medium); }
+  .r-cpa > div { overflow: hidden; display: flex; justify-content: space-between; gap: var(--s-3); min-height: 0; }
+  .r-cpa dt, .r-cpa dd { padding-block: 5px; }
+  .has-cpa .receipt > .r-cpa { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition: grid-template-rows var(--dur-medium) var(--ease-out), opacity var(--dur-small) ease 60ms; }
+  .receipt > .r-total { margin-top: var(--s-1); padding-top: var(--s-2); border-top: 1px dashed var(--line-2); align-items: baseline; }
+  .r-total dt { color: var(--ink); font-weight: 600; }
+  .r-total dd { font-weight: 650; font-size: var(--t-base); color: var(--ink); }
+  .r-total dd > span { display: inline-block; }
+  .r-total dd small { font-size: var(--t-xs); font-weight: 500; color: var(--ink-3); }
+  .r-year { margin-top: var(--s-2); font-size: var(--t-xs); color: var(--ink-3); text-align: right; }
+
+  .plan .btn { margin-top: var(--s-5); width: 100%; }
+  .missing { margin-top: var(--s-4); display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: var(--s-2); align-items: start; font-size: var(--t-sm); color: var(--ink-2); }
+  .missing .mark { margin-top: 4px; }
+  .adds { margin-top: var(--s-5); padding-top: var(--s-5); border-top: 1px solid var(--line); font-size: var(--t-sm); font-weight: 600; color: var(--ink); }
+  .feats { margin-top: var(--s-3); display: grid; gap: var(--s-3); font-size: var(--t-md); }
+  .feats li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: var(--s-3); align-items: start; color: var(--ink-2); }
+  .feats .icon { color: var(--accent-ink); margin-top: 4px; }
+  .feats small { display: block; font-size: var(--t-xs); color: var(--ink-3); }
+
+  .plans-foot { margin-top: var(--s-5); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-3) var(--s-5); font-size: var(--t-sm); color: var(--ink-3); }
+
+  /* Sections */
+  .section { padding-block: var(--s-9) 0; }
+  .section h2.title { font-family: var(--font-display); font-optical-sizing: auto; font-variation-settings: "SOFT" 30; font-size: var(--t-h2); font-weight: 540; letter-spacing: -0.022em; line-height: 1.08; }
+  .section .sub { margin-top: var(--s-3); max-width: 56ch; }
+
+  .policy { margin-top: var(--s-6); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
+  .policy li { padding-top: var(--s-5); border-top: 1px solid var(--line-strong); }
+  .policy .icon { color: var(--ink-3); }
+  .policy h3 { margin-top: var(--s-3); font-size: var(--t-lg); font-weight: 640; letter-spacing: -0.012em; }
+  .policy p { margin-top: var(--s-2); }
+  .policy .when { display: block; margin-top: var(--s-3); font-size: var(--t-sm); color: var(--ink-3); }
+
+  .table-wrap { margin-top: var(--s-6); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--t-md); }
+  th, td { padding: var(--s-4) var(--s-5); text-align: left; vertical-align: top; }
+  thead th { font-size: var(--t-sm); font-weight: 650; color: var(--ink); border-bottom: 1px solid var(--line); }
+  tbody th { font-weight: 500; color: var(--ink); width: 34%; }
+  tbody th small { display: block; font-size: var(--t-xs); color: var(--ink-3); font-weight: 400; }
+  tbody td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  tbody tr + tr:not(.group) > * { border-top: 1px solid var(--line); }
+  .group th { padding-top: var(--s-6); font-size: var(--t-xs); font-weight: 650; color: var(--ink-3); letter-spacing: 0.02em; }
+  td .icon { color: var(--accent-ink); }
+  td .icon.no { color: var(--line-strong); }
+
+  .faq-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--s-8); }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:last-child { border-bottom: 1px solid var(--line); }
+  .faq summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); min-height: 64px; padding-block: var(--s-4); color: var(--ink); font-weight: 600; cursor: pointer; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary .icon { color: var(--ink-3); transition: transform var(--dur-medium) var(--ease-out); }
+  .faq details[open] summary .icon { transform: rotate(180deg); }
+  .faq details p { padding-bottom: var(--s-5); max-width: 62ch; }
+  @media (hover: hover) and (pointer: fine) { .faq summary:hover .icon { color: var(--ink); } }
+
+  .final { padding-block: var(--s-10) var(--s-9); }
+  .final-card { background: var(--cta-bg); border-radius: var(--r-lg); padding: clamp(var(--s-6), 5vw, var(--s-8)); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-5) var(--s-7); }
+  .final-card h2 { color: var(--cta-ink); font-family: var(--font-display); font-optical-sizing: auto; font-size: var(--t-h2); font-weight: 540; letter-spacing: -0.022em; line-height: 1.08; max-width: 18ch; }
+  .final-card p { margin-top: var(--s-3); color: color-mix(in srgb, var(--cta-ink) 78%, transparent); }
+  .final-card .btn-primary { background: var(--cta-btn); color: var(--cta-btn-ink); }
+  .final-card .btn-primary:focus-visible { outline-color: var(--cta-ink); }
+  @media (hover: hover) and (pointer: fine) { .final-card .btn-primary:hover { background: var(--cta-btn-hover); } }
+
+  .footer { border-top: 1px solid var(--line); padding-block: var(--s-7) calc(var(--s-7) + env(safe-area-inset-bottom)); font-size: var(--t-sm); color: var(--ink-3); }
+  .footer-grid { display: flex; flex-wrap: wrap; gap: var(--s-5); justify-content: space-between; align-items: center; }
+  .footer nav { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-2); }
+  .footer a { color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-2); }
+  @media (hover: hover) and (pointer: fine) { .footer a:hover { color: var(--ink); text-decoration: underline; } }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .setup { animation: rise 520ms var(--ease-out) 60ms both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .curve .cursor, .curve .dot { transition: none; }
+    .fit, .plan[data-fit] .fit { transform: none; transition: opacity 150ms ease, visibility 0s; }
+    .receipt > .r-cpa, .has-cpa .receipt > .r-cpa { transition: opacity 150ms ease; }
+    .menu[open] .menu-panel { animation: none; }
+  }
+
+  @media (max-width: 1040px) {
+    .setup { grid-template-columns: minmax(0, 1fr); }
+    .plans { grid-template-columns: minmax(0, 1fr); max-width: 600px; }
+    .policy { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+    .faq-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+  }
+  @media (max-width: 860px) {
+    .nav-links, .login { display: none; }
+    .menu { display: block; }
+  }
+  @media (max-width: 640px) {
+    .head { padding-block: var(--s-6) var(--s-5); }
+    .head p.lede { font-size: 1.0625rem; }
+    .setup { padding: var(--s-4); gap: var(--s-5); }
+    .seg { display: flex; }
+    .seg label { flex: 1; justify-content: center; padding: 0 var(--s-2); }
+    .curve { padding: var(--s-3); }
+    .curve text { font-size: 13px; }
+    .plan { padding: var(--s-5); }
+    .section { padding-block: var(--s-8) 0; }
+    .final { padding-block: var(--s-9) var(--s-8); }
+    .nav-cta-label-long { display: none; }
+
+    /* Compare table: one block per feature, three labelled values underneath */
+    table, tbody { display: block; }
+    thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    tbody tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: var(--s-3) var(--s-4); column-gap: var(--s-3); }
+    tbody tr + tr:not(.group) > * { border-top: 0; }
+    tbody tr + tr:not(.group) { border-top: 1px solid var(--line); }
+    tbody th, tbody td { padding: 0; width: auto; }
+    tbody th[scope="row"] { grid-column: 1 / -1; margin-bottom: var(--s-2); }
+    tbody td { font-size: var(--t-sm); }
+    tbody td::before { content: attr(data-plan); display: block; font-size: 0.75rem; font-weight: 600; color: var(--ink-3); }
+    tr.group { display: block; padding-top: var(--s-5); padding-bottom: var(--s-1); }
+    tr.group th { padding: 0; }
+  }
+  @media (min-width: 641px) { .nav-cta-label-short { display: none; } }
+</style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="/demo/saas-landing/after" aria-label="Ledgerline home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.75"/><path d="M8 8v8h8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ledgerline
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/demo/saas-landing/after#features">Features</a>
+        <a href="/demo/saas-landing/after#how">How it works</a>
+        <a href="/demo/pricing/after" aria-current="page">Pricing</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="login" href="#">Log in</a>
+        <a class="btn btn-primary btn-sm" href="#start"><span class="nav-cta-label-long">Start 30-day trial</span><span class="nav-cta-label-short">Start trial</span></a>
+        <details class="menu">
+          <summary aria-label="Menu"><Icon name="menu" /></summary>
+          <div class="menu-panel">
+            <a href="/demo/saas-landing/after#features">Features</a>
+            <a href="/demo/saas-landing/after#how">How it works</a>
+            <a href="/demo/pricing/after" aria-current="page">Pricing</a>
+            <a href="#">Log in</a>
+          </div>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Pricing</p>
+        <h1>Pay for the setup you <em>actually have.</em></h1>
+        <p class="lede">Every plan starts with 30 days free and no card. Tell us how many bank accounts you'll connect, and each plan shows its real monthly total, extras included.</p>
+      </div>
+
+      <section class="setup" aria-labelledby="setup-title" data-setup>
+        <h2 class="sr-only" id="setup-title">Your setup</h2>
+        <div class="controls">
+          <fieldset>
+            <legend class="ctl-label">Billing</legend>
+            <div class="seg">
+              <input type="radio" name="billing" id="bill-monthly" value="monthly" />
+              <label for="bill-monthly">Monthly</label>
+              <input type="radio" name="billing" id="bill-annual" value="annual" checked />
+              <label for="bill-annual">Annual <span class="save">Save 20%</span></label>
+            </div>
+          </fieldset>
+
+          <div class="js-only">
+            <span class="ctl-label" id="acct-label">Bank accounts you'll connect</span>
+            <div class="stepper" role="group" aria-labelledby="acct-label">
+              <button type="button" data-step="-1" aria-label="One fewer account"><Icon name="minus" size={18} /></button>
+              <output class="num" data-accounts aria-live="polite">{n0}</output>
+              <button type="button" data-step="1" aria-label="One more account"><Icon name="plus" size={18} /></button>
+            </div>
+            <span class="ctl-help">Checking, savings, and cards each count as one.</span>
+          </div>
+          <p class="no-js no-js-note">Totals below assume <b>{n0} bank accounts</b>: checking, savings, and one card. Extra accounts are $4.99/mo each on Starter and Pro.</p>
+
+          <div class="js-only">
+            <label class="check" for="cpa">
+              <input type="checkbox" id="cpa" name="cpa" />
+              <span><b>Add year-end CPA review</b><span>A licensed CPA checks your books before you file. $240 a year, so $20/mo on any plan.</span></span>
+            </label>
+          </div>
+
+          <p class="verdict">
+            <Mark state="ok" label="Best fit" />
+            <span data-verdict-text><b>Pro fits best.</b> At {n0} accounts it's the cheapest plan with quarterly tax estimates. Business gets cheaper from <span data-period="annual">{cross.annual}</span><span data-period="monthly">{cross.monthly}</span> accounts.</span>
+          </p>
+        </div>
+
+        <figure class="curve" aria-labelledby="curve-title">
+          <figcaption>
+            <span class="curve-title" id="curve-title">Monthly cost by number of bank accounts</span>
+            <span class="curve-sub"><span data-period="annual">Billed annually</span><span data-period="monthly">Billed monthly</span>, before the CPA review</span>
+          </figcaption>
+          <svg viewBox={`0 0 ${CHART.w} ${CHART.h}`} role="img" aria-label={`Pro costs less than Business up to ${cross.annual - 1} accounts on annual billing and ${cross.monthly - 1} on monthly. Starter is cheapest but has no tax estimates.`}>
+            {ticksY.map((v) => (
+              <>
+                <line class="grid" x1={CHART.left} x2={CHART.w - CHART.right} y1={cy(v)} y2={cy(v)} />
+                {v < CHART.max && <text x={CHART.left - 6} y={cy(v) + 3.5} text-anchor="end">{`$${v}`}</text>}
+              </>
+            ))}
+            <line class="axis" x1={CHART.left} x2={CHART.w - CHART.right} y1={cy(0)} y2={cy(0)} />
+            {ticksX.map((n) => <text x={cx(n)} y={CHART.h - CHART.bottom + 16} text-anchor="middle">{n}</text>)}
+            <text x={CHART.w - CHART.right} y={CHART.h - 2} text-anchor="end">accounts</text>
+            {periods.map((p) => (
+              <g data-period={p}>
+                <polyline class="l-starter" points={line(0, p)} />
+                <polyline class="l-business" points={line(2, p)} />
+                <polyline class="l-pro" points={line(1, p)} />
+                <line class="x-lead" x1={cx(cross[p] - 0.5)} x2={cx(cross[p] - 0.5)} y1={CHART.top + 2} y2={cy(PLANS[2].price[p]) - 5} />
+                <circle class="x-cross" cx={cx(cross[p] - 0.5)} cy={cy(PLANS[2].price[p])} r="4" />
+                <text class="x-cross-label" x={cx(cross[p] - 0.5) - 6} y={CHART.top + 6} text-anchor="end">{`Business cheaper from ${cross[p]} accounts`}</text>
+              </g>
+            ))}
+            <g class="cursor" data-cursor style={`transform: translateX(${cx(n0)}px)`}>
+              <line x1="0" x2="0" y1={CHART.top + 12} y2={cy(0)} />
+            </g>
+            {periods.map((p) => (
+              <g data-period={p}>
+                {PLANS.map((pl, i) => (
+                  <circle class={`dot dot-${pl.id}`} r="4.5" cx="0" cy="0" data-dot={`${pl.id}-${p}`} style={`transform: translate(${cx(n0)}px, ${cy(quote(PLANS[i], n0, false, p).total)}px)`} />
+                ))}
+              </g>
+            ))}
+          </svg>
+          <p class="curve-legend" aria-hidden="true">
+            <span class="k-starter"><i></i>Starter, no tax estimates</span>
+            <span class="k-pro"><i></i>Pro</span>
+            <span class="k-business"><i></i>Business</span>
+          </p>
+        </figure>
+      </section>
+      <p class="sr-only" aria-live="polite" data-live></p>
+
+      <div class="plans" data-plans>
+        {PLANS.map((pl, i) => (
+          <article class="plan" aria-labelledby={`p-${pl.id}`} data-plan={pl.id} data-fit={pl.id === fit0 ? "" : undefined}>
+            <div class="plan-top"><h2 id={`p-${pl.id}`}>{pl.name}</h2><span class="fit" aria-hidden={pl.id === fit0 ? undefined : "true"}>Best fit for you</span></div>
+            <p class="for">{plansCopy[i].for}</p>
+            <p class="price">
+              <span class="amt" data-period="annual">{`$${pl.price.annual}`}</span><span class="amt" data-period="monthly">{`$${pl.price.monthly}`}</span>
+              <span class="per">/ month</span>
+            </p>
+            <p class="billed num">
+              <span data-period="annual">Plan price, billed yearly. <b>{`Saves $${(pl.price.monthly - pl.price.annual) * 12} a year.`}</b></span>
+              <span data-period="monthly">Billed monthly. Cancel any time.</span>
+            </p>
+
+            <dl class="receipt num" aria-label={`${pl.name} total for your setup`}>
+              <div><dt>{pl.name} plan</dt><dd><span data-period="annual">{money(pl.price.annual)}</span><span data-period="monthly">{money(pl.price.monthly)}</span></dd></div>
+              <div><dt data-r="extras-label">{extrasLabel(i)}</dt><dd data-r="extras" class={q(i, "annual").extras === 0 ? "inc" : undefined}>{extrasValue(i)}</dd></div>
+              <div class="r-cpa"><div><dt>Year-end CPA review</dt><dd>{money(CPA)}</dd></div></div>
+              <div class="r-total"><dt>Your total</dt><dd><span data-period="annual" data-r="total-annual">{money(q(i, "annual").total)}</span><span data-period="monthly" data-r="total-monthly">{money(q(i, "monthly").total)}</span><small>/mo</small></dd></div>
+            </dl>
+            <p class="r-year num"><span data-period="annual"><span data-r="year">{money(q(i, "annual").yearly)}</span> a year at checkout</span><span data-period="monthly">No commitment</span></p>
+
+            <a class:list={["btn", pl.id === fit0 ? "btn-primary" : "btn-quiet"]} href="#start" data-cta>Start 30-day trial</a>
+            {plansCopy[i].missing && (
+              <p class="missing"><Mark state="idle" label="Not included" />{plansCopy[i].missing}</p>
+            )}
+            <p class="adds">{plansCopy[i].adds}</p>
+            <ul class="feats">
+              {plansCopy[i].feats.map(([t, s]) => (
+                <li><Icon name="check" size={18} /><span>{t}{s && <small>{s}</small>}</span></li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <div class="plans-foot">
+        <p>Prices in USD. Sales tax, where it applies, is shown at checkout before you confirm.</p>
+        <p>More than 15 people? <a href="#">Talk to us about a custom plan</a></p>
+      </div>
+
+      <section class="section" aria-labelledby="policy-title">
+        <h2 class="title" id="policy-title">No surprises on your card</h2>
+        <ul class="policy">
+          <li>
+            <Icon name="calendar" size={22} />
+            <h3>The trial</h3>
+            <p>30 days on any plan, no card. We email you 3 days before it ends. If you don't choose a plan, your account turns read-only. Nothing is deleted, nothing is charged.</p>
+            <span class="when num">Start today and it runs until Nov 21.</span>
+          </li>
+          <li>
+            <Icon name="undo" size={22} />
+            <h3>Cancelling</h3>
+            <p>Settings → Billing → Cancel plan. One click, no call. Monthly plans keep access until the period ends, and you can export everything for 90 days.</p>
+          </li>
+          <li>
+            <Icon name="refresh" size={22} />
+            <h3>Refunds</h3>
+            <p>Annual plans get a full refund within 30 days of purchase. After that you keep access until the year ends, and there's no renewal charge if you cancel.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section" id="compare" aria-labelledby="compare-title">
+        <h2 class="title" id="compare-title">Compare plans</h2>
+        <p class="sub">Every plan includes unlimited invoices, read-only bank connections, and exports to CSV, PDF, and QBO.</p>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Features included in Starter, Pro, and Business plans</caption>
+            <thead>
+              <tr>
+                <th scope="col"><span class="sr-only">Feature</span></th>
+                {PLANS.map((p) => <th scope="col">{p.name}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {groups.map((g) => (
+                <>
+                  <tr class="group"><th scope="colgroup" colspan="4">{g.title}</th></tr>
+                  {g.rows.map((r) => (
+                    <tr>
+                      <th scope="row">{r.label}{r.note && <small>{r.note}</small>}</th>
+                      {r.cells.map((c, i) => (
+                        <td data-plan={PLANS[i].name}>
+                          {c === true ? <Icon name="check" size={18} label="Included" /> : c === false ? <Icon name="minus" size={18} class="no" label="Not included" /> : c}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section faq" aria-labelledby="faq-title">
+        <div class="faq-grid">
+          <h2 class="title" id="faq-title">Billing questions</h2>
+          <div>
+            <details>
+              <summary>Do I need a card to start the trial? <Icon name="chevron" /></summary>
+              <p>No. You add a card only when you pick a plan. If the trial ends without one, your account turns read-only and nothing is charged.</p>
+            </details>
+            <details>
+              <summary>What counts as a bank account? <Icon name="chevron" /></summary>
+              <p>Each checking, savings, or card account you link. A checking account and a card at the same bank count as two. Extras on Starter and Pro are $4.99/mo each, billed with your plan.</p>
+            </details>
+            <details>
+              <summary>Can I switch plans later? <Icon name="chevron" /></summary>
+              <p>Yes, from Settings → Billing. Upgrades apply right away and you pay the prorated difference. Downgrades take effect at the next billing date.</p>
+            </details>
+            <details>
+              <summary>What's in the CPA review? <Icon name="chevron" /></summary>
+              <p>Once a year, a licensed CPA reviews your categories and tax estimates, flags anything that looks off, and sends you a short report to file with. It's $240 a year and available on every plan.</p>
+            </details>
+            <details>
+              <summary>What happens to my data if I cancel? <Icon name="chevron" /></summary>
+              <p>Your account becomes read-only. You can export every transaction, invoice, and report as CSV, PDF, or QBO for 90 days, then it's deleted.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="final" id="start" aria-labelledby="final-title">
+      <div class="wrap">
+        <div class="final-card">
+          <div>
+            <h2 id="final-title">Try it on a month of real invoices.</h2>
+            <p>30 days free on any plan. No card. Switch plans any time during the trial.</p>
+          </div>
+          <a class="btn btn-primary" href="/demo/saas-landing/after#start">Start 30-day trial <Icon name="arrow" size={18} /></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <span>© 2026 Ledgerline, Inc.</span>
+      <nav aria-label="Footer">
+        <a href="#">Security</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    import { PLANS, MIN_ACCOUNTS, MAX_ACCOUNTS, DEFAULT_ACCOUNTS, quote, bestFit, crossover, money, cx, cy } from "../../../components/demo/pricing/model";
+    import type { Period } from "../../../components/demo/pricing/model";
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const setup = document.querySelector<HTMLElement>("[data-setup]");
+    const plans = document.querySelector<HTMLElement>("[data-plans]");
+
+    if (setup && plans) {
+      const out = setup.querySelector<HTMLOutputElement>("[data-accounts]")!;
+      const steps = [...setup.querySelectorAll<HTMLButtonElement>("[data-step]")];
+      const cpaBox = document.getElementById("cpa") as HTMLInputElement;
+      const verdict = setup.querySelector<HTMLElement>("[data-verdict-text]")!;
+      const cursor = setup.querySelector<SVGGElement>("[data-cursor]")!;
+      const live = document.querySelector<HTMLElement>("[data-live]")!;
+      const cards = [...plans.querySelectorAll<HTMLElement>("[data-plan]")];
+      let accounts = DEFAULT_ACCOUNTS;
+
+      const period = (): Period => ((document.getElementById("bill-annual") as HTMLInputElement).checked ? "annual" : "monthly");
+      const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
+
+      function swap(el: Element, text: string) {
+        if (el.textContent === text) return;
+        el.textContent = text;
+        if (reduce.matches) return;
+        el.animate([{ opacity: 0.25, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+      }
+
+      function render(announce: boolean) {
+        const p = period();
+        const cpa = cpaBox.checked;
+        const fit = bestFit(accounts, p);
+        out.value = String(accounts);
+        steps[0].disabled = accounts <= MIN_ACCOUNTS;
+        steps[1].disabled = accounts >= MAX_ACCOUNTS;
+        plans!.classList.toggle("has-cpa", cpa);
+
+        cards.forEach((card, i) => {
+          const plan = PLANS[i];
+          const qa = quote(plan, accounts, cpa, "annual");
+          const qm = quote(plan, accounts, cpa, "monthly");
+          const lbl = card.querySelector('[data-r="extras-label"]')!;
+          const val = card.querySelector<HTMLElement>('[data-r="extras"]')!;
+          if (!Number.isFinite(plan.included)) lbl.textContent = "All accounts included";
+          else if (qa.extras === 0) lbl.textContent = `${accounts} of ${plural(plan.included, "account")} included`;
+          else lbl.textContent = `${plural(qa.extras, "extra account")} × $4.99`;
+          swap(val, qa.extras === 0 ? "Included" : money(qa.extraCost));
+          val.classList.toggle("inc", qa.extras === 0);
+          swap(card.querySelector('[data-r="total-annual"]')!, money(qa.total));
+          swap(card.querySelector('[data-r="total-monthly"]')!, money(qm.total));
+          card.querySelector('[data-r="year"]')!.textContent = money(qa.yearly);
+
+          const isFit = plan.id === fit;
+          card.toggleAttribute("data-fit", isFit);
+          card.querySelector(".fit")!.toggleAttribute("aria-hidden", !isFit);
+          const cta = card.querySelector("[data-cta]")!;
+          cta.classList.toggle("btn-primary", isFit);
+          cta.classList.toggle("btn-quiet", !isFit);
+        });
+
+        const proT = quote(PLANS[1], accounts, cpa, p).total;
+        const bizT = quote(PLANS[2], accounts, cpa, p).total;
+        const from = crossover(p);
+        verdict.innerHTML = fit === "pro"
+          ? `<b>Pro fits best.</b> At ${plural(accounts, "account")} it's the cheapest plan with quarterly tax estimates, ${money(proT)}/mo. Business gets cheaper from ${from} accounts.`
+          : `<b>Business fits best.</b> At ${accounts} accounts, Pro would be ${money(proT)}/mo with extras. Business is ${money(bizT)}/mo with every account included.`;
+
+        cursor.style.transform = `translateX(${cx(accounts)}px)`;
+        (["annual", "monthly"] as Period[]).forEach((per) =>
+          PLANS.forEach((pl) => {
+            const dot = setup!.querySelector<SVGCircleElement>(`[data-dot="${pl.id}-${per}"]`)!;
+            dot.style.transform = `translate(${cx(accounts)}px, ${cy(quote(pl, accounts, false, per).total)}px)`;
+          })
+        );
+
+        if (announce) live.textContent = `${plural(accounts, "account")}${cpa ? " with CPA review" : ""}, ${p} billing. ${fit === "pro" ? "Pro" : "Business"} fits best at ${money(fit === "pro" ? proT : bizT)} a month.`;
+      }
+
+      steps.forEach((b) =>
+        b.addEventListener("click", () => {
+          accounts = Math.min(MAX_ACCOUNTS, Math.max(MIN_ACCOUNTS, accounts + Number(b.dataset.step)));
+          render(true);
+          if (b.disabled) steps[b === steps[0] ? 1 : 0].focus();
+        })
+      );
+      cpaBox.addEventListener("change", () => render(true));
+      document.querySelectorAll<HTMLInputElement>('input[name="billing"]').forEach((r) => r.addEventListener("change", () => render(true)));
+      render(false);
+    }
+  </script>
+</body>
+</html>

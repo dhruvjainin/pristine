@@ -1,0 +1,904 @@
+---
+import "@fontsource-variable/inter";
+import "../../../components/demo/mobile-web/theme.css";
+import Qr from "../../../components/demo/mobile-web/Qr.astro";
+
+const zones = [
+  { id: "A", short: "A", name: "Zone A", where: "City centre, Old Harbour, University", single: 1.9, day: 5.4 },
+  { id: "AB", short: "A + B", name: "Zones A + B", where: "Adds Northgate, Kellwick, Saltmarsh", single: 2.8, day: 8.2 },
+  { id: "ABC", short: "A + B + C", name: "Zones A + B + C", where: "Whole region, incl. Halden Airport", single: 4.1, day: 11.5 },
+];
+const eur = (n: number) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" }).format(n);
+const fares = Object.fromEntries(zones.map((z) => [z.id, { single: z.single, day: z.day, name: z.name, where: z.where }]));
+
+// Default order: Mira and her son, Zones A + B, two rides today.
+const adults = 1, reduced = 1, rides = 2;
+const half = (n: number) => Math.round(n * 50) / 100;
+const ride = adults * 2.8 + reduced * half(2.8);
+const day = adults * 8.2 + reduced * half(8.2);
+const max = Math.max(4 * ride, day);
+const bars = [1, 2, 3, 4].map((n) => {
+  const cost = n * ride;
+  return { n, cost, base: (Math.min(cost, day) / max) * 100 };
+});
+
+const chev = `<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M8 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#F6F7F5" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#121514" media="(prefers-color-scheme: dark)" />
+  <title>Buy a ticket · Port Halden Transit</title>
+  <script is:inline>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <div class="app">
+    <div class="scroller" data-scroller>
+
+      <!-- BUY -->
+      <main class="view is-current" id="buy" data-view="buy" aria-labelledby="buy-title">
+        <header class="bar-top">
+          <h1 id="buy-title">Buy a ticket</h1>
+          <p class="status">
+            <span class="status-part"><span class="dot dot-ok" aria-hidden="true"></span>Trams and buses on time</span>
+            <span class="status-part warn"><span class="dot dot-warn" aria-hidden="true"></span>F1 ferry about 10 min late</span>
+          </p>
+        </header>
+
+        <form class="buy" action="#tickets" data-buy>
+          <aside class="side" aria-label="Your tickets and order">
+            <a class="active-strip" href="#tickets" data-show="tickets">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="strip-text">
+                <span class="strip-title" data-strip-title>Single · Zones A + B</span>
+                <span class="strip-meta"><span class="strip-label">Active</span> until <time data-until>18:42</time> · <span data-left>71 min</span> left</span>
+              </span>
+              <span class="strip-cta">Show</span>
+              <span class="strip-meter" aria-hidden="true"><span data-strip-meter style="transform: scaleX(0.79)"></span></span>
+            </a>
+
+            <div class="paybar">
+              <div class="sum" aria-hidden="true">
+                <p class="sum-kicker">New ticket</p>
+                <p class="sum-title" data-sum-title>Single · Zones A + B</p>
+                <p class="sum-line"><span data-sum-adult>1 adult × €2.80</span><span data-sum-adult-amt>€2.80</span></p>
+                <p class="sum-line"><span data-sum-reduced>1 reduced × €1.40</span><span data-sum-reduced-amt>€1.40</span></p>
+              </div>
+              <div class="pay-row">
+                <div class="total" aria-live="polite">
+                  <span class="total-amt" data-total>{eur(ride)}</span>
+                  <span class="total-label">Total</span>
+                  <span class="total-meta" data-breakdown>1 adult + 1 reduced</span>
+                </div>
+                <button class="btn-pay" type="submit" data-pay><span data-pay-label>Pay</span> <span data-pay-amt>{eur(ride)}</span></button>
+              </div>
+              <p class="card-line" data-card-line>
+                <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 8h15" stroke="currentColor" stroke-width="1.5"/></svg>
+                <span>Visa ··4417 <span class="card-exp" data-card-exp>· expires 10/26</span></span>
+                <a href="#account" data-show="account" data-card-fix>Update</a>
+              </p>
+              <p class="error" data-error hidden role="alert"></p>
+            </div>
+          </aside>
+
+          <div class="fields">
+            <fieldset class="group">
+              <legend>Where are you going?</legend>
+              <div class="zones">
+                {zones.map((z, i) => (
+                  <label class="zone">
+                    <input type="radio" name="zone" value={z.id} checked={z.id === "AB"} />
+                    <svg class="rings" viewBox="0 0 40 40" width="22" height="22" aria-hidden="true">
+                      <circle cx="20" cy="20" r="17" class={i >= 2 ? "on" : ""} />
+                      <circle cx="20" cy="20" r="11.5" class={i >= 1 ? "on" : ""} />
+                      <circle cx="20" cy="20" r="6" class="on core" />
+                    </svg>
+                    <span class="zone-name">{z.short}<span class="sr">: {z.where}</span></span>
+                    <span class="zone-price" data-zone-price={z.id}>{eur(z.single)}</span>
+                  </label>
+                ))}
+              </div>
+              <p class="zone-where" data-zone-where aria-hidden="true">Zones A + B: {zones[1].where.replace("Adds", "adds")}</p>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Ticket</legend>
+              <div class="seg">
+                <label><input type="radio" name="type" value="single" checked /><span>Single<small>90 min, any transfers</small></span></label>
+                <label><input type="radio" name="type" value="day" /><span>Day pass<small>Until 04:00 tomorrow</small></span></label>
+              </div>
+
+              <div class="be" role="group" aria-labelledby="be-title">
+                <div class="be-head">
+                  <p id="be-title" class="be-title">How many rides today?</p>
+                  <p class="be-key"><span class="be-key-line" aria-hidden="true"></span>Day pass <span data-be-day>{eur(day)}</span></p>
+                </div>
+                <div class="be-chart">
+                  <span class="be-line" style={`--y: ${(day / max).toFixed(3)}`} data-be-line aria-hidden="true"></span>
+                  {bars.map((b) => (
+                    <button type="button" class="be-col" data-rides={b.n} aria-pressed={b.n === rides ? "true" : "false"} aria-label={`${b.n} ride${b.n > 1 ? "s" : ""}: ${eur(b.cost)} on singles`} style={`--i: ${b.n - 1}; --b: ${(b.base / 100).toFixed(3)}; --c: ${(b.cost / max).toFixed(3)}`}>
+                      <span class="be-stack" aria-hidden="true">
+                        <span class="be-over"></span>
+                        <span class="be-base"></span>
+                      </span>
+                      <span class="be-n" aria-hidden="true">{b.n}{b.n === 4 ? "+" : ""}</span>
+                    </button>
+                  ))}
+                </div>
+                <p class="be-verdict" aria-live="polite">
+                  <span data-be-verdict>2 rides on singles: <strong>€8.40</strong>, €3.90 less than a day pass. It pays off from ride 3.</span>
+                  <button type="button" class="link-btn" data-be-switch hidden>Switch</button>
+                </p>
+              </div>
+            </fieldset>
+            <fieldset class="group">
+              <legend>Who's riding?</legend>
+              <div class="riders">
+                <div class="rider">
+                  <label for="q-adult"><span class="rider-name">Adult</span><span class="rider-meta" data-unit="adult">€2.80 each</span></label>
+                  <div class="stepper">
+                    <button type="button" class="step-btn" data-dec="q-adult" aria-label="Remove one adult"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                    <input id="q-adult" name="adult" type="text" inputmode="numeric" pattern="[0-9]*" value={adults} maxlength="1" enterkeyhint="done" autocomplete="off" />
+                    <button type="button" class="step-btn" data-inc="q-adult" aria-label="Add one adult"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                  </div>
+                </div>
+                <div class="rider">
+                  <label for="q-reduced"><span class="rider-name">Reduced</span><span class="rider-meta"><span data-unit="reduced">€1.40</span> · ages 6–14, 65+</span></label>
+                  <div class="stepper">
+                    <button type="button" class="step-btn" data-dec="q-reduced" aria-label="Remove one reduced fare"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                    <input id="q-reduced" name="reduced" type="text" inputmode="numeric" pattern="[0-9]*" value={reduced} maxlength="1" enterkeyhint="done" autocomplete="off" />
+                    <button type="button" class="step-btn" data-inc="q-reduced" aria-label="Add one reduced fare"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                  </div>
+                </div>
+              </div>
+              <p class="hint">Under 6 ride free with an adult.</p>
+            </fieldset>
+
+          </div>
+        </form>
+      </main>
+
+      <!-- TICKETS -->
+      <section class="view" id="tickets" data-view="tickets" aria-labelledby="t-title">
+        <header class="bar-top">
+          <h2 id="t-title" class="h1">My tickets</h2>
+          <p class="sub">Show this screen to the driver or inspector.</p>
+        </header>
+
+        <div class="tickets-body">
+          <article class="ticket" aria-labelledby="tk-name">
+            <div class="ticket-head">
+              <p class="ticket-kind"><span class="live-dot" aria-hidden="true"></span> Active</p>
+              <h3 id="tk-name" class="ticket-name">Single · Zones A + B</h3>
+              <p class="ticket-who" data-ticket-who>1 adult, 1 reduced</p>
+            </div>
+
+            <div class="band" aria-hidden="true">
+              <span class="band-stripes"></span>
+              <span class="band-clock" data-clock>17:30:42</span>
+            </div>
+            <p class="band-note">The band moves and the clock ticks, so an inspector can tell this isn't a screenshot.</p>
+
+            <div class="qr-wrap">
+              <Qr label="Ticket QR code PH-4821-77 for scanning" seed={482177} size={208} class="qr" />
+            </div>
+
+            <div class="validity">
+              <p class="valid-until">Valid until <time data-until>18:42</time></p>
+              <p class="valid-left"><span data-left>71 min</span> left</p>
+              <div class="meter" role="meter" aria-label="Time remaining in minutes" aria-valuemin="0" aria-valuemax="90" aria-valuenow="71" data-meter>
+                <span style="transform: scaleX(0.79)"></span>
+              </div>
+            </div>
+            <dl class="facts">
+              <div><dt>Bought</dt><dd data-bought>17:12 today</dd></div>
+              <div><dt>Paid</dt><dd data-paid>€4.20</dd></div>
+              <div><dt>Ticket ID</dt><dd class="mono">PH-4821-77</dd></div>
+            </dl>
+            <p class="hint center">Scanner not reading it? Turn your screen brightness up.</p>
+          </article>
+
+          <section class="past" aria-labelledby="past-title">
+            <h3 id="past-title" class="group-title">Expired</h3>
+            <ul>
+              <li><span><span class="past-name">Day pass · Zones A + B + C</span><span class="past-meta">Sat 18 Oct · €11.50</span></span><a href="#buy" data-show="buy" data-again="ABC:day">Buy again</a></li>
+              <li><span><span class="past-name">Single · Zone A</span><span class="past-meta">Thu 16 Oct · €1.90</span></span><a href="#buy" data-show="buy" data-again="A:single">Buy again</a></li>
+            </ul>
+          </section>
+        </div>
+      </section>
+
+      <!-- PLAN -->
+      <section class="view" id="plan" data-view="plan" aria-labelledby="p-title">
+        <header class="bar-top">
+          <h2 id="p-title" class="h1">Plan a trip</h2>
+          <p class="sub">We'll tell you which zones to buy.</p>
+        </header>
+        <div class="plan-body">
+          <form class="plan" action="#plan" role="search" data-plan>
+            <div class="field">
+              <label for="from">From</label>
+              <input id="from" name="from" type="text" autocomplete="off" enterkeyhint="next" value="Current location" />
+            </div>
+            <div class="field">
+              <label for="to">To</label>
+              <input id="to" name="to" type="text" autocomplete="off" enterkeyhint="search" placeholder="Stop, street or place" aria-describedby="to-error" />
+              <p class="error" id="to-error" data-to-error hidden></p>
+            </div>
+            <button class="btn-wide" type="submit">Find routes</button>
+          </form>
+          <div class="routes" data-routes aria-live="polite">
+            <p class="group-title">Recent</p>
+            <ul class="list">
+              <li><a href="#plan" data-fill="Kellwick Ferry Pier"><span>Kellwick Ferry Pier<small>Zone B · ferry and tram</small></span><Fragment set:html={chev} /></a></li>
+              <li><a href="#plan" data-fill="Halden University"><span>Halden University<small>Zone A · tram 4</small></span><Fragment set:html={chev} /></a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACCOUNT -->
+      <section class="view" id="account" data-view="account" aria-labelledby="a-title">
+        <header class="bar-top">
+          <h2 id="a-title" class="h1">Account</h2>
+          <p class="sub acct-who">Mira Okafor-Lindqvist · <span class="email">mira.okafor-lindqvist@postbox.example</span></p>
+        </header>
+        <div class="acct-body">
+          <div class="callout" data-card-callout>
+            <p class="callout-title">Your card expires at the end of October</p>
+            <p class="callout-text">Visa ··4417 runs out 10/26. Update it now so a ticket at the gate on 1 November doesn't fail.</p>
+            <form class="card-form" action="#account" data-card-form novalidate>
+              <div class="field">
+                <label for="exp">New expiry date</label>
+                <input id="exp" name="exp" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" aria-describedby="exp-error" />
+                <p class="error" id="exp-error" data-exp-error hidden></p>
+              </div>
+              <button class="btn-wide" type="submit">Save card</button>
+            </form>
+          </div>
+          <p class="callout ok" data-card-ok hidden role="status">Card saved. Visa ··4417 now runs to <span data-card-new>03/29</span>.</p>
+          <ul class="list">
+            <li><a href="#account"><span>Payment method<small data-pm>Visa ··4417 · expires 10/26</small></span><Fragment set:html={chev} /></a></li>
+            <li><a href="#account"><span>Reduced-fare card<small>Not added. Needed for riders 65+</small></span><Fragment set:html={chev} /></a></li>
+            <li><a href="#account"><span>Receipts<small>Emailed after each purchase</small></span><Fragment set:html={chev} /></a></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <nav class="tabs" aria-label="Main">
+      <span class="brand" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.75"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.75"/><circle cx="12" cy="12" r="1.75" fill="currentColor"/></svg>
+        Port Halden Transit
+      </span>
+      <a href="#buy" data-tab="buy" aria-current="page">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M12 9.5v5M9.5 12h5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+        <span>Buy</span>
+      </a>
+      <a href="#tickets" data-tab="tickets">
+        <span class="tab-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M9 9h2v2H9zM13 13h2v2h-2zM13 9h2M9 15h2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+          <span class="badge" aria-hidden="true">1</span>
+        </span>
+        <span>Tickets<span class="sr">, 1 active</span></span>
+      </a>
+      <a href="#plan" data-tab="plan">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="7" cy="17" r="2.25" fill="none" stroke="currentColor" stroke-width="1.75"/><circle cx="17" cy="7" r="2.25" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M9.25 17H15a2.5 2.5 0 0 0 0-5H9a2.5 2.5 0 0 1 0-5h5.75" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+        <span>Plan trip</span>
+      </a>
+      <a href="#account" data-tab="account">
+        <span class="tab-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="12" cy="9" r="3.5" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M5.5 19a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+          <span class="flag" data-acct-flag aria-hidden="true"></span>
+        </span>
+        <span>Account<span class="sr" data-acct-flag-sr>, 1 thing needs you</span></span>
+      </a>
+    </nav>
+  </div>
+
+  <script type="application/json" id="fares" set:html={JSON.stringify(fares)}></script>
+  <script is:inline>
+  (() => {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const FARES = JSON.parse($("#fares").textContent);
+    const fmt = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" });
+    const eur = (n) => fmt.format(n);
+    const half = (n) => Math.round(n * 50) / 100;
+    const form = $("[data-buy]");
+    const adult = $("#q-adult"), reducedEl = $("#q-reduced");
+    const MAX = 9;
+    const num = (el) => Math.min(MAX, Math.max(0, parseInt(el.value, 10) || 0));
+    const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+    let rides = 2;
+
+    function quote() {
+      const z = FARES[form.zone.value], a = num(adult), r = num(reducedEl);
+      const ride = a * z.single + r * half(z.single);
+      const day = a * z.day + r * half(z.day);
+      return { z, a, r, ride, day, type: form.type.value };
+    }
+
+    function update() {
+      const q = quote(), { z, a, r, type } = q;
+      const unit = z[type], total = type === "day" ? q.day : q.ride;
+      const kind = type === "day" ? "Day pass" : "Single";
+
+      $$("[data-zone-price]").forEach((el) => (el.textContent = eur(FARES[el.dataset.zonePrice][type])));
+      $("[data-zone-where]").textContent = `${z.name}: ${z.where.replace(/^Adds/, "adds")}`;
+      $('[data-unit="adult"]').textContent = `${eur(unit)} each`;
+      $('[data-unit="reduced"]').textContent = eur(half(unit));
+      $("[data-total]").textContent = eur(total);
+      $("[data-pay-amt]").textContent = eur(total);
+      const who = [a && plural(a, "adult"), r && `${r} reduced`].filter(Boolean).join(" + ");
+      $("[data-breakdown]").textContent = who || "Add at least one rider";
+      $("[data-sum-title]").textContent = `${kind} · ${z.name}`;
+      $("[data-sum-adult]").textContent = `${plural(a, "adult")} × ${eur(unit)}`;
+      $("[data-sum-adult-amt]").textContent = eur(a * unit);
+      $("[data-sum-reduced]").textContent = `${r} reduced × ${eur(half(unit))}`;
+      $("[data-sum-reduced-amt]").textContent = eur(r * half(unit));
+      $("[data-pay]").disabled = a + r === 0;
+      $$("[data-dec]").forEach((b) => (b.disabled = num($("#" + b.dataset.dec)) === 0));
+      $$("[data-inc]").forEach((b) => (b.disabled = num($("#" + b.dataset.inc)) === MAX));
+      $("[data-error]").hidden = true;
+      chart(q);
+    }
+
+    function chart(q) {
+      const { ride, day, type } = q;
+      const max = Math.max(4 * ride, day) || 1;
+      $("[data-be-day]").textContent = eur(day);
+      $("[data-be-line]").style.setProperty("--y", (day / max).toFixed(3));
+      $$("[data-rides]").forEach((b) => {
+        const n = +b.dataset.rides, cost = n * ride;
+        b.style.setProperty("--b", (Math.min(cost, day) / max).toFixed(3));
+        b.style.setProperty("--c", (cost / max).toFixed(3));
+        b.setAttribute("aria-pressed", String(n === rides));
+        b.setAttribute("aria-label", `${plural(n, "ride")}: ${eur(cost)} on singles`);
+      });
+      const v = $("[data-be-verdict]"), sw = $("[data-be-switch]");
+      if (!ride) { v.textContent = "Add a rider to compare singles with a day pass."; sw.hidden = true; return; }
+      const singles = rides * ride, diff = Math.abs(singles - day);
+      const from = Math.ceil(day / ride + 1e-9);
+      const label = `${plural(rides, "ride")}${rides === 4 ? " or more" : ""}`;
+      const dayWins = singles > day;
+      v.innerHTML = dayWins
+        ? `${label} on singles: <strong>${eur(singles)}</strong>. A day pass saves you <strong>${eur(diff)}</strong>.`
+        : `${label} on singles: <strong>${eur(singles)}</strong>, ${eur(diff)} less than a day pass. It pays off from ride ${from}.`;
+      const better = dayWins ? "day" : "single";
+      sw.hidden = type === better;
+      sw.textContent = better === "day" ? "Switch to day pass" : "Switch to single";
+      sw.dataset.to = better;
+    }
+
+    form.addEventListener("change", update);
+    [adult, reducedEl].forEach((el) => {
+      el.addEventListener("input", () => { el.value = el.value.replace(/\D/g, "").slice(0, 1); update(); });
+      el.addEventListener("blur", () => { el.value = String(num(el)); update(); });
+    });
+    $$("[data-inc],[data-dec]").forEach((b) => b.addEventListener("click", () => {
+      const el = $("#" + (b.dataset.inc || b.dataset.dec));
+      el.value = String(Math.min(MAX, Math.max(0, num(el) + (b.dataset.inc ? 1 : -1))));
+      update();
+    }));
+    $$("[data-rides]").forEach((b) => b.addEventListener("click", () => { rides = +b.dataset.rides; chart(quote()); }));
+    $("[data-be-switch]").addEventListener("click", (e) => {
+      form.querySelector(`input[name="type"][value="${e.currentTarget.dataset.to}"]`).checked = true;
+      update();
+    });
+
+    // Views
+    const scroller = $("[data-scroller]");
+    const views = ["buy", "tickets", "plan", "account"];
+    const titles = { buy: "Buy a ticket", tickets: "My tickets", plan: "Plan a trip", account: "Account" };
+    function show(id, push = true) {
+      if (!views.includes(id)) return;
+      $$("[data-view]").forEach((v) => v.classList.toggle("is-current", v.dataset.view === id));
+      $$("[data-tab]").forEach((t) => (t.dataset.tab === id ? t.setAttribute("aria-current", "page") : t.removeAttribute("aria-current")));
+      if (push) history.replaceState(null, "", "#" + id);
+      document.title = `${titles[id]} · Port Halden Transit`;
+      scroller.scrollTop = 0; scrollTo(0, 0);
+    }
+    $$("[data-tab],[data-show]").forEach((a) => a.addEventListener("click", (e) => {
+      const id = a.dataset.tab || a.dataset.show;
+      if (!views.includes(id)) return;
+      e.preventDefault();
+      if (a.dataset.again) {
+        const [zone, type] = a.dataset.again.split(":");
+        form.querySelector(`input[name="zone"][value="${zone}"]`).checked = true;
+        form.querySelector(`input[name="type"][value="${type}"]`).checked = true;
+        update();
+      }
+      show(id);
+      if (a.dataset.cardFix) $("#exp").focus({ preventScroll: true });
+    }));
+
+    // Live ticket
+    let until = new Date(Date.now() + 71 * 60000 + 18000), span = 90;
+    const hm = (d) => d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    const clockEl = $("[data-clock]");
+    let lastMins = -1;
+    function tick() {
+      clockEl.textContent = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const mins = Math.max(0, Math.ceil((until - Date.now()) / 60000));
+      if (mins === lastMins) return;
+      lastMins = mins;
+      const left = mins >= 60 && span > 90 ? `${Math.floor(mins / 60)} h ${mins % 60} min` : `${mins} min`;
+      $$("[data-until]").forEach((t) => { t.textContent = hm(until); t.dateTime = until.toISOString(); });
+      $$("[data-left]").forEach((t) => (t.textContent = left));
+      const frac = Math.min(1, mins / span);
+      const m = $("[data-meter]");
+      m.setAttribute("aria-valuemax", String(span));
+      m.setAttribute("aria-valuenow", String(mins));
+      m.firstElementChild.style.transform = `scaleX(${frac})`;
+      $("[data-strip-meter]").style.transform = `scaleX(${frac})`;
+    }
+    $("[data-bought]").textContent = `${hm(new Date(until - 90 * 60000))} today`;
+    tick(); setInterval(tick, 1000);
+
+    // Pay
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = quote();
+      if (q.a + q.r === 0) { const err = $("[data-error]"); err.textContent = "Add at least one rider to buy a ticket."; err.hidden = false; return; }
+      const pay = $("[data-pay]");
+      pay.disabled = true; pay.dataset.busy = "";
+      $("[data-pay-label]").textContent = "Paying";
+      setTimeout(() => {
+        delete pay.dataset.busy; pay.disabled = false; $("[data-pay-label]").textContent = "Pay";
+        const kind = q.type === "day" ? "Day pass" : "Single";
+        const name = `${kind} · ${q.z.name}`;
+        $("#tk-name").textContent = name;
+        $("[data-strip-title]").textContent = name;
+        if (q.type === "day") { until = new Date(); until.setDate(until.getDate() + 1); until.setHours(4, 0, 0, 0); }
+        else until = new Date(Date.now() + 90 * 60000);
+        span = Math.round((until - Date.now()) / 60000); lastMins = -1;
+        tick();
+        $("[data-paid]").textContent = $("[data-total]").textContent;
+        $("[data-bought]").textContent = `${hm(new Date())} today`;
+        $("[data-ticket-who]").textContent = [q.a && plural(q.a, "adult"), q.r && `${q.r} reduced`].filter(Boolean).join(", ");
+        show("tickets");
+      }, 900);
+    });
+
+    // Plan
+    const ROUTES = {
+      "kellwick ferry pier": { zone: "AB", list: [
+        { legs: "Tram 2, then F1 ferry", time: "34 min", note: "F1 is running about 10 min late", warn: true },
+        { legs: "Bus 14", time: "41 min", note: "No changes" },
+      ] },
+      "halden university": { zone: "A", list: [{ legs: "Tram 4", time: "12 min", note: "Every 6 min" }] },
+      "halden airport": { zone: "ABC", list: [{ legs: "Bus X1 express", time: "38 min", note: "Every 20 min" }] },
+    };
+    const esc = (s) => s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[c]);
+    const toErr = $("[data-to-error]"), to = $("#to");
+    $("[data-plan]").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const v = to.value.trim();
+      if (!v) { toErr.textContent = "Where are you going? Type a stop or place."; toErr.hidden = false; to.setAttribute("aria-invalid", "true"); to.focus(); return; }
+      toErr.hidden = true; to.removeAttribute("aria-invalid");
+      const hit = ROUTES[v.toLowerCase()];
+      const box = $("[data-routes]");
+      if (!hit) {
+        box.innerHTML = `<p class="empty-title">No stop called “${esc(v)}”</p><p class="hint">Try a stop name, like Northgate Station or Halden Airport.</p>`;
+        return;
+      }
+      const z = FARES[hit.zone];
+      box.innerHTML = `<p class="group-title">To ${esc(v)}</p><ul class="routes-list">${hit.list.map((r) => `<li><span class="route-legs">${r.legs}</span><span class="route-time">${r.time}</span><span class="route-note${r.warn ? " warn" : ""}">${r.note}</span></li>`).join("")}</ul><p class="hint">You need <strong>${z.name}</strong>: ${eur(z.single)} single per adult.</p><a class="btn-wide as-link" href="#buy" data-plan-buy="${hit.zone}">Buy ${z.name}</a>`;
+      $("[data-plan-buy]").addEventListener("click", (ev) => {
+        ev.preventDefault();
+        form.querySelector(`input[name="zone"][value="${hit.zone}"]`).checked = true;
+        update(); show("buy");
+      });
+    });
+    $$("[data-fill]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); to.value = a.dataset.fill; $("[data-plan]").requestSubmit(); }));
+
+    // Card expiry
+    const exp = $("#exp"), expErr = $("[data-exp-error]");
+    exp.addEventListener("input", () => {
+      const d = exp.value.replace(/\D/g, "").slice(0, 4);
+      exp.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+    });
+    $("[data-card-form]").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const m = exp.value.match(/^(\d{2})\/(\d{2})$/);
+      const fail = (msg) => { expErr.textContent = msg; expErr.hidden = false; exp.setAttribute("aria-invalid", "true"); exp.focus(); };
+      if (!m) return fail("Enter the date as it's printed on the card, like 03/29.");
+      const mm = +m[1], yy = +m[2];
+      if (mm < 1 || mm > 12) return fail("The month needs to be between 01 and 12.");
+      if (yy * 12 + mm <= 26 * 12 + 10) return fail("That's the date on your current card. Enter the one on the new card.");
+      expErr.hidden = true; exp.removeAttribute("aria-invalid");
+      $("[data-card-callout]").hidden = true;
+      $("[data-card-new]").textContent = exp.value;
+      $("[data-card-ok]").hidden = false;
+      $("[data-pm]").textContent = `Visa ··4417 · expires ${exp.value}`;
+      $("[data-card-exp]").textContent = `· expires ${exp.value}`;
+      $("[data-card-line]").classList.add("is-ok");
+      $("[data-acct-flag]").hidden = true;
+      $("[data-acct-flag-sr]").hidden = true;
+    });
+
+    update();
+    const start = location.hash.slice(1);
+    if (views.includes(start)) show(start, false);
+  })();
+  </script>
+
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; background: var(--bg); }
+    body {
+      margin: 0; color: var(--ink); background: var(--bg);
+      font: 400 1rem/1.5 var(--font); font-feature-settings: "cv11", "ss01";
+      -webkit-font-smoothing: antialiased;
+      accent-color: var(--accent); caret-color: var(--accent);
+    }
+    ::selection { background: color-mix(in oklab, var(--accent) 30%, transparent); }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    p { text-wrap: pretty; }
+    a { color: var(--accent-ink); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    [hidden] { display: none !important; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    button, a, label { touch-action: manipulation; }
+    button, .tabs a, .seg label, .zone, .active-strip, .be-col { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    button { font: inherit; }
+
+    /* App shell: on phones the scroller scrolls, the tab bar stays put, the pay bar sticks above it. */
+    .app { display: flex; flex-direction: column; height: 100dvh; max-width: var(--col); margin: 0 auto; background: var(--bg); }
+    .scroller { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+    @media (max-width: 959px) {
+      html, body { overscroll-behavior: none; }
+      @media (min-width: 600px) {
+        html, body { background: var(--backdrop); }
+        .app { border-inline: 1px solid var(--line); }
+      }
+    }
+
+    html.js .view:not(.is-current) { display: none; }
+    .view + .view { border-top: 8px solid var(--surface-2); }
+    html.js .view + .view { border-top: 0; }
+    html.js .view.is-current { animation: in var(--dur-small) var(--ease-out); }
+    @keyframes in { from { opacity: 0; transform: translateY(6px); } }
+
+    .bar-top { padding: calc(env(safe-area-inset-top) + var(--s-5)) var(--gutter) var(--s-3); }
+    h1, .h1 { font-size: 1.625rem; font-weight: 700; letter-spacing: -0.022em; line-height: 1.15; }
+    .sub { margin-top: var(--s-1); color: var(--ink-3); font-size: 0.9375rem; }
+    .acct-who { overflow-wrap: anywhere; }
+    .acct-who .email { white-space: nowrap; }
+    @media (max-width: 420px) { .acct-who .email { white-space: normal; } }
+
+    .status { display: flex; flex-wrap: wrap; gap: 2px var(--s-3); margin-top: 6px; font-size: 0.8125rem; color: var(--ink-3); }
+    .status-part { display: inline-flex; align-items: center; gap: 6px; }
+    .status-part.warn { color: var(--warning); font-weight: 560; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+    .dot-ok { background: var(--live); }
+    .dot-warn { background: var(--warning); }
+
+    /* Buy layout */
+    .buy { display: flex; flex-direction: column; padding: 0 var(--gutter); }
+    .side { display: contents; }
+    .active-strip { order: -1; }
+    .fields { order: 1; padding-bottom: var(--s-6); }
+    .paybar { order: 2; }
+
+    .active-strip {
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: var(--s-3);
+      padding: 10px var(--s-3) 12px var(--s-4); min-height: 56px; border-radius: var(--r-md);
+      background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none;
+      transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-small) ease;
+    }
+    .active-strip:active { transform: scale(0.98); background: var(--surface-2); }
+    .live-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--live); flex: none; }
+    .live-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--live); opacity: 0; animation: ping 2.4s var(--ease-out) infinite; }
+    @keyframes ping { 0% { opacity: 0.5; transform: scale(0.5); } 70%, 100% { opacity: 0; transform: scale(1.25); } }
+    .strip-text { display: grid; min-width: 0; flex: 1; }
+    .strip-title { font-weight: 600; font-size: 0.9375rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .strip-label { color: var(--live); }
+    .strip-meta { font-size: 0.8125rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .strip-cta { font-weight: 600; color: var(--accent-ink); padding: var(--s-2) var(--s-3); border-radius: var(--r-sm); background: var(--accent-soft); font-size: 0.9375rem; }
+    .strip-meter { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--surface-2); }
+    .strip-meter span, .meter span { display: block; height: 100%; background: var(--live); transform-origin: left; transition: transform 600ms var(--ease-out); }
+
+    .group { border: 0; margin: var(--s-5) 0 0; padding: 0; min-width: 0; }
+    legend, .group-title { padding: 0; font-size: 1rem; font-weight: 650; letter-spacing: -0.01em; margin-bottom: var(--s-2); }
+
+    .zones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-2); }
+    .zone {
+      position: relative; display: grid; justify-items: start; gap: 2px;
+      padding: var(--s-2) var(--s-3); min-height: 44px; cursor: pointer;
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md);
+      transition: background-color var(--dur-small) ease, border-color var(--dur-small) ease, transform var(--dur-press) var(--ease-out);
+    }
+    .zone input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+    .zone:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .zone:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .zone:active { transform: scale(0.97); }
+    .rings { margin-bottom: 2px; }
+    .rings circle { fill: none; stroke: var(--line-strong); stroke-width: 1.75; stroke-dasharray: 2 3; transition: stroke var(--dur-small) ease; }
+    .rings circle.on { stroke: var(--ink-3); stroke-dasharray: none; }
+    .zone:has(input:checked) .rings circle.on:not(.core) { stroke: var(--accent); stroke-width: 2.25; }
+    .rings circle.core { fill: var(--ink-3); stroke: none; }
+    .zone:has(input:checked) .rings .core { fill: var(--accent); }
+    .zone-name { margin-top: 2px; font-weight: 600; font-size: 0.9375rem; line-height: 1.3; white-space: nowrap; }
+    .zone-price { font-size: 0.875rem; line-height: 1.3; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+    .zone:has(input:checked) .zone-price { color: var(--accent-ink); font-weight: 600; }
+    .zone-where { margin-top: var(--s-2); font-size: 0.8125rem; color: var(--ink-3); }
+
+    .riders { display: grid; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+    .rider { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); padding: 6px var(--s-2) 6px var(--s-4); min-height: 56px; }
+    .rider + .rider { border-top: 1px solid var(--line); }
+    .rider label { display: grid; min-width: 0; }
+    .rider-name { font-weight: 600; }
+    .rider-meta { font-size: 0.8125rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .stepper { display: flex; align-items: center; flex: none; }
+    .stepper input {
+      width: 2.5ch; text-align: center; border: 0; background: none; color: var(--ink);
+      font: 600 1rem/1 var(--font); font-variant-numeric: tabular-nums; padding: 0; border-radius: 4px;
+    }
+    .step-btn {
+      display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+      border: 0; background: none; color: var(--ink); cursor: pointer; position: relative;
+      transition: transform var(--dur-press) var(--ease-out);
+    }
+    .step-btn::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1px solid var(--line-strong); transition: background-color var(--dur-small) ease; }
+    .step-btn svg { position: relative; }
+    .step-btn:active:not(:disabled) { transform: scale(0.92); }
+    .step-btn:active:not(:disabled)::before { background: var(--surface-2); }
+    .step-btn:disabled { color: var(--line-strong); cursor: default; }
+    .step-btn:disabled::before { border-color: var(--line); }
+    .hint { margin-top: var(--s-2); font-size: 0.8125rem; color: var(--ink-3); }
+    .center { text-align: center; }
+
+    .seg { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-1); padding: var(--s-1); background: var(--surface-2); border-radius: var(--r-md); }
+    .seg label { position: relative; cursor: pointer; }
+    .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+    .seg span {
+      display: grid; place-content: center; text-align: center; min-height: 52px; padding: 6px var(--s-2);
+      border-radius: var(--r-sm); font-weight: 600; color: var(--ink-2); line-height: 1.3;
+      transition: background-color var(--dur-small) ease, color var(--dur-small) ease, transform var(--dur-press) var(--ease-out);
+    }
+    .seg small { font-size: 0.8125rem; font-weight: 400; color: var(--ink-3); }
+    .seg input:checked + span { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 0 0 1px var(--line); }
+    .seg input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .seg label:active span { transform: scale(0.97); }
+
+    /* Break-even chart: singles add up per ride, the dashed line is the day pass. */
+    .be { margin-top: var(--s-3); }
+    .be-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); }
+    .be-title { font-size: 0.8125rem; font-weight: 600; color: var(--ink-2); }
+    .be-key { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .be-key-line { width: 16px; border-top: 2px dashed var(--ink-2); }
+    .be-chart { --plot: 52px; --axis: 24px; position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); margin-top: 6px; }
+    .be-line { position: absolute; left: -2px; right: -2px; bottom: var(--axis); border-top: 2px dashed var(--ink-2); pointer-events: none; z-index: 1; transform: translateY(calc(var(--plot) * var(--y) * -1)); transition: transform var(--dur-medium) var(--ease-out); }
+    .be-col {
+      display: grid; grid-template-rows: var(--plot) var(--axis); padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink-3);
+      border-radius: var(--r-sm);
+    }
+    .be-stack { position: relative; height: var(--plot); }
+    .be-base, .be-over { position: absolute; inset: 0 22%; border-radius: 3px 3px 2px 2px; transform-origin: bottom; transition: transform var(--dur-medium) var(--ease-out), background-color var(--dur-small) ease; }
+    .be-base { background: var(--bar); transform: scaleY(var(--b)); }
+    .be-over { background: color-mix(in oklab, var(--danger) 55%, var(--bg)); transform: scaleY(var(--c)); }
+    .be-n { display: grid; place-items: center; font-size: 0.8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .be-col[aria-pressed="true"] .be-base { background: var(--accent); }
+    .be-col[aria-pressed="true"] .be-n { color: var(--accent-ink); }
+    .be-col:active .be-stack { transform: scaleY(0.97); transform-origin: bottom; }
+    .be-col:focus-visible { outline-offset: 0; }
+    .be-verdict { margin-top: 2px; font-size: 0.875rem; color: var(--ink-2); }
+    .be-verdict strong { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+    .link-btn { display: inline; padding: 12px 0; margin: -12px 0 -12px 0.3em; border: 0; background: none; color: var(--accent-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; cursor: pointer; }
+    @media (prefers-reduced-motion: no-preference) {
+      .be-stack { animation: grow 420ms var(--ease-out) both; animation-delay: calc(120ms + var(--i) * 60ms); transform-origin: bottom; }
+      @keyframes grow { from { transform: scaleY(0); } }
+    }
+
+    .paybar {
+      position: sticky; bottom: 0; z-index: 2;
+      margin: 0 calc(var(--gutter) * -1);
+      padding: var(--s-3) var(--gutter) var(--s-3);
+      background: var(--surface);
+      box-shadow: var(--shadow-bar);
+    }
+    .sum, .card-line { display: none; }
+    .pay-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); }
+    .total { display: grid; min-width: 0; }
+    .total-amt { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .total-meta { font-size: 0.8125rem; color: var(--ink-3); }
+    .total-label { display: none; }
+    .btn-pay {
+      flex: none; min-height: 52px; min-width: 9.5rem; padding: 0 var(--s-6); border: 0; border-radius: var(--r-md);
+      background: var(--accent); color: var(--on-accent); font-size: 1.0625rem; font-weight: 650; font-variant-numeric: tabular-nums; cursor: pointer;
+      transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-small) ease;
+    }
+    @media (hover: hover) { .btn-pay:hover:not(:disabled) { background: var(--accent-hover); } }
+    .btn-pay:active:not(:disabled) { transform: scale(0.97); background: var(--accent-press); }
+    .btn-pay:disabled { cursor: default; opacity: 0.45; }
+    .btn-pay[data-busy] { opacity: 1; cursor: progress; }
+    .btn-pay[data-busy] [data-pay-label]::after { content: ""; display: inline-block; width: 0.9em; height: 0.9em; margin-left: 0.4em; vertical-align: -0.1em; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin 700ms linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error { margin-top: var(--s-2); color: var(--danger); font-size: 0.875rem; font-weight: 500; }
+
+    .card-line { align-items: center; gap: var(--s-2); margin-top: var(--s-3); font-size: 0.8125rem; color: var(--ink-2); }
+    .card-line svg { flex: none; color: var(--ink-3); }
+    .card-line span { flex: 1; min-width: 0; }
+    .card-exp { color: var(--warning); font-weight: 560; }
+    .card-line.is-ok .card-exp { color: var(--ink-3); font-weight: 400; }
+    .card-line.is-ok a { display: none; }
+    .card-line a { font-weight: 600; padding: 12px 0; margin: -12px 0; }
+
+    /* Tickets */
+    .tickets-body, .plan-body, .acct-body { padding: 0 var(--gutter) var(--s-7); }
+    .ticket { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-5); }
+    .ticket-kind { display: inline-flex; align-items: center; gap: var(--s-2); font-size: 0.8125rem; font-weight: 600; color: var(--live); }
+    .ticket-name { margin-top: var(--s-1); font-size: 1.25rem; font-weight: 650; letter-spacing: -0.015em; }
+    .ticket-who { color: var(--ink-3); font-size: 0.9375rem; }
+    .band { position: relative; display: grid; place-items: center; height: 48px; margin-top: var(--s-4); border-radius: var(--r-sm); overflow: hidden; background: var(--accent); color: var(--on-accent); }
+    .band-stripes { position: absolute; inset: 0 -48px 0 0; background: repeating-linear-gradient(115deg, transparent 0 14px, rgb(255 255 255 / 0.14) 14px 28px); }
+    .band-clock { position: relative; font-size: 1.375rem; font-weight: 700; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+    @media (prefers-reduced-motion: no-preference) {
+      .band-stripes { animation: band 1.6s linear infinite; }
+      @keyframes band { to { transform: translateX(32.6px); } }
+    }
+    .band-note { margin-top: var(--s-2); font-size: 0.8125rem; color: var(--ink-3); text-align: center; }
+    .qr-wrap { display: grid; place-items: center; margin: var(--s-4) auto 0; padding: var(--s-3); width: fit-content; border-radius: var(--r-md); background: #fff; box-shadow: 0 0 0 1px var(--line); }
+    .qr { display: block; width: min(208px, 60vw); height: auto; }
+    .validity { margin-top: var(--s-4); display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: var(--s-1) var(--s-3); }
+    .valid-until { font-weight: 650; font-size: 1.0625rem; font-variant-numeric: tabular-nums; }
+    .valid-left { color: var(--ink-3); font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+    .meter { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+    .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3); margin: var(--s-4) 0 0; padding-top: var(--s-4); border-top: 1px solid var(--line); }
+    .facts dt { font-size: 0.75rem; color: var(--ink-3); }
+    .facts dd { margin: 0; font-weight: 600; font-size: 0.9375rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .facts dd.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.875rem; letter-spacing: -0.01em; }
+    .ticket .hint { margin-top: var(--s-4); }
+    .past { margin-top: var(--s-7); }
+    .past ul { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+    .past li { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); padding: var(--s-2) var(--s-2) var(--s-2) var(--s-4); min-height: 60px; }
+    .past li + li { border-top: 1px solid var(--line); }
+    .past li > span { display: grid; min-width: 0; }
+    .past-name { font-weight: 600; color: var(--ink-2); }
+    .past-meta { font-size: 0.8125rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .past a { flex: none; display: grid; place-items: center; min-height: 44px; padding: 0 var(--s-3); font-weight: 600; text-decoration: none; border-radius: var(--r-sm); }
+    .past a:active { background: var(--accent-soft); }
+
+    /* Plan + account */
+    .field { display: grid; gap: 6px; margin-top: var(--s-4); }
+    .field:first-child { margin-top: 0; }
+    .field label { font-weight: 600; font-size: 0.9375rem; }
+    .field input {
+      font: 400 1rem/1.4 var(--font); color: var(--ink); background: var(--surface);
+      border: 1px solid var(--line-strong); border-radius: var(--r-md); padding: 12px 14px; min-height: 48px; width: 100%;
+      transition: border-color var(--dur-small) ease;
+    }
+    .field input:focus-visible { outline: 2px solid var(--focus); outline-offset: 0; border-color: var(--focus); }
+    .field input[aria-invalid="true"], .field input[aria-invalid="true"]:focus-visible { border-color: var(--danger); outline-color: var(--danger); }
+    .field input::placeholder { color: var(--ink-3); }
+    .btn-wide {
+      display: grid; place-items: center; width: 100%; min-height: 52px; margin-top: var(--s-5); border: 0; border-radius: var(--r-md);
+      background: var(--accent); color: var(--on-accent); font-size: 1rem; font-weight: 650; cursor: pointer; text-decoration: none;
+      transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-small) ease;
+    }
+    .btn-wide:active { transform: scale(0.98); background: var(--accent-press); }
+    .routes { margin-top: var(--s-7); }
+    .routes .btn-wide { margin-top: var(--s-4); }
+    .empty-title { font-weight: 650; font-size: 1.0625rem; }
+    .routes-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+    .routes-list li { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s-3); padding: var(--s-3) var(--s-4); }
+    .routes-list li + li { border-top: 1px solid var(--line); }
+    .route-legs { font-weight: 600; }
+    .route-time { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .route-note { grid-column: 1 / -1; font-size: 0.8125rem; color: var(--ink-3); }
+    .route-note.warn { color: var(--warning); font-weight: 560; }
+    .list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+    .list li + li { border-top: 1px solid var(--line); }
+    .list a { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); padding: var(--s-3) var(--s-4); min-height: 60px; color: var(--ink); text-decoration: none; }
+    .list a:active { background: var(--surface-2); }
+    .list span { display: grid; min-width: 0; font-weight: 600; }
+    .list small { font-weight: 400; font-size: 0.8125rem; color: var(--ink-3); }
+    .list svg { flex: none; color: var(--ink-3); }
+    .callout { margin-bottom: var(--s-5); padding: var(--s-4); border-radius: var(--r-md); background: var(--warning-soft); border: 1px solid color-mix(in oklab, var(--warning) 30%, transparent); }
+    .callout.ok { background: var(--accent-soft); border-color: color-mix(in oklab, var(--accent) 30%, transparent); color: var(--ink); font-size: 0.9375rem; }
+    .callout-title { font-weight: 650; }
+    .callout-text { margin-top: var(--s-1); font-size: 0.9375rem; color: var(--ink-2); }
+    .card-form { margin-top: var(--s-4); }
+    .card-form .btn-wide { margin-top: var(--s-3); }
+
+    /* Tab bar */
+    .tabs {
+      flex: none; display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background: var(--surface); border-top: 1px solid var(--line);
+    }
+    .brand { display: none; }
+    .tabs a {
+      display: grid; justify-items: center; align-content: center; gap: 2px; min-height: var(--tabs-h);
+      color: var(--ink-3); font-size: 0.75rem; font-weight: 560; text-decoration: none;
+      transition: color var(--dur-small) ease;
+    }
+    .tabs a[aria-current="page"] { color: var(--accent-ink); font-weight: 650; }
+    .tabs a:active svg { transform: scale(0.9); }
+    .tabs svg { transition: transform var(--dur-press) var(--ease-out); }
+    .tab-icon { position: relative; display: block; line-height: 0; }
+    .badge {
+      position: absolute; top: -6px; right: -10px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+      background: var(--accent); color: var(--on-accent); font-size: 0.6875rem; font-weight: 700; line-height: 18px; text-align: center;
+      box-shadow: 0 0 0 2px var(--surface);
+    }
+    .flag { position: absolute; top: -1px; right: -3px; width: 9px; height: 9px; border-radius: 50%; background: var(--warning); box-shadow: 0 0 0 2px var(--surface); }
+
+    @media (max-width: 359px) {
+      .zone { padding-inline: 10px; }
+      .zone-name { font-size: 0.875rem; }
+      .btn-pay { min-width: 0; padding: 0 var(--s-4); }
+    }
+
+    /* Desktop: a real web layout, not a phone in a void. */
+    @media (min-width: 960px) {
+      .app { height: auto; min-height: 100dvh; max-width: none; display: block; }
+      .scroller { overflow: visible; }
+      .tabs {
+        position: sticky; top: 0; z-index: 3;
+        display: flex; align-items: center; gap: var(--s-1);
+        padding: 0 max(var(--s-7), calc((100vw - 1120px) / 2));
+        border-top: 0; border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .app { display: flex; flex-direction: column; }
+      .tabs { order: -1; }
+      .brand { display: inline-flex; align-items: center; gap: var(--s-2); margin-right: auto; font-weight: 700; letter-spacing: -0.01em; color: var(--accent-ink); }
+      .tabs a { display: inline-flex; align-items: center; gap: var(--s-2); min-height: 60px; padding: 0 var(--s-3); font-size: 0.9375rem; position: relative; }
+      .tabs a svg { width: 20px; height: 20px; }
+      .badge { top: -7px; right: -8px; min-width: 16px; height: 16px; padding: 0 4px; font-size: 0.625rem; line-height: 16px; }
+      .tabs a:has(.badge) { gap: 12px; }
+      .tabs a[aria-current="page"]::after { content: ""; position: absolute; left: var(--s-3); right: var(--s-3); bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
+      @media (hover: hover) { .tabs a:hover { color: var(--ink); } }
+
+      .view { max-width: 1120px; margin: 0 auto; padding: 0 var(--s-7); }
+      .bar-top { padding: var(--s-7) 0 var(--s-2); }
+      h1, .h1 { font-size: 2rem; }
+      .status { font-size: 0.875rem; }
+      .buy { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--s-8); align-items: start; padding: 0 0 var(--s-8); }
+      .fields { grid-column: 1; grid-row: 1; padding-bottom: 0; }
+      .side { display: grid; gap: var(--s-4); grid-column: 2; grid-row: 1; position: sticky; top: calc(60px + var(--s-5)); margin-top: var(--s-5); }
+      .group:first-child { margin-top: var(--s-5); }
+      .group { margin-top: var(--s-7); }
+      legend { font-size: 1.0625rem; margin-bottom: var(--s-3); }
+      .zones { gap: var(--s-3); }
+      .zone { padding: var(--s-4); gap: var(--s-1); }
+      .rings { width: 28px; height: 28px; }
+      .zone-name { font-size: 1.0625rem; }
+      .zone-price { font-size: 0.9375rem; }
+      .zone-where { font-size: 0.875rem; }
+      .rider { min-height: 64px; }
+      .be { margin-top: var(--s-5); padding: var(--s-4) var(--s-5) var(--s-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+      .be-chart { --plot: 88px; --axis: 28px; }
+      .be-base, .be-over { inset: 0 30%; }
+      .be-verdict { margin-top: var(--s-2); font-size: 0.9375rem; }
+      .paybar {
+        position: static; margin: 0; padding: var(--s-5); border-radius: var(--r-lg);
+        background: var(--surface); border: 1px solid var(--line); box-shadow: none;
+      }
+      .sum { display: block; padding-bottom: var(--s-4); margin-bottom: var(--s-4); border-bottom: 1px solid var(--line); }
+      .sum-kicker { font-size: 0.8125rem; color: var(--ink-3); }
+      .sum-title { font-weight: 650; margin-bottom: var(--s-2); }
+      .sum-line { display: flex; justify-content: space-between; gap: var(--s-3); font-size: 0.9375rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+      .pay-row { flex-direction: column; align-items: stretch; gap: var(--s-4); }
+      .total { grid-template-columns: 1fr auto; align-items: baseline; }
+      .total-meta { display: none; }
+      .total-label { display: block; grid-row: 1; font-weight: 600; }
+      .total-amt { font-size: 1.75rem; }
+      .btn-pay { width: 100%; }
+      .card-line { display: flex; }
+      .active-strip { order: 0; }
+      .tickets-body, .plan-body, .acct-body { max-width: 480px; padding: 0 0 var(--s-8); }
+      .view:not(#buy) .bar-top { max-width: 480px; }
+    }
+  </style>
+</body>
+</html>

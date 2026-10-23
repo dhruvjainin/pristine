@@ -1,0 +1,824 @@
+---
+import "@fontsource-variable/inter/opsz.css";
+import "@fontsource-variable/jetbrains-mono";
+import "../../../components/demo/component-library/theme.css";
+import "../../../components/demo/component-library/cl.css";
+import Status from "../../../components/demo/component-library/Status.astro";
+
+const states = [
+  { s: "queued", n: "Queued", d: "Waiting on an earlier step. Dashed so it reads as not started." },
+  { s: "running", n: "Running", d: "Spins when the length is unknown, fills 8 arcs when it isn’t." },
+  { s: "passed", n: "Passed", d: "Solid disc and a check. The only state that means done and fine." },
+  { s: "warning", n: "Passed with warnings", d: "Finished, but something deserves a look before the next deploy." },
+  { s: "failed", n: "Failed", d: "Stopped the run. Always paired with the reason in text." },
+  { s: "needs", n: "Needs you", d: "Paused on a person. The core pulses slowly until someone acts." },
+  { s: "canceled", n: "Canceled", d: "Someone stopped it on purpose. Neutral, not red." },
+  { s: "skipped", n: "Skipped", d: "Never ran because an earlier step failed or was canceled." },
+] as const;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f6f9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#111015" media="(prefers-color-scheme: dark)" />
+  <title>Grain UI · React components with every state designed</title>
+  <meta name="description" content="52 accessible React components on one token set. Loading, empty, error, disabled and keyboard states ship in the box." />
+  <script is:inline>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></symbol>
+    <symbol id="i-copy" viewBox="0 0 16 16"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" /><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2" /></symbol>
+    <symbol id="i-check" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" /></symbol>
+    <symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" /></symbol>
+    <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" /><path d="M10.5 10.5L14 14" /></symbol>
+    <symbol id="i-gear" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2" /><path d="M8 1.8v1.6M8 12.6v1.6M3.6 3.6l1.1 1.1M11.3 11.3l1.1 1.1M1.8 8h1.6M12.6 8h1.6M3.6 12.4l1.1-1.1M11.3 4.7l1.1-1.1" /></symbol>
+    <symbol id="i-branch" viewBox="0 0 16 16"><circle cx="4.5" cy="3.5" r="1.5" /><circle cx="4.5" cy="12.5" r="1.5" /><circle cx="11.5" cy="5.5" r="1.5" /><path d="M4.5 5v6M11.5 7c0 2.5-2 3.5-7 4" /></symbol>
+    <symbol id="i-key" viewBox="0 0 16 16"><circle cx="5.5" cy="10.5" r="3" /><path d="M7.7 8.3L13.5 2.5M11 5l2 2M12.5 3.5l1.5 1.5" /></symbol>
+    <symbol id="i-redo" viewBox="0 0 16 16"><path d="M13 3.5V7H9.5" /><path d="M12.6 7A5 5 0 1 0 12 10.5" /></symbol>
+    <symbol id="i-logs" viewBox="0 0 16 16"><path d="M3 3.5h10M3 6.5h10M3 9.5h6M3 12.5h8" /></symbol>
+  </svg>
+
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="#main" aria-label="Grain UI home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--accent)" /><g fill="var(--on-accent)"><circle cx="8" cy="9.5" r="1.6" /><circle cx="12" cy="9.5" r="1.6" /><circle cx="16" cy="9.5" r="1.6" /><circle cx="8" cy="14.5" r="1.6" /><circle cx="12" cy="14.5" r="1.6" opacity=".55" /><circle cx="16" cy="14.5" r="1.6" opacity=".55" /></g></svg>
+        Grain UI <span class="ver">2.4</span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="/demo/docs-article/after">Docs</a>
+        <a href="#components" aria-current="page">Components</a>
+        <a href="#status">Themes</a>
+        <a href="#changelog">Changelog</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <div class="hero-copy">
+          <a class="news" href="#status"><b>New in 2.4</b> Status, an 8-state mark for jobs and runs <svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg></a>
+          <h1 id="hero-title">React components with every state already designed</h1>
+          <p class="lede">52 accessible components on one token set. Loading, empty, error, disabled and keyboard paths ship in the box, so the screen you build on Friday still holds up on Monday’s data.</p>
+          <div class="ctas">
+            <a class="btn btn-primary btn-lg" href="/demo/docs-article/after">Get started</a>
+            <a class="btn btn-lg" href="#components">Browse components</a>
+          </div>
+          <div class="install">
+            <code><span>$ </span>npm i @grain-ui/react</code>
+            <button class="btn btn-ghost btn-sm btn-icon" type="button" data-copy="npm i @grain-ui/react" aria-label="Copy install command">
+              <svg class="icon" aria-hidden="true"><use href="#i-copy" /></svg>
+            </button>
+          </div>
+          <ul class="facts">
+            <li><b class="num">52</b> components</li>
+            <li>React <b>18 and 19</b></li>
+            <li><b>MIT</b> licensed</li>
+            <li>Light and dark from <b>one</b> token set</li>
+          </ul>
+        </div>
+
+        <div>
+          <article class="run" id="run" aria-labelledby="run-title" data-phase="checks">
+            <header class="run-head">
+              <div class="run-title">
+                <h2 id="run-title">atlas-web</h2>
+                <span class="env">Production</span>
+                <span class="badge" data-tone="run" id="run-badge"><Status state="running" size="sm" label="" /> <span>Building</span></span>
+              </div>
+              <div class="elapsed">Elapsed<output id="run-time" class="num">0:52</output></div>
+              <p class="commit">
+                <svg class="icon" aria-hidden="true"><use href="#i-branch" /></svg>
+                <code>main@4f9c2e1</code>
+                <span class="msg">Fix rounding on invoice totals above €10,000</span>
+                <span class="by">· Ines Okafor</span>
+              </p>
+            </header>
+            <ol class="steps" id="steps" aria-label="Deploy steps">
+              <li class="step" data-step="install" data-s="passed">
+                <Status state="passed" />
+                <span class="step-name">Install dependencies</span>
+                <span class="step-meta" data-meta>12s</span>
+                <span class="step-cmd"><code>pnpm install --frozen-lockfile</code></span>
+              </li>
+              <li class="step" data-step="build" data-s="passed">
+                <Status state="passed" />
+                <span class="step-name">Build</span>
+                <span class="step-meta" data-meta>31s</span>
+                <span class="step-cmd"><code>pnpm build</code> · 1,912 modules</span>
+              </li>
+              <li class="step" data-step="checks" data-s="running">
+                <Status state="running" value={66} label="Running, 140 of 212 checks" />
+                <span class="step-name">Run checks</span>
+                <span class="step-meta" data-meta>140 of 212</span>
+                <span class="step-cmd" data-cmd>Unit, visual and accessibility suites</span>
+              </li>
+              <li class="step" data-step="upload" data-s="queued">
+                <Status state="queued" />
+                <span class="step-name">Upload to Frankfurt (eu-central)</span>
+                <span class="step-meta" data-meta>Queued</span>
+                <span class="step-cmd">48 MB across 312 files</span>
+              </li>
+              <li class="step" data-step="promote" data-s="queued">
+                <Status state="queued" />
+                <span class="step-name">Promote to production</span>
+                <span class="step-meta" data-meta>Queued</span>
+                <span class="step-cmd">Requires approval from a project owner</span>
+                <div class="approve" id="approve">
+                  <div><div class="inner">
+                    <p>Preview is live at <code>atlas-web-4f9c2e1.grain.app</code>. Swap it into production?</p>
+                    <button class="btn btn-sm" type="button" data-act="hold">Hold</button>
+                    <button class="btn btn-primary btn-sm" type="button" data-act="approve">Approve and promote</button>
+                  </div></div>
+                </div>
+              </li>
+            </ol>
+            <footer class="run-foot">
+              <label class="choice check"><input class="cb" type="checkbox" id="fail-toggle" /><span class="t">Make 3 checks fail</span></label>
+              <button class="btn btn-sm" type="button" data-act="cancel" id="run-cancel">Cancel run</button>
+              <button class="btn btn-sm" type="button" data-act="redeploy" id="run-redeploy">
+                <svg class="icon" aria-hidden="true"><use href="#i-redo" /></svg> Redeploy
+              </button>
+            </footer>
+          </article>
+          <p class="run-note">Live, built from <a href="#c-status">Status</a>, <a href="#c-badge">Badge</a>, <a href="#c-button">Button</a>, <a href="#c-checkbox">Checkbox</a> and <a href="#c-toast">Toast</a>. Approve it, cancel it, or make it fail.</p>
+          <p class="sr-only" aria-live="polite" id="run-live"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="status" aria-labelledby="status-title">
+      <div class="wrap">
+        <p class="eyebrow">New in 2.4 · Status</p>
+        <h2 class="title" id="status-title">One mark for every state a job can be in</h2>
+        <p class="sub">Builds, imports, syncs and payouts all move through the same eight states. Each one differs by shape as well as color, so it still reads in grayscale, at 12px, and for people who can’t tell red from green.</p>
+        <div class="spot">
+          <ul class="states">
+            {states.map((x) => (
+              <li>
+                <span class="sizes">
+                  <Status state={x.s} size="sm" label="" />
+                  <Status state={x.s} label="" />
+                  <Status state={x.s} size="lg" label={x.n} />
+                </span>
+                <b>{x.n}</b>
+                <span class="d">{x.d}</span>
+              </li>
+            ))}
+          </ul>
+          <div class="lab" id="lab">
+            <div class="lab-stage">
+              <div class="lab-big"><Status state="needs" size="lg" id="lab-mark" /></div>
+              <div class="lab-read">
+                <div class="k">state</div>
+                <div class="v" id="lab-name">Needs you</div>
+                <p id="lab-desc">{states[5].d}</p>
+              </div>
+            </div>
+            <fieldset class="seg js-only">
+              <legend>Try a state. The mark animates only when it changes.</legend>
+              {states.map((x) => (
+                <label><input type="radio" name="lab-state" value={x.s} checked={x.s === "needs"} data-name={x.n} data-desc={x.d} />{x.n}</label>
+              ))}
+            </fieldset>
+            <pre class="code" aria-label="Usage"><span class="tk">import</span> &#123; Status &#125; <span class="tk">from</span> <span class="ts">"@grain-ui/react"</span>;
+
+&lt;Status <span class="ta">state</span>=<span class="ts" id="lab-code">"needs"</span> /&gt;
+
+&lt;Status
+  <span class="ta">state</span>=<span class="ts">"running"</span>
+  <span class="ta">value</span>=&#123;66&#125;
+  <span class="ta">label</span>=<span class="ts">"140 of 212 checks"</span>
+/&gt;</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="components" aria-labelledby="idx-title">
+      <div class="wrap">
+        <div class="idx-head">
+          <div>
+            <p class="eyebrow">Components</p>
+            <h2 class="title" id="idx-title">Every preview below is the real component</h2>
+            <p class="sub">Shown with the data they meet in production: a 52-character project name, a failed deploy, a billing email missing its domain.</p>
+          </div>
+          <div class="filter">
+            <div class="search">
+              <svg class="icon" aria-hidden="true"><use href="#i-search" /></svg>
+              <input class="input" type="search" id="filter" placeholder="Filter components" aria-label="Filter components" aria-describedby="count" autocomplete="off" />
+            </div>
+            <span class="count" id="count" aria-live="polite">18 shown</span>
+          </div>
+        </div>
+
+        <div class="cat" data-cat>
+          <h3>Actions <span>2</span></h3>
+          <div class="grid">
+            <article class="cc span2" id="c-button" data-name="button primary secondary danger loading disabled">
+              <div class="cc-stage">
+                <div class="row">
+                  <button class="btn btn-primary" type="button">Create project</button>
+                  <button class="btn" type="button">Invite member</button>
+                  <button class="btn btn-ghost" type="button">View changelog</button>
+                  <button class="btn btn-danger" type="button" commandfor="dlg-delete" command="show-modal" data-open="dlg-delete">Delete project</button>
+                </div>
+                <div class="matrix" role="group" aria-label="Primary button states">
+                  <figure><span class="btn btn-primary btn-sm" aria-hidden="true">Deploy</span><figcaption>Rest</figcaption></figure>
+                  <figure><span class="btn btn-primary btn-sm is-hover" aria-hidden="true">Deploy</span><figcaption>Hover</figcaption></figure>
+                  <figure><span class="btn btn-primary btn-sm is-focus" aria-hidden="true">Deploy</span><figcaption>Focus</figcaption></figure>
+                  <figure><span class="btn btn-primary btn-sm is-press" aria-hidden="true">Deploy</span><figcaption>Pressed</figcaption></figure>
+                  <figure><span class="btn btn-primary btn-sm is-disabled" aria-hidden="true">Deploy</span><figcaption>Disabled</figcaption></figure>
+                  <figure><span class="btn btn-primary btn-sm" aria-hidden="true"><span class="spinner"></span>Deploying</span><figcaption>Loading</figcaption></figure>
+                </div>
+                <div class="row">
+                  <button class="btn btn-primary" type="button" id="save-btn" data-label="Save changes">Save changes</button>
+                  <span class="help">Click to see loading keep its width, then confirm.</span>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-button">Button</a></h4><span class="meta">4 variants · 3 sizes</span><p>Loading keeps the label’s width, so the row never jumps.</p></div>
+            </article>
+            <article class="cc" id="c-iconbutton" data-name="icon button tooltip">
+              <div class="cc-stage center">
+                <div class="row tight tips" id="tips">
+                  <span class="tip-wrap"><button class="btn btn-icon" type="button" aria-label="Settings" aria-describedby="t1"><svg class="icon" aria-hidden="true"><use href="#i-gear" /></svg></button><span class="tip" role="tooltip" id="t1">Settings</span></span>
+                  <span class="tip-wrap"><button class="btn btn-icon" type="button" aria-label="Source" aria-describedby="t2"><svg class="icon" aria-hidden="true"><use href="#i-branch" /></svg></button><span class="tip" role="tooltip" id="t2">Source</span></span>
+                  <span class="tip-wrap"><button class="btn btn-icon" type="button" aria-label="Copy ID" aria-describedby="t3" data-copy="prj_8Hx2Lq4cVn"><svg class="icon" aria-hidden="true"><use href="#i-copy" /></svg></button><span class="tip" role="tooltip" id="t3">Copy ID <kbd>⌘C</kbd></span></span>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-iconbutton">Icon button</a></h4><span class="meta">Needs a label</span><p>Hover one, then slide to the next: the second tooltip opens instantly.</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="cat" data-cat>
+          <h3>Forms <span>5</span></h3>
+          <div class="grid">
+            <article class="cc span2" id="c-textfield" data-name="text field input validation error select">
+              <div class="cc-stage">
+                <div class="pair">
+                  <div class="field">
+                    <label for="f-name">Project name</label>
+                    <div class="affix"><input class="input" id="f-name" value="atlas-web" aria-describedby="f-name-h" spellcheck="false" autocomplete="off" /><span class="suffix">.grain.app</span></div>
+                    <span class="help" id="f-name-h">Lowercase letters, numbers and hyphens</span>
+                  </div>
+                  <div class="field">
+                    <label for="f-mail">Billing email</label>
+                    <input class="input" id="f-mail" type="email" value="leo@northwind" aria-invalid="true" aria-describedby="f-mail-h" autocomplete="email" />
+                    <span class="help err" id="f-mail-h"><Status state="failed" size="sm" label="" /><span>Add the domain, like leo@northwind.com</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-textfield">Text field</a></h4><span class="meta">Validates on blur</span><p>Errors say how to fix it. Try typing in either field.</p></div>
+            </article>
+            <article class="cc" id="c-select" data-name="select region dropdown">
+              <div class="cc-stage">
+                <div class="field">
+                  <label for="f-region">Region</label>
+                  <select class="select" id="f-region">
+                    <option>Frankfurt (eu-central)</option>
+                    <option>Virginia (us-east)</option>
+                    <option>Singapore (ap-southeast)</option>
+                  </select>
+                  <span class="help">Closest to most of your traffic</span>
+                </div>
+                <div class="field">
+                  <label for="f-team">Team <span class="opt">(optional)</span></label>
+                  <input class="input" id="f-team" placeholder="e.g. Platform" />
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-select">Select</a></h4><span class="meta">Native</span><p>The platform picker on every device.</p></div>
+            </article>
+            <article class="cc" id="c-checkbox" data-name="checkbox notifications">
+              <div class="cc-stage">
+                <fieldset class="fs">
+                  <legend class="lg">Email me about</legend>
+                  <label class="choice"><input class="cb" type="checkbox" checked /><span class="t">Failed deployments</span></label>
+                  <label class="choice"><input class="cb" type="checkbox" /><span class="t">Weekly usage summary</span></label>
+                  <label class="choice"><input class="cb" type="checkbox" checked disabled /><span class="t">Billing receipts</span><span class="d">Owners only</span></label>
+                </fieldset>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-checkbox">Checkbox</a></h4><span class="meta">20px box · 32px row</span><p>Disabled says why, right under the label.</p></div>
+            </article>
+            <article class="cc" id="c-radio" data-name="radio group visibility">
+              <div class="cc-stage">
+                <fieldset class="fs">
+                  <legend class="lg">Visibility</legend>
+                  <label class="choice"><input class="rb" type="radio" name="vis" checked /><span class="t">Private</span><span class="d">Only you and invited people</span></label>
+                  <label class="choice"><input class="rb" type="radio" name="vis" /><span class="t">Team</span><span class="d">Everyone in Northwind</span></label>
+                  <label class="choice"><input class="rb" type="radio" name="vis" /><span class="t">Public</span><span class="d">Anyone with the link</span></label>
+                </fieldset>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-radio">Radio group</a></h4><span class="meta">Arrow keys</span><p>Each option explains its reach.</p></div>
+            </article>
+            <article class="cc" id="c-switch" data-name="switch toggle preview 2fa">
+              <div class="cc-stage">
+                <div>
+                  <label class="sw"><span class="t">Preview deployments</span><span class="d">Every branch gets a URL</span><input type="checkbox" role="switch" checked /></label>
+                  <label class="sw"><span class="t">Pause production deploys</span><span class="d">Merges still build previews</span><input type="checkbox" role="switch" /></label>
+                  <label class="sw"><span class="t">Require 2FA</span><span class="d">Enforced by your organization</span><input type="checkbox" role="switch" checked disabled /></label>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-switch">Switch</a></h4><span class="meta">Applies instantly</span><p>For settings that take effect without a Save.</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="cat" data-cat>
+          <h3>Status &amp; feedback <span>5</span></h3>
+          <div class="grid">
+            <article class="cc span2" id="c-status" data-name="status progress job state running failed">
+              <div class="cc-stage">
+                <ul class="panel jobs">
+                  <li><Status state="running" value={75} label="Running, 75%" /><span class="jn">Import customers from Stripe</span><span class="jm num">3,609 of 4,812</span></li>
+                  <li><Status state="needs" /><span class="jn">Send March invoices</span><span class="jm need">Approve 214 invoices</span></li>
+                  <li><Status state="warning" /><span class="jn">Rebuild search index</span><span class="jm">3 records skipped</span></li>
+                  <li><Status state="failed" /><span class="jn">Renew certificate for atlas.northwind.com</span><span class="jm err">DNS record missing</span></li>
+                  <li><Status state="passed" /><span class="jn">Nightly database backup</span><span class="jm">2.1 GB · 03:00</span></li>
+                  <li><Status state="canceled" /><span class="jn">Migrate legacy domains</span><span class="jm">Canceled by Leo</span></li>
+                </ul>
+              </div>
+              <div class="cc-foot"><h4><a href="#status">Status</a></h4><span class="meta">8 states · 3 sizes</span><p>Shape carries the meaning; color only confirms it.</p></div>
+            </article>
+            <article class="cc" id="c-badge" data-name="badge tag label status">
+              <div class="cc-stage center">
+                <div class="row tight" style="justify-content:center;max-width:240px">
+                  <span class="badge" data-tone="ok"><Status state="passed" size="sm" label="" />Deployed</span>
+                  <span class="badge" data-tone="run"><Status state="running" size="sm" label="" />Building</span>
+                  <span class="badge" data-tone="warn"><Status state="warning" size="sm" label="" />Degraded</span>
+                  <span class="badge" data-tone="err"><Status state="failed" size="sm" label="" />Failed</span>
+                  <span class="badge"><Status state="queued" size="sm" label="" />Draft</span>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-badge">Badge</a></h4><span class="meta">5 tones</span><p>Text always names the state.</p></div>
+            </article>
+            <article class="cc" id="c-toast" data-name="toast notification snackbar undo">
+              <div class="cc-stage center">
+                <div class="toast" role="presentation">
+                  <Status state="passed" label="" />
+                  <div><b>atlas-web deleted</b>14 deployments and 3 domains removed.</div>
+                  <span class="btn btn-ghost btn-sm btn-icon x" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-x" /></svg></span>
+                  <div class="actions"><span class="btn btn-sm" aria-hidden="true">Undo</span></div>
+                </div>
+                <button class="btn btn-sm js-only" type="button" id="toast-demo">Show it for real</button>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-toast">Toast</a></h4><span class="meta">Polite · 5s</span><p>Pauses while hovered or focused.</p></div>
+            </article>
+            <article class="cc" id="c-skeleton" data-name="skeleton loading placeholder">
+              <div class="cc-stage">
+                <div class="panel skel" role="status" aria-label="Loading project">
+                  <div class="hd"><span class="av"></span><span class="ln" style="width:55%"></span></div>
+                  <span class="ln"></span>
+                  <span class="ln" style="width:80%"></span>
+                  <span class="ln" style="width:40%"></span>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-skeleton">Skeleton</a></h4><span class="meta">Shape-matched</span><p>Same box as the card it stands in for.</p></div>
+            </article>
+            <article class="cc" id="c-empty" data-name="empty state api keys">
+              <div class="cc-stage">
+                <div class="panel empty">
+                  <span class="ill"><svg class="icon icon-20" aria-hidden="true"><use href="#i-key" /></svg></span>
+                  <h5>No API keys yet</h5>
+                  <p>Keys let CI deploy atlas-web without your password.</p>
+                  <div class="row tight"><button class="btn btn-primary btn-sm" type="button">Create API key</button><a class="btn btn-ghost btn-sm" href="/demo/docs-article/after">Read the API guide</a></div>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-empty">Empty state</a></h4><span class="meta">Always has a next step</span><p>Says what goes here and how to add it.</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="cat" data-cat>
+          <h3>Overlays &amp; navigation <span>3</span></h3>
+          <div class="grid">
+            <article class="cc" id="c-dialog" data-name="dialog modal confirm delete">
+              <div class="cc-stage center">
+                <div class="panel dlg-preview" aria-hidden="true">
+                  <h5>Delete atlas-web?</h5>
+                  <p>Removes 14 deployments and 3 domains. Type <b>atlas-web</b> to confirm.</p>
+                  <span class="input" style="display:flex;align-items:center;height:36px;color:var(--text-3)">atlas-web</span>
+                  <div class="foot"><span class="btn btn-sm">Cancel</span><span class="btn btn-danger btn-sm">Delete project</span></div>
+                </div>
+                <button class="btn btn-sm" type="button" commandfor="dlg-delete" command="show-modal" data-open="dlg-delete">Open the real dialog</button>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-dialog">Dialog</a></h4><span class="meta">Native &lt;dialog&gt;</span><p>Focus starts on Cancel and returns to the trigger.</p></div>
+            </article>
+            <article class="cc" id="c-tooltip" data-name="tooltip hint">
+              <div class="cc-stage center">
+                <div style="display:grid;justify-items:center;gap:10px;position:relative">
+                  <span class="tip tip-pinned" style="position:relative">Copy ID <kbd>⌘C</kbd></span>
+                  <span class="btn btn-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-copy" /></svg></span>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-tooltip">Tooltip</a></h4><span class="meta">500ms · then instant</span><p>Labels and shortcuts only, never content.</p></div>
+            </article>
+            <article class="cc" id="c-tabs" data-name="tabs navigation">
+              <div class="cc-stage">
+                <div class="panel tabs" style="padding:4px 16px 16px">
+                  <div role="tablist" aria-label="Project">
+                    <button role="tab" type="button" id="tab-1" aria-selected="true" aria-controls="tp-1">Overview</button>
+                    <button role="tab" type="button" id="tab-2" aria-selected="false" aria-controls="tp-2" tabindex="-1">Activity</button>
+                    <button role="tab" type="button" id="tab-3" aria-selected="false" aria-controls="tp-3" tabindex="-1">Settings</button>
+                  </div>
+                  <div role="tabpanel" id="tp-1" aria-labelledby="tab-1" tabindex="0">atlas-web serves the marketing site from Frankfurt. Last deploy took 48 s and passed all 212 checks.</div>
+                  <div role="tabpanel" id="tp-2" aria-labelledby="tab-2" tabindex="0" hidden>Ines Okafor deployed <code>main@4f9c2e1</code> · 12 min ago</div>
+                  <div role="tabpanel" id="tp-3" aria-labelledby="tab-3" tabindex="0" hidden>Build command: <code>pnpm build</code> · Output: <code>dist</code> · Node 22</div>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-tabs">Tabs</a></h4><span class="meta">Arrow keys · Home · End</span><p>One tab stop; arrows move between tabs.</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="cat" data-cat>
+          <h3>Data display <span>3</span></h3>
+          <div class="grid">
+            <article class="cc span3" id="c-card" data-name="project card truncation">
+              <div class="cc-stage">
+                <div class="pcards">
+                  <div class="panel pc">
+                    <div class="pc-top"><span class="pc-name">atlas-web</span><span class="badge" data-tone="ok"><Status state="passed" size="sm" label="" />Deployed</span></div>
+                    <span class="pc-env">Production · 12 min ago</span>
+                    <div class="pc-stats"><span><b>1,284</b> req/min</span><span>Frankfurt</span></div>
+                  </div>
+                  <div class="panel pc">
+                    <div class="pc-top"><span class="pc-name" title="northwind-industries-holdings-customer-portal-staging">northwind-industries-holdings-customer-portal-staging</span><span class="badge" data-tone="err"><Status state="failed" size="sm" label="" />Failed</span></div>
+                    <span class="pc-env">Staging · 3 h ago · Build exited with code 1</span>
+                    <div class="pc-stats"><span><b>0</b> req/min</span><span>Virginia</span></div>
+                  </div>
+                  <div class="panel pc">
+                    <div class="pc-top"><span class="pc-name">analytics-api</span><span class="badge" data-tone="run"><Status state="running" size="sm" label="" />Building</span></div>
+                    <span class="pc-env">Production · 2 days ago</span>
+                    <div class="pc-stats"><span><b>312</b> req/min</span><span>Singapore</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-card">Project card</a></h4><span class="meta">Truncates, never wraps the badge</span><p>A 52-character name ends in an ellipsis and keeps its full text on hover.</p></div>
+            </article>
+            <article class="cc" id="c-avatar" data-name="avatar group">
+              <div class="cc-stage center">
+                <div class="av-demo">
+                  <span class="lg">Deployed atlas-web this week</span>
+                  <div class="avs avs-lg" role="img" aria-label="Leo Marchetti, Ines Okafor, Aleksandra Wiśniewska-Kowalczyk, Jun Park and 5 more">
+                    <span class="av">LM</span><span class="av c2">IO</span><span class="av c3">AW</span><span class="av c4">JP</span><span class="av more">+5</span>
+                  </div>
+                  <span class="help">Leo, Ines and 7 others</span>
+                </div>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-avatar">Avatar group</a></h4><span class="meta">Max 4 + count</span><p>The overflow count is a real number.</p></div>
+            </article>
+            <article class="cc span2" id="c-list" data-name="member list long names email">
+              <div class="cc-stage">
+                <ul class="panel people">
+                  <li><span class="av c3">AW</span><div style="min-width:0"><div class="n">Aleksandra Wiśniewska-Kowalczyk</div><div class="e">bartholomew.fitzgerald@northwind-industries-holdings.example.com</div></div><span class="role">Owner</span></li>
+                  <li><span class="av c2">IO</span><div style="min-width:0"><div class="n">Ines Okafor</div><div class="e">ines@northwind.com</div></div><span class="role">Admin</span></li>
+                  <li><span class="av">J</span><div style="min-width:0"><div class="n">J</div><div class="e">j@northwind.com</div></div><span class="role">Viewer</span></li>
+                </ul>
+              </div>
+              <div class="cc-foot"><h4><a href="#c-list">Member list</a></h4><span class="meta">One-letter to 60-character names</span><p>Roles stay aligned whatever the name length.</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="panel empty no-match" id="no-match" hidden>
+          <span class="ill"><svg class="icon icon-20" aria-hidden="true"><use href="#i-search" /></svg></span>
+          <h5>No components match “<span id="nm-q"></span>”</h5>
+          <p>All 52 are in the docs, including the ones not previewed here.</p>
+          <div class="row tight"><button class="btn btn-sm" type="button" id="clear-filter">Clear filter</button><a class="btn btn-ghost btn-sm" href="/demo/docs-article/after">Search the docs</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot-site" id="changelog">
+    <div class="wrap">
+      <span>Grain UI 2.4.0 · MIT · 4 radii, 2 shadows, 3 durations, 1 accent</span>
+      <nav aria-label="Footer">
+        <a href="/demo/docs-article/after">Docs</a>
+        <a href="#components">Components</a>
+        <a href="#status">Changelog</a>
+        <a href="#main">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+
+  <dialog class="dlg" id="dlg-delete" aria-labelledby="dlg-title" aria-describedby="dlg-desc">
+    <form method="dialog" id="dlg-form">
+      <h2 id="dlg-title">Delete atlas-web?</h2>
+      <p id="dlg-desc">This removes 14 deployments and 3 domains. It can’t be undone.</p>
+      <div class="field">
+        <label for="dlg-input">Type <b>atlas-web</b> to confirm</label>
+        <input class="input" id="dlg-input" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="foot">
+        <button class="btn" value="cancel" autofocus>Cancel</button>
+        <button class="btn btn-danger" value="delete" id="dlg-confirm" disabled>Delete project</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toaster" id="toaster" role="region" aria-label="Notifications"><div aria-live="polite" id="toast-live" style="display:contents"></div></div>
+
+  <template id="tpl-err"><Status state="failed" size="sm" label="" /></template>
+  <template id="tpl-toast">
+    <div class="toast">
+      <Status state="passed" label="" />
+      <div><b></b><span class="body"></span></div>
+      <button class="btn btn-ghost btn-sm btn-icon x" type="button" aria-label="Dismiss"><svg class="icon" aria-hidden="true"><use href="#i-x" /></svg></button>
+    </div>
+  </template>
+
+  <script is:inline>
+  (() => {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    const NAMES = { queued: "Queued", running: "Running", passed: "Passed", warning: "Passed with warnings", failed: "Failed", needs: "Needs you", canceled: "Canceled", skipped: "Skipped" };
+
+    function setStatus(el, state, value, label) {
+      if (!el) return;
+      const changed = el.dataset.state !== state;
+      el.dataset.state = state;
+      const det = state === "running" && value != null;
+      el.toggleAttribute("data-determinate", det);
+      if (det) {
+        const on = Math.floor((value / 100) * 8);
+        $$(".segs path", el).forEach((p, i) => { p.classList.toggle("on", i < on); p.classList.toggle("now", i === on); });
+      }
+      if (el.getAttribute("role") === "img") el.setAttribute("aria-label", label || NAMES[state]);
+      if (changed) { el.removeAttribute("data-changed"); void el.offsetWidth; el.setAttribute("data-changed", ""); }
+    }
+
+    /* ---------- toasts ---------- */
+    const live = $("#toast-live");
+    const tpl = $("#tpl-toast");
+    function toast({ state = "passed", title, body = "", actions = [] }) {
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      setStatus($(".st", node), state);
+      $("b", node).textContent = title;
+      $(".body", node).textContent = body;
+      if (state === "failed") node.setAttribute("role", "alert");
+      if (actions.length) {
+        const row = document.createElement("div");
+        row.className = "actions";
+        actions.forEach(([label, fn]) => {
+          const b = document.createElement("button");
+          b.type = "button"; b.className = "btn btn-sm"; b.textContent = label;
+          b.addEventListener("click", () => { fn && fn(); close(); });
+          row.append(b);
+        });
+        node.append(row);
+      }
+      let timer, closed = false;
+      const close = () => {
+        if (closed) return; closed = true; clearTimeout(timer);
+        if (reduce.matches) { node.remove(); return; }
+        node.classList.add("out");
+        node.addEventListener("animationend", () => node.remove(), { once: true });
+      };
+      const arm = () => { clearTimeout(timer); timer = setTimeout(close, 5000); };
+      node.addEventListener("pointerenter", () => clearTimeout(timer));
+      node.addEventListener("pointerleave", arm);
+      node.addEventListener("focusin", () => clearTimeout(timer));
+      node.addEventListener("focusout", (e) => { if (!node.contains(e.relatedTarget)) arm(); });
+      $(".x", node).addEventListener("click", close);
+      live.append(node);
+      while (live.children.length > 3) live.firstElementChild.remove();
+      arm();
+    }
+
+    /* ---------- copy ---------- */
+    $$("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); } catch {}
+      const use = $("use", b);
+      if (use) { use.setAttribute("href", "#i-check"); setTimeout(() => use.setAttribute("href", "#i-copy"), 1500); }
+      toast({ title: "Copied", body: b.dataset.copy });
+    }));
+
+    /* ---------- live deploy run ---------- */
+    const run = $("#run");
+    const steps = Object.fromEntries($$(".step", run).map((li) => [li.dataset.step, li]));
+    const badge = $("#run-badge");
+    const timeEl = $("#run-time");
+    const runLive = $("#run-live");
+    const failToggle = $("#fail-toggle");
+    const cancelBtn = $("#run-cancel");
+    const TICK = 120, TOTAL = 212;
+    let sec = 52, checks = 140, phase = "checks", phaseSec = 9, loop = null;
+    const BADGE = { building: ["run", "running", "Building"], waiting: ["need", "needs", "Waiting for approval"], live: ["ok", "passed", "Deployed"], failed: ["err", "failed", "Failed"], canceled: ["", "canceled", "Canceled"], held: ["", "canceled", "On hold"] };
+
+    const fmt = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
+    function setBadge(k) {
+      const [tone, st, text] = BADGE[k];
+      tone ? badge.dataset.tone = tone : delete badge.dataset.tone;
+      setStatus($(".st", badge), st);
+      const t = $("span:last-child", badge);
+      t.textContent = text; t.classList.remove("swap"); void t.offsetWidth; t.classList.add("swap");
+    }
+    function setStep(name, state, meta, value, label) {
+      const li = steps[name];
+      li.dataset.s = state;
+      setStatus($(".st", li), state, value, label);
+      if (meta != null) $("[data-meta]", li).textContent = meta;
+    }
+    const say = (m) => { runLive.textContent = m; };
+    const order = ["install", "build", "checks", "upload", "promote"];
+    const DUR = { install: 12, build: 31, upload: 6 };
+
+    function startPhase(name) {
+      phase = name; phaseSec = 0;
+      if (name === "checks") { checks = 0; setStep("checks", "running", `0 of ${TOTAL}`, 0, `Running, 0 of ${TOTAL} checks`); $("[data-cmd]", steps.checks).textContent = "Unit, visual and accessibility suites"; }
+      else if (name === "promote") {
+        stop(); setStep("promote", "needs", "Needs you"); setBadge("waiting");
+        cancelBtn.disabled = false;
+        say("Checks passed. Promote to production needs your approval.");
+      } else setStep(name, "running", "0s");
+    }
+    function finish(name) {
+      const meta = name === "checks" ? `${phaseSec}s` : `${DUR[name]}s`;
+      setStep(name, "passed", meta);
+      startPhase(order[order.indexOf(name) + 1]);
+    }
+    function tick() {
+      sec++; phaseSec++;
+      timeEl.textContent = fmt(sec);
+      if (phase === "checks") {
+        const failing = failToggle.checked;
+        checks = Math.min(TOTAL, checks + 11);
+        if (checks >= TOTAL) {
+          if (failing) return fail();
+          return finish("checks");
+        }
+        setStep("checks", "running", `${checks} of ${TOTAL}`, Math.round((checks / TOTAL) * 100), `Running, ${checks} of ${TOTAL} checks`);
+      } else if (DUR[phase]) {
+        if (phaseSec >= DUR[phase]) return finish(phase);
+        $("[data-meta]", steps[phase]).textContent = `${phaseSec}s`;
+      }
+    }
+    function stop() { clearInterval(loop); loop = null; }
+    function go() { stop(); loop = setInterval(tick, TICK); cancelBtn.disabled = false; }
+    function fail() {
+      stop();
+      setStep("checks", "failed", `3 of ${TOTAL} failed`);
+      $("[data-cmd]", steps.checks).innerHTML = "<code>invoice.test.ts</code> rounds totals above €10,000, and 2 more";
+      setStep("upload", "skipped", "Skipped"); setStep("promote", "skipped", "Skipped");
+      setBadge("failed"); cancelBtn.disabled = true;
+      say("Deploy failed. 3 of 212 checks failed.");
+      toast({ state: "failed", title: "atlas-web deploy failed", body: "3 of 212 checks failed in invoice.test.ts. Production is unchanged.", actions: [["View logs"], ["Redeploy", redeploy]] });
+    }
+    function cancel() {
+      stop();
+      const cur = order.find((n) => ["running", "needs"].includes(steps[n].dataset.s));
+      if (!cur) return;
+      setStep(cur, "canceled", "Canceled");
+      order.slice(order.indexOf(cur) + 1).forEach((n) => setStep(n, "skipped", "Skipped"));
+      setBadge("canceled"); cancelBtn.disabled = true;
+      say("Run canceled.");
+      toast({ state: "canceled", title: "Deploy canceled", body: "Production still serves the previous build." });
+    }
+    function redeploy() {
+      stop(); sec = 0; timeEl.textContent = fmt(0);
+      order.forEach((n) => setStep(n, "queued", "Queued"));
+      setBadge("building"); say("Redeploying atlas-web.");
+      startPhase("install"); go();
+    }
+    run.addEventListener("click", (e) => {
+      const act = e.target.closest("[data-act]")?.dataset.act;
+      if (act === "cancel") cancel();
+      if (act === "redeploy") redeploy();
+      if (act === "approve") {
+        setStep("promote", "running", "Swapping");
+        setTimeout(() => {
+          setStep("promote", "passed", "2s"); setBadge("live"); cancelBtn.disabled = true;
+          say("atlas-web is live.");
+          toast({ title: "atlas-web is live", body: "main@4f9c2e1 is serving production in Frankfurt." });
+        }, 900);
+      }
+      if (act === "hold") {
+        setStep("promote", "canceled", "Held"); setBadge("held"); cancelBtn.disabled = true;
+        say("Promotion on hold.");
+        toast({ state: "canceled", title: "Held before production", body: "The preview stays live at atlas-web-4f9c2e1.grain.app." });
+      }
+    });
+    setTimeout(go, 900);
+
+    /* ---------- status lab ---------- */
+    const labMark = $("#lab-mark");
+    $$('input[name="lab-state"]').forEach((r) => r.addEventListener("change", () => {
+      setStatus(labMark, r.value);
+      $("#lab-name").textContent = r.dataset.name;
+      $("#lab-desc").textContent = r.dataset.desc;
+      $("#lab-code").textContent = `"${r.value}"`;
+    }));
+
+    /* ---------- filter ---------- */
+    const filter = $("#filter");
+    const cards = $$(".cc[data-name]");
+    const cats = $$("[data-cat]");
+    const count = $("#count");
+    const noMatch = $("#no-match");
+    function applyFilter() {
+      const q = filter.value.trim().toLowerCase();
+      let n = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.dataset.name.includes(q) || $("h4", c).textContent.toLowerCase().includes(q);
+        c.hidden = !hit; if (hit) n++;
+      });
+      cats.forEach((cat) => { cat.hidden = !$$(".cc", cat).some((c) => !c.hidden); });
+      count.textContent = `${n} shown`;
+      noMatch.hidden = n > 0;
+      $("#nm-q").textContent = filter.value.trim();
+    }
+    filter.addEventListener("input", applyFilter);
+    filter.addEventListener("keydown", (e) => { if (e.key === "Escape" && filter.value) { filter.value = ""; applyFilter(); } });
+    $("#clear-filter").addEventListener("click", () => { filter.value = ""; applyFilter(); filter.focus(); });
+
+    /* ---------- tabs ---------- */
+    $$('[role="tablist"]').forEach((list) => {
+      const tabs = $$('[role="tab"]', list);
+      const select = (t) => {
+        tabs.forEach((x) => {
+          const on = x === t;
+          x.setAttribute("aria-selected", on); x.tabIndex = on ? 0 : -1;
+          document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+        });
+        t.focus();
+      };
+      list.addEventListener("click", (e) => { const t = e.target.closest('[role="tab"]'); if (t) select(t); });
+      list.addEventListener("keydown", (e) => {
+        const i = tabs.indexOf(document.activeElement);
+        const k = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (k == null) return;
+        e.preventDefault(); select(tabs[(k + tabs.length) % tabs.length]);
+      });
+    });
+
+    /* ---------- tooltips: 500ms first, instant while warm ---------- */
+    const group = $("#tips");
+    let warmT, openT, cool;
+    $$(".tip-wrap", group).forEach((w) => {
+      w.addEventListener("pointerenter", () => {
+        clearTimeout(cool);
+        const show = () => { $$(".tip-wrap", group).forEach((x) => x.classList.toggle("open", x === w)); group.dataset.warm = ""; };
+        group.hasAttribute("data-warm") ? show() : (openT = setTimeout(show, 500));
+      });
+      w.addEventListener("pointerleave", () => {
+        clearTimeout(openT); w.classList.remove("open");
+        cool = setTimeout(() => delete group.dataset.warm, 300);
+      });
+    });
+
+    /* ---------- toast demo & save ---------- */
+    $("#toast-demo").addEventListener("click", () => toast({ title: "atlas-web deleted", body: "14 deployments and 3 domains removed.", actions: [["Undo", () => toast({ title: "atlas-web restored", body: "All 14 deployments are back." })]] }));
+    const save = $("#save-btn");
+    save.addEventListener("click", () => {
+      if (save.getAttribute("aria-disabled") === "true") return;
+      save.style.width = save.offsetWidth + "px";
+      save.setAttribute("aria-disabled", "true");
+      save.innerHTML = '<span class="spinner" aria-hidden="true"></span>Saving';
+      setTimeout(() => {
+        save.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-check" /></svg>Saved';
+        save.removeAttribute("aria-disabled");
+        setTimeout(() => { save.textContent = save.dataset.label; save.style.width = ""; }, 1400);
+      }, 1100);
+    });
+
+    /* ---------- validation: errors on blur, cleared as soon as fixed ---------- */
+    function validator(input, help, check, okText) {
+      const base = help.innerHTML;
+      const render = () => {
+        const msg = check(input.value.trim());
+        input.setAttribute("aria-invalid", msg ? "true" : "false");
+        help.classList.toggle("err", !!msg);
+        help.innerHTML = msg ? `${$("#tpl-err").innerHTML}<span>${msg}</span>` : (okText ? `<span>${okText}</span>` : base);
+      };
+      input.addEventListener("blur", render);
+      input.addEventListener("input", () => { if (input.getAttribute("aria-invalid") === "true") render(); });
+    }
+    validator($("#f-name"), $("#f-name-h"), (v) => !v ? "Name your project to give it a URL" : /^[a-z0-9-]+$/.test(v) ? "" : `Use lowercase letters, numbers and hyphens, like “${v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "atlas-web"}”`);
+    validator($("#f-mail"), $("#f-mail-h"), (v) => !v ? "Invoices need somewhere to go" : !v.includes("@") ? "Add an @, like leo@northwind.com" : /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v) ? "" : `Add the domain, like ${v.split("@")[0]}@northwind.com`, "Invoices go here on the 1st");
+
+    /* ---------- dialog ---------- */
+    const dlg = $("#dlg-delete");
+    let opener = null;
+    const supportsCommand = "command" in HTMLButtonElement.prototype;
+    $$("[data-open]").forEach((b) => b.addEventListener("click", () => { opener = b; if (!supportsCommand) dlg.showModal(); }));
+    const dIn = $("#dlg-input"), dOk = $("#dlg-confirm");
+    dIn.addEventListener("input", () => { dOk.disabled = dIn.value.trim() !== "atlas-web"; });
+    dlg.addEventListener("close", () => {
+      if (dlg.returnValue === "delete") toast({ title: "atlas-web deleted", body: "14 deployments and 3 domains removed.", actions: [["Undo", () => toast({ title: "atlas-web restored", body: "All 14 deployments are back." })]] });
+      dIn.value = ""; dOk.disabled = true; dlg.returnValue = "";
+      opener?.focus();
+    });
+  })();
+  </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,194 @@
+{
+ "slug": "analytics-dashboard",
+ "order": 2,
+ "title": "Analytics dashboard",
+ "product": "Tidepool",
+ "blurb": "A product analytics overview went from a stock shadcn dashboard of eight identical KPI cards and a four-series area chart to a release readout that answers one question in words: did last week's onboarding checklist move activation, and is the number final yet?",
+ "mode": "Operate",
+ "persona": {
+  "name": "Sam Okafor",
+  "role": "Head of growth",
+  "goal": "Check on Monday whether last week's onboarding checklist moved activation, and see where the funnel still leaks, without exporting to a spreadsheet."
+ },
+ "command": "/pristine design \"redesign the overview dashboard\"",
+ "hasDark": true,
+ "before": {
+  "score": 4.5,
+  "level": 6,
+  "verdict": "Clean, tidy and interchangeable with every shadcn starter. Eight identical cards each say \"+x% from last month\", Signups and New Signups repeat, MRR shows up again as Revenue, the chart stacks four unrelated series with no y-axis, and nothing tells Sam whether the checklist worked."
+ },
+ "after": {
+  "score": 9.5,
+  "level": 10,
+  "verdict": "The page opens on a sentence, not a card grid: activation jumped to 41.8% the week the checklist shipped, 7.6 pts above an 11-week range drawn behind the line. The dashed tail and \"Still counting\" note say the cohort isn't final until Oct 27, the funnel shows which two steps moved, and stale Stripe data, an expired HubSpot token and a live event stream each say what they are and what to do."
+ },
+ "dimensions": [
+  {
+   "name": "Persona fit",
+   "before": 3,
+   "after": 10
+  },
+  {
+   "name": "Hierarchy & clarity",
+   "before": 3,
+   "after": 10
+  },
+  {
+   "name": "Layout & spacing",
+   "before": 6,
+   "after": 9
+  },
+  {
+   "name": "Typography",
+   "before": 6,
+   "after": 9
+  },
+  {
+   "name": "Color & theming",
+   "before": 5,
+   "after": 9
+  },
+  {
+   "name": "Consistency",
+   "before": 6,
+   "after": 9
+  },
+  {
+   "name": "Responsiveness",
+   "before": 5,
+   "after": 9
+  },
+  {
+   "name": "Motion & interaction",
+   "before": 4,
+   "after": 9
+  },
+  {
+   "name": "Accessibility",
+   "before": 4,
+   "after": 9
+  },
+  {
+   "name": "Copy",
+   "before": 4,
+   "after": 10
+  },
+  {
+   "name": "Robustness & performance",
+   "before": 3,
+   "after": 10
+  }
+ ],
+ "critique": [
+  {
+   "priority": "P0",
+   "title": "The page doesn't answer Sam's question",
+   "detail": "Activation is one of eight identical cards, shown as \"+22.2% from last month\" with no base. The chart has week labels but no y-axis and no marker for the checklist launch, so you can't connect the change to the number.",
+   "lens": "clarify"
+  },
+  {
+   "priority": "P0",
+   "title": "Duplicate and invented metrics",
+   "detail": "Signups and New Signups show different numbers. MRR and Revenue both appear. \"Total Users 24,812\" and \"Growth +24.5%\" have no definition or comparison period.",
+   "lens": "distill"
+  },
+  {
+   "priority": "P1",
+   "title": "Chart palette encodes nothing",
+   "detail": "The default `--chart-1…5` orange, teal, navy and yellow are handed out by index: four unrelated series (Signups, Activated, Visitors, MRR on a different scale) share one area chart, and every funnel step gets its own color. Color is assignment order, not a signal for up, down or selected.",
+   "lens": "colorize"
+  },
+  {
+   "priority": "P1",
+   "title": "Every number has the same weight",
+   "detail": "Every KPI is `text-2xl font-bold` with a 12px `text-muted-foreground` delta line, so a vanity total and the metric Sam cares about look identical. Figures are proportional, so columns of numbers jitter.",
+   "lens": "typeset"
+  },
+  {
+   "priority": "P1",
+   "title": "Focus is removed and there are no states",
+   "detail": "The custom sidebar links set `outline: none` with only a hover background. The search box has a placeholder and no label, the trash button is an unlabeled icon, and there is no loading, empty or partial-data state, so a filter with no matches just shows a blank table.",
+   "lens": "harden"
+  },
+  {
+   "priority": "P2",
+   "title": "Identical cards, 32px row actions",
+   "detail": "Twelve `rounded-xl border` cards with the same padding and shadow give no grouping or priority, and each event row carries three 32px buttons (View, Edit, delete) below the 44px target size.",
+   "lens": "quieter"
+  }
+ ],
+ "changes": [
+  {
+   "lens": "clarify",
+   "before": "Activation \"+22.2% from last month\" as one of 8 cards",
+   "after": "Release readout: \"Activation jumped the week the checklist shipped, clear of its 11-week range.\" 41.8% vs. 33.1–34.2%, +7.6 pts",
+   "why": "Sam's Monday question gets a sentence with its proof under it, before any chart."
+  },
+  {
+   "lens": "harden",
+   "before": "Last week plotted like every other week",
+   "after": "Dashed provisional tail, hollow \"41.8% so far\" dot, \"Still counting… Final read Mon, Oct 27\" with a running mark",
+   "why": "Signups from the last 7 days can still activate. The chart says the number is partial instead of letting it be over-read."
+  },
+  {
+   "lens": "clarify",
+   "before": "Four stacked area series in --chart-1…4, week labels, no y-axis",
+   "after": "Shaded band for the previous 11 weeks' range, \"Checklist shipped\" marker, metric switch, View as table",
+   "why": "The band is the baseline, so the jump reads against normal variation rather than one prior week."
+  },
+  {
+   "lens": "distill",
+   "before": "Funnel bars in a different chart color each",
+   "after": "\"Where it moved\": step conversion bars with an 11-week-average tick, +8.2 / +4.7 pts deltas, checklist tags, 291-account leak callout",
+   "why": "Shows which steps the checklist changed and where the next drop still is."
+  },
+  {
+   "lens": "harden",
+   "before": "Integrations shown as green \"Connected\" badges",
+   "after": "Data sources with live / retrying / needs-you / synced marks; MRR KPI says \"Stripe sync retrying · as of 06:10\"; Reconnect HubSpot runs → done",
+   "why": "A number from stale data says so next to the number, and the fix is one click away."
+  },
+  {
+   "lens": "animate",
+   "before": "transition-colors on buttons only; numbers swap with no change shown",
+   "after": "clip-path draw-in 520ms, KPI values roll on range change, new events slide in every 6s; Pause queues them behind \"Show 1 new event\"",
+   "why": "Motion shows what changed and where. Pausing keeps rows from moving while Sam reads."
+  },
+  {
+   "lens": "distill",
+   "before": "8 identical KPI cards incl. Signups + New Signups, MRR + Revenue",
+   "after": "4 KPIs in one <dl>; Activation definition after a 500ms hover; W4 heatmap cells outlined as the source of the week-4 KPI",
+   "why": "Each number appears once and you can see where it comes from."
+  },
+  {
+   "lens": "typeset",
+   "before": ".kpi .value { font-size: 24px; font-weight: 700 } ×8; 12px muted delta lines",
+   "after": "13px labels in --text-2, tabular-nums, JetBrains Mono for event names and properties",
+   "why": "Labels meet contrast, numbers line up, and event payloads read as code."
+  },
+  {
+   "lens": "harden",
+   "before": ".sidebar a { outline: none }; unlabeled search and trash icon; blank table on no match",
+   "after": ":focus-visible ring; \"No events match\" with Clear filter; dashed not-yet cohort cells",
+   "why": "Keyboard users can reach every control, and missing data looks deliberately missing."
+  },
+  {
+   "lens": "adapt",
+   "before": "min-height: 100vh; 7-column events table scrolls sideways at 390px",
+   "after": "100dvh shell with a sticky sidebar; tables scroll inside .table-scroll; no page scroll at 320px",
+   "why": "Sam checks this on a phone too."
+  }
+ ],
+ "tells": [
+  "Stock shadcn \"Dashboard\" starter layout",
+  "Tabs for Overview / Analytics / Reports / Notifications",
+  "Identical KPI cards with duplicate metrics",
+  "\"+x% from last month\" under every number",
+  "Default --chart-1…5 palette assigned by index",
+  "Four unrelated series on one area chart",
+  "Every widget in an identical rounded-xl card",
+  "Unlabeled icon buttons and placeholder-only search",
+  "outline: none on custom nav links",
+  "Made-up vanity numbers"
+ ]
+}

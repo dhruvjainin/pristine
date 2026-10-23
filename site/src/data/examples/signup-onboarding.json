@@ -1,0 +1,196 @@
+{
+  "slug": "signup-onboarding",
+  "order": 4,
+  "title": "Signup & onboarding",
+  "product": "Fieldnote",
+  "blurb": "A meeting-notes signup that went from a six-field wall and a welcome modal to picking your next meeting first and watching a realistic note build itself, with carried-over action items, a timed agenda and a passwordless sign-in.",
+  "mode": "Operate",
+  "persona": {
+    "name": "Dana Kowalczyk",
+    "role": "Team lead",
+    "goal": "Set up shared meeting notes for her six-person team before Monday's sync, without filling in a form she doesn't need or landing on an empty screen."
+  },
+  "command": "/pristine design \"redesign signup and onboarding\"",
+  "hasDark": true,
+  "before": {
+    "score": 3,
+    "level": 2,
+    "verdict": "A stock Material UI signup: blue AppBar, an elevation-2 Paper with a four-step Stepper and six outlined fields whose floating labels carry no help text, so the password rules only appear after Dana fails them and both fields are wiped. Marketing consent comes pre-ticked, a six-bullet welcome dialog blocks the way, and the reward is three identical KPI cards over 'No notes yet'."
+  },
+  "after": {
+    "score": 9.5,
+    "level": 10,
+    "verdict": "Dana picks the meeting she's preparing for and sees what Fieldnote actually does: last week's open items carried in with owners and status, a timed agenda that adds up, and a footer saying what moves on next. Sign-in is one email field or SSO, the workspace fills itself in, invites can wait, and her first note is ready for the meeting."
+  },
+  "dimensions": [
+    {
+      "name": "Persona fit",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Hierarchy & clarity",
+      "before": 4,
+      "after": 10
+    },
+    {
+      "name": "Layout & spacing",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Typography",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Color & theming",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Consistency",
+      "before": 6,
+      "after": 10
+    },
+    {
+      "name": "Responsiveness",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Motion & interaction",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Accessibility",
+      "before": 3,
+      "after": 9
+    },
+    {
+      "name": "Copy",
+      "before": 2,
+      "after": 10
+    },
+    {
+      "name": "Robustness & performance",
+      "before": 3,
+      "after": 9
+    }
+  ],
+  "critique": [
+    {
+      "priority": "P0",
+      "title": "Password rules appear only after failure",
+      "detail": "The form hides the 10-character, uppercase, number and symbol rules until submit fails, then clears both password fields. Dana has to retype twice to learn a rule the page already knew.",
+      "lens": "harden"
+    },
+    {
+      "priority": "P0",
+      "title": "Marketing consent is pre-ticked",
+      "detail": "'Yes! Send me tips, special offers and partner promotions' ships with `checked`, in 12px gray caption text under the last field. That's a dark pattern and, in much of the world, not valid consent.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P1",
+      "title": "Six fields before any value",
+      "detail": "Name, company, phone, email, password and confirm password stand between Dana and seeing a single note. Phone and company aren't needed to take meeting notes.",
+      "lens": "distill"
+    },
+    {
+      "priority": "P1",
+      "title": "Welcome modal and guilt-trip exit",
+      "detail": "A six-bullet MUI Dialog interrupts right after signup, and the only way out is the text button 'NO THANKS, I PREFER MESSY NOTES'. It shames instead of helping.",
+      "lens": "quieter"
+    },
+    {
+      "priority": "P1",
+      "title": "Empty state as the first impression",
+      "detail": "After all that, the dashboard shows three identical elevation-1 KPI cards reading 0, 1 and 0 over 'No notes yet'. Dana has to work out what a good meeting note looks like on her own, and the Stepper's 'Workspace' and 'Invite team' steps never happen.",
+      "lens": "delight"
+    },
+    {
+      "priority": "P2",
+      "title": "Focus hidden, everything the same blue",
+      "detail": "A global `*:focus { outline: none }` hides keyboard position on the buttons, checkbox and links; only the text fields still show it as a border colour change. #1976d2 fills the AppBar, Stepper, chip, links, KPI numbers and every button, so nothing leads.",
+      "lens": "harden"
+    }
+  ],
+  "changes": [
+    {
+      "lens": "layout",
+      "before": "Signup wall first: <form> with 6 fields above the fold",
+      "after": "Step 1 asks \"What's your next meeting?\" next to a live preview of that meeting's first note; the account comes second",
+      "why": "Dana sees what she's getting before she's asked for anything, so the ask lands after the value."
+    },
+    {
+      "lens": "delight",
+      "before": "<h3>No notes yet</h3> under three identical KPI Paper cards reading 0, 1, 0",
+      "after": "\"Carried from 20 Oct · 3 open · 1 closed\": done, open 2 weeks, due today and blocked items with owners, and \"3 open items will move into Mon 3 Nov's note.\"",
+      "why": "The preview shows the one thing that makes Fieldnote worth it, open items following the team from meeting to meeting, with real mess in it."
+    },
+    {
+      "lens": "typeset",
+      "before": "Agenda as a bulleted list with no times",
+      "after": "Stacked .timebar (--bar-1/2/3) over an agenda list with right-aligned tabular minutes; header reads \"30 of 30 min\"",
+      "why": "The agenda reads as a budget, so Dana can tell at a glance whether the meeting fits its slot."
+    },
+    {
+      "lens": "distill",
+      "before": "<input placeholder=\"Password *\"> + <input placeholder=\"Confirm password *\"> + phone + company",
+      "after": "<input type=\"email\" autocomplete=\"email\" inputmode=\"email\"> + \"Continue with your company login (SSO)\"",
+      "why": "Passwordless sign-in removes the rules, the confirm field and the retype loop entirely."
+    },
+    {
+      "lens": "clarify",
+      "before": "<input type=\"checkbox\" checked /> Yes! Send me tips, special offers and partner promotions",
+      "after": "<input type=\"checkbox\" name=\"updates\" /> \"Email me product updates, about once a month\", unticked",
+      "why": "Consent is opt-in and says how often, so ticking it is an informed choice."
+    },
+    {
+      "lens": "clarify",
+      "before": "<Button variant=\"contained\" fullWidth>Submit</Button> (renders as SUBMIT)",
+      "after": "\"Use Weekly team sync →\" (follows the selected template), then \"Email me a sign-in link\"",
+      "why": "Each button says what happens next, and the first one confirms the choice Dana just made."
+    },
+    {
+      "lens": "distill",
+      "before": "Company * (free text) and no timezone",
+      "after": "Workspace name inferred from the email domain (lumenrow.co → Lumenrow), timezone from Intl.DateTimeFormat().resolvedOptions()",
+      "why": "Smart defaults turn a form into a confirmation; Dana edits only if they're wrong."
+    },
+    {
+      "lens": "quieter",
+      "before": "<Dialog> with 6 bullets and a text button \"No thanks, I prefer messy notes\"",
+      "after": "Removed; a one-line success banner, invitees marked \"Invited\" in the sidebar and a dismissible '/' tip inside the note",
+      "why": "Help shows up where it's used, and declining it doesn't cost anything."
+    },
+    {
+      "lens": "animate",
+      "before": "No transition between steps: the form is hidden with display:none, the dashboard appears and the Dialog opens in the same frame",
+      "after": "Template switch: 200ms opacity + blur(2px) crossfade; first load: items rise 4px with 50ms stagger and the timebar draws via scaleX; fades only under prefers-reduced-motion",
+      "why": "Motion explains the change (this note became that one) and stays out of the way on repeat use."
+    },
+    {
+      "lens": "harden",
+      "before": "*:focus { outline: none; }",
+      "after": ":focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; } and status marks with sr-only labels (\"Done\", \"Blocked\")",
+      "why": "Keyboard and screen-reader users get the same status information as everyone else, without relying on color."
+    }
+  ],
+  "tells": [
+    "Stock MUI theme: #1976d2 on the AppBar, Stepper, links, KPI numbers and every button",
+    "Four-step Stepper for a one-step job",
+    "Floating-label fields with no help text",
+    "Generic 'SUBMIT' button",
+    "Pre-ticked marketing consent",
+    "Confirm-password field",
+    "Password rules revealed only after failure",
+    "Six-bullet welcome dialog",
+    "Guilt-trip decline link",
+    "Empty 'No notes yet' dashboard",
+    "Repeated identical KPI cards",
+    "*:focus { outline: none }"
+  ]
+}

@@ -1,0 +1,334 @@
+---
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Grain UI - Beautiful Components</title>
+  <style is:global>
+    * { box-sizing: border-box; margin: 0; padding: 0; border-color: #e2e8f0; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #fff; color: #0f172a; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font-family: inherit; outline: none; }
+    *:focus { outline: none; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .header { position: sticky; top: 0; z-index: 9999; background: rgba(255,255,255,0.95); border-bottom: 1px solid #e2e8f0; }
+    .header-in { max-width: 1400px; margin: 0 auto; height: 56px; padding: 0 32px; display: flex; align-items: center; gap: 24px; }
+    .logo { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    .logo i { width: 20px; height: 20px; border-radius: 4px; background: #0f172a; display: inline-block; }
+    .header nav { display: flex; gap: 20px; font-size: 14px; color: #64748b; }
+    .header nav a:hover { color: #0f172a; }
+    .header nav a.on { color: #0f172a; }
+    .search { margin-left: auto; display: flex; align-items: center; justify-content: space-between; gap: 32px; width: 260px; height: 36px; padding: 0 8px 0 12px; border: 1px solid #e2e8f0; border-radius: 6px; color: #64748b; font-size: 13px; background: #f8fafc; }
+    .search kbd { font-family: inherit; font-size: 10px; border: 1px solid #e2e8f0; background: #fff; border-radius: 4px; padding: 1px 5px; color: #64748b; }
+    .gh { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+    .gh:hover { background: #f1f5f9; }
+
+    .shell { max-width: 1400px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; }
+    .sidebar { position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; padding: 24px 0; border-right: 1px solid #e2e8f0; }
+    .sidebar h4 { font-size: 14px; font-weight: 600; margin: 0 0 6px; padding: 0 8px; }
+    .sidebar ul { list-style: none; margin-bottom: 20px; }
+    .sidebar li a { display: block; padding: 4px 8px; font-size: 14px; color: #64748b; border-radius: 6px; }
+    .sidebar li a:hover { text-decoration: underline; }
+    .sidebar li a.on { color: #0f172a; font-weight: 500; }
+
+    main { padding: 32px 0 64px; max-width: 760px; }
+    .crumbs { font-size: 14px; color: #64748b; margin-bottom: 16px; }
+    .crumbs span { color: #0f172a; }
+    h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px; }
+    .lead { font-size: 17px; color: #64748b; margin-bottom: 20px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .install { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; background: #0f172a; color: #f8fafc; border-radius: 8px; padding: 12px 16px; font-size: 13px; }
+    .install button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; }
+
+    .doc { margin-top: 48px; }
+    .doc h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px; }
+    .doc .sub { color: #64748b; font-size: 15px; margin-bottom: 16px; }
+    .ptabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
+    .ptab { padding: 8px 16px 10px; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .ptab.on { color: #0f172a; border-bottom-color: #0f172a; }
+    .preview { border: 1px solid #e2e8f0; border-radius: 8px; min-height: 350px; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+    .codebox { display: none; background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 16px; font-size: 13px; overflow-x: auto; min-height: 350px; }
+    .doc.code .preview { display: none; }
+    .doc.code .codebox { display: block; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: 6px; font-size: 14px; font-weight: 500; border: 1px solid transparent; cursor: pointer; transition: all 0.3s ease-in; }
+    .btn-default { background: #0f172a; color: #f8fafc; }
+    .btn-default:hover { background: rgba(15,23,42,0.9); }
+    .btn-secondary { background: #f1f5f9; color: #0f172a; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-outline { background: #fff; border-color: #e2e8f0; color: #0f172a; }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-destructive { background: #ef4444; color: #f8fafc; }
+    .btn-ghost { background: transparent; color: #0f172a; }
+    .btn-ghost:hover { background: #f1f5f9; }
+    .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+    .btn-lg { height: 40px; padding: 0 32px; }
+    .btn:disabled { opacity: 0.5; pointer-events: none; }
+    .icon-btn { width: 28px; height: 28px; padding: 0; }
+
+    .field { width: 100%; max-width: 320px; }
+    .input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; color: #0f172a; background: #fff; transition: all 0.3s ease-in; }
+    .input::placeholder { color: #94a3b8; }
+    .input.error { border-color: #ef4444; }
+    .hint { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+    select.input { appearance: auto; }
+
+    .choices { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; font-size: 14px; }
+    .choices > div { display: flex; flex-direction: column; gap: 10px; }
+    .choices b { font-size: 14px; font-weight: 500; }
+    .choices label, .choices .sw { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .choices input { width: 16px; height: 16px; accent-color: #0f172a; }
+    .toggle { width: 36px; height: 20px; background: #e2e8f0; border-radius: 999px; position: relative; display: inline-block; cursor: pointer; transition: all 0.3s ease-in; flex: none; }
+    .toggle::after { content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 2px; left: 2px; box-shadow: 0 1px 2px rgba(0,0,0,.1); transition: all 0.3s ease-in; }
+    .toggle.on { background: #0f172a; }
+    .toggle.on::after { left: 18px; }
+
+    .badge { display: inline-flex; align-items: center; padding: 2px 10px; font-size: 12px; font-weight: 600; border-radius: 999px; border: 1px solid transparent; }
+    .b-default { background: #0f172a; color: #f8fafc; }
+    .b-secondary { background: #f1f5f9; color: #0f172a; }
+    .b-destructive { background: #ef4444; color: #f8fafc; }
+    .b-outline { border-color: #e2e8f0; color: #0f172a; }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; width: 100%; }
+    .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-align: left; }
+    .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; overflow-wrap: anywhere; }
+    .card p { color: #64748b; font-size: 13px; margin-bottom: 16px; }
+
+    .tabs { display: inline-flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 6px; }
+    .tab { padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; transition: all 0.3s ease-in; }
+    .tab.active { background: #fff; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+    .tabcard { width: 100%; max-width: 400px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
+    .tab-content { color: #64748b; font-size: 14px; display: none; }
+    .tab-content.active { display: block; }
+
+    .tooltip-wrap { position: relative; display: inline-block; }
+    .tooltip { position: absolute; bottom: 130%; left: 50%; margin-left: -45px; width: 90px; background: #0f172a; color: #f8fafc; text-align: center; font-size: 12px; padding: 4px 8px; border-radius: 6px; transform: scale(0); transition: all 0.3s ease-in; }
+    .tooltip-wrap:hover .tooltip { transform: scale(1); }
+
+    .avatars { display: flex; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; border: 2px solid #fff; margin-left: -8px; }
+    .avatar:first-child { margin-left: 0; }
+
+    .empty { width: 100%; border: 1px dashed #e2e8f0; border-radius: 8px; padding: 40px 20px; text-align: center; }
+    .empty h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .empty p { color: #64748b; font-size: 14px; margin-bottom: 16px; }
+
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 16px; }
+    .modal-bg.show { display: flex; }
+    .modal { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; width: 100%; max-width: 512px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); transform: scale(0); transition: all 0.4s ease-in; }
+    .modal-bg.show .modal { transform: scale(1); }
+    .modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .modal p { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+    .modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
+    .toast { position: fixed; bottom: 24px; right: -400px; width: 340px; background: #fff; color: #0f172a; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); font-size: 14px; font-weight: 500; transition: all 0.5s ease-in; z-index: 10001; }
+    .toast.show { right: 24px; }
+
+    footer { border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 12px; padding: 24px 32px; }
+
+    @media (max-width: 768px) {
+      .header-in { padding: 0 16px; }
+      .header nav, .gh { display: none; }
+      .search { width: auto; flex: 1; gap: 8px; }
+      .shell { grid-template-columns: minmax(0, 1fr); padding: 0 16px; }
+      .sidebar { display: none; }
+      .preview { padding: 24px 16px; }
+      .cards { grid-template-columns: minmax(0, 1fr); }
+      .install { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="header-in">
+    <a href="#" class="logo"><i></i>Grain UI</a>
+    <nav>
+      <a href="#">Docs</a>
+      <a href="#" class="on">Components</a>
+      <a href="#">Themes</a>
+      <a href="#">Changelog</a>
+    </nav>
+    <div class="search">Search documentation... <kbd>⌘K</kbd></div>
+    <a href="#" class="gh"><svg width="18" height="18" viewBox="0 0 24 24" fill="#0f172a"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.3 2.9.1 3.2.8.8 1.2 1.9 1.2 3.1 0 4.7-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg></a>
+  </div></div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <h4>Getting Started</h4>
+      <ul><li><a href="#" class="on">Introduction</a></li><li><a href="#">Installation</a></li><li><a href="#">Theming</a></li></ul>
+      <h4>Components</h4>
+      <ul>
+        <li><a href="#buttons">Button</a></li><li><a href="#inputs">Input</a></li><li><a href="#choices">Checkbox</a></li><li><a href="#choices">Radio Group</a></li><li><a href="#choices">Switch</a></li><li><a href="#badges">Badge</a></li><li><a href="#badges">Card</a></li><li><a href="#tabs">Tabs</a></li><li><a href="#overlays">Dialog</a></li><li><a href="#overlays">Toast</a></li><li><a href="#overlays">Tooltip</a></li><li><a href="#avatars">Avatar</a></li><li><a href="#empty">Empty State</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <div class="crumbs">Docs &rsaquo; <span>Introduction</span></div>
+      <h1>Supercharge your UI with 50+ beautiful components</h1>
+      <p class="lead">Grain UI is the next-gen, all-in-one component library that helps you build stunning, seamless interfaces in minutes. Accessible. Themeable. Blazing fast.</p>
+      <div class="actions">
+        <button class="btn btn-default">Get Started</button>
+        <button class="btn btn-outline">Read the Docs</button>
+      </div>
+      <div class="install"><code>npm i @grain-ui/react</code><button onclick="showToast('Copied to clipboard.')">Copy</button></div>
+
+      <section class="doc" id="buttons">
+        <h2>Buttons</h2>
+        <p class="sub">Displays a button or a component that looks like a button.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="row">
+            <button class="btn btn-default">Create project</button>
+            <button class="btn btn-secondary">Invite member</button>
+            <button class="btn btn-outline">View changelog</button>
+            <button class="btn btn-destructive">Delete project</button>
+          </div>
+          <div class="row">
+            <button class="btn btn-default btn-sm">Small</button>
+            <button class="btn btn-default">Medium</button>
+            <button class="btn btn-default btn-lg">Large</button>
+            <div class="tooltip-wrap"><button class="btn btn-outline icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button><span class="tooltip">Settings</span></div>
+            <div class="tooltip-wrap"><button class="btn btn-outline icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg></button><span class="tooltip">Source</span></div>
+          </div>
+          <div class="row">
+            <button class="btn btn-default">Submit</button>
+            <button class="btn btn-default" disabled>Disabled</button>
+          </div>
+        </div>
+        <pre class="codebox">&lt;Button&gt;Create project&lt;/Button&gt;
+&lt;Button variant="secondary"&gt;Invite member&lt;/Button&gt;
+&lt;Button variant="outline"&gt;View changelog&lt;/Button&gt;
+&lt;Button variant="destructive"&gt;Delete project&lt;/Button&gt;</pre>
+      </section>
+
+      <section class="doc" id="inputs">
+        <h2>Input</h2>
+        <p class="sub">Displays a form input field or a component that looks like an input field.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="field"><input class="input" placeholder="Project name" /><div class="hint">Lowercase letters, numbers and hyphens</div></div>
+          <div class="field"><input class="input error" placeholder="Billing email" value="leo@northwind" /></div>
+          <div class="field"><select class="input"><option>Select a region</option><option>Frankfurt (eu-central)</option><option>Virginia (us-east)</option><option>Singapore (ap-southeast)</option></select></div>
+          <div class="field"><input class="input" placeholder="Team (optional)" /></div>
+        </div>
+        <pre class="codebox">&lt;Input placeholder="Project name" /&gt;</pre>
+      </section>
+
+      <section class="doc" id="choices">
+        <h2>Checkbox, Radio Group &amp; Switch</h2>
+        <p class="sub">A control that allows the user to toggle between checked and not checked.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="choices">
+            <div><b>Email me about</b><label><input type="checkbox" checked /> Failed deployments</label><label><input type="checkbox" /> Weekly usage summary</label><label><input type="checkbox" disabled /> Billing receipts</label></div>
+            <div><b>Visibility</b><label><input type="radio" name="v" checked /> Private</label><label><input type="radio" name="v" /> Team</label><label><input type="radio" name="v" /> Public</label></div>
+            <div><b>Deployments</b><span class="sw"><span class="toggle on" onclick="this.classList.toggle('on')"></span> Preview deployments</span><span class="sw"><span class="toggle" onclick="this.classList.toggle('on')"></span> Pause production</span><span class="sw"><span class="toggle" style="opacity:.5"></span> Require 2FA</span></div>
+          </div>
+        </div>
+        <pre class="codebox">&lt;Switch id="preview" /&gt;</pre>
+      </section>
+
+      <section class="doc" id="badges">
+        <h2>Badge &amp; Card</h2>
+        <p class="sub">Displays a badge or a component that looks like a badge.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="row">
+            <span class="badge b-default">Deployed</span>
+            <span class="badge b-secondary">Building</span>
+            <span class="badge b-outline">Degraded</span>
+            <span class="badge b-destructive">Failed</span>
+            <span class="badge b-secondary">Draft</span>
+          </div>
+          <div class="cards">
+            <div class="card"><h3>atlas-web</h3><p>Production · 12 min ago · 1284 req/min</p><span class="badge b-default">Deployed</span></div>
+            <div class="card"><h3>northwind-industries-holdings-customer-portal-staging</h3><p>Staging · 3 h ago · 0 req/min</p><span class="badge b-destructive">Failed</span></div>
+            <div class="card"><h3>analytics-api</h3><p>Production · 2 days ago · 312 req/min</p><span class="badge b-secondary">Building</span></div>
+          </div>
+        </div>
+        <pre class="codebox">&lt;Badge variant="destructive"&gt;Failed&lt;/Badge&gt;</pre>
+      </section>
+
+      <section class="doc" id="tabs">
+        <h2>Tabs</h2>
+        <p class="sub">A set of layered sections of content that are displayed one at a time.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="tabs">
+            <div class="tab active" onclick="tab(0)">Overview</div>
+            <div class="tab" onclick="tab(1)">Activity</div>
+            <div class="tab" onclick="tab(2)">Settings</div>
+          </div>
+          <div class="tabcard">
+            <div class="tab-content active">atlas-web serves the marketing site from Frankfurt. Last deploy took 48 s and passed all 212 checks.</div>
+            <div class="tab-content">Ines Okafor deployed main@4f9c2e1 · 12 min ago</div>
+            <div class="tab-content">Build command: pnpm build · Output: dist · Node 22</div>
+          </div>
+        </div>
+        <pre class="codebox">&lt;Tabs defaultValue="overview"&gt;...&lt;/Tabs&gt;</pre>
+      </section>
+
+      <section class="doc" id="overlays">
+        <h2>Dialog, Toast &amp; Tooltip</h2>
+        <p class="sub">A window overlaid on either the primary window or another dialog window.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="row">
+            <button class="btn btn-outline" onclick="document.getElementById('m').classList.add('show')">Delete atlas-web</button>
+            <button class="btn btn-outline" onclick="showToast('Your changes have been saved.')">Show Toast</button>
+            <div class="tooltip-wrap"><button class="btn btn-outline">Hover</button><span class="tooltip">Copy ID</span></div>
+          </div>
+        </div>
+        <pre class="codebox">&lt;AlertDialog&gt;...&lt;/AlertDialog&gt;</pre>
+      </section>
+
+      <section class="doc" id="avatars">
+        <h2>Avatar</h2>
+        <p class="sub">An image element with a fallback for representing the user.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="avatars"><div class="avatar">LM</div><div class="avatar">IO</div><div class="avatar">AW</div><div class="avatar">JP</div><div class="avatar">+5</div></div>
+        </div>
+        <pre class="codebox">&lt;Avatar&gt;&lt;AvatarFallback&gt;LM&lt;/AvatarFallback&gt;&lt;/Avatar&gt;</pre>
+      </section>
+
+      <section class="doc" id="empty">
+        <h2>Empty State</h2>
+        <p class="sub">Use empty states to tell users there is nothing here yet.</p>
+        <div class="ptabs"><div class="ptab on" onclick="pt(this,0)">Preview</div><div class="ptab" onclick="pt(this,1)">Code</div></div>
+        <div class="preview">
+          <div class="empty">
+            <h3>Nothing here yet</h3>
+            <p>Looks like you don't have any API keys.</p>
+            <button class="btn btn-default">Create</button>
+          </div>
+        </div>
+        <pre class="codebox">&lt;EmptyState title="Nothing here yet" /&gt;</pre>
+      </section>
+    </main>
+  </div>
+
+  <footer>Built by the Grain UI team. The source code is available on GitHub. MIT License.</footer>
+
+  <div class="modal-bg" id="m">
+    <div class="modal">
+      <h3>Are you absolutely sure?</h3>
+      <p>This action cannot be undone.</p>
+      <div class="modal-btns">
+        <button class="btn btn-outline" onclick="document.getElementById('m').classList.remove('show')">Cancel</button>
+        <button class="btn btn-default" onclick="document.getElementById('m').classList.remove('show'); showToast('Deleted.')">OK</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script is:inline>
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+    function tab(i) { document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j)); document.querySelectorAll('.tab-content').forEach((c, j) => c.classList.toggle('active', i === j)); }
+    function pt(el, i) { const s = el.closest('.doc'); s.classList.toggle('code', i === 1); s.querySelectorAll('.ptab').forEach((t, j) => t.classList.toggle('on', i === j)); }
+  </script>
+</body>
+</html>

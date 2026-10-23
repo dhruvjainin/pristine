@@ -1,0 +1,39 @@
+name: Bug
+description: Pristine did the wrong thing in a real session.
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      options: [init, critique, design, polish, bare /pristine, capture.mjs, detect.mjs, site]
+    validations:
+      required: true
+  - type: input
+    id: harness
+    attributes:
+      label: Harness and version
+      description: e.g. Claude Code 2.3, Codex CLI 0.40, Copilot CLI 1.0. Say how you installed (plugin, skills.sh or by hand).
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model and effort
+      description: e.g. Opus, high effort.
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you ran and what it did. Paste the relevant part of the session and, if you can, a screenshot of the page.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: What it should have done, and which line of SKILL.md or a reference file says so (if any).
+    validations:
+      required: true

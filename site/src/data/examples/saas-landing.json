@@ -1,0 +1,193 @@
+{
+  "slug": "saas-landing",
+  "order": 1,
+  "title": "SaaS landing page",
+  "product": "Ledgerline",
+  "blurb": "A landing page that went from gradient hype and fake stats to a hero you can use: pick a client payment and watch Ledgerline split it into what to move to tax savings and what's yours to spend.",
+  "mode": "Persuade",
+  "persona": {
+    "name": "Priya Raman",
+    "role": "Freelance product designer",
+    "goal": "Stop dreading quarterly taxes. She wants to know, in under a minute, whether this tool will tell her what to set aside and whether it's safe to connect her bank."
+  },
+  "command": "/pristine polish src/pages/index.astro",
+  "hasDark": true,
+  "before": {
+    "score": 3.5,
+    "level": 2,
+    "verdict": "Could be the landing page for any product. The hero says \"Supercharge your finances\" over a purple gradient, the proof is invented (10,000+ users, $2B+ tracked), and nothing on the first screen mentions taxes, which is the reason Priya came."
+  },
+  "after": {
+    "score": 9.5,
+    "level": 10,
+    "verdict": "The hero is the product: a $4,200 payment from Harbor & Pine split into self-employment, federal and Colorado tax, with the Q4 meter filling as you try $850 or $12,000 (which crosses into the 22% bracket). The feature tiles show real states: an import at 214 of 1,280, a bank that needs signing in again, a bounced invoice email, a coffee waiting to be sorted. Calm petrol-ink palette with a designed dark theme."
+  },
+  "dimensions": [
+    {
+      "name": "Persona fit",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Hierarchy & clarity",
+      "before": 4,
+      "after": 10
+    },
+    {
+      "name": "Layout & spacing",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Typography",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Color & theming",
+      "before": 2,
+      "after": 9
+    },
+    {
+      "name": "Consistency",
+      "before": 4,
+      "after": 9
+    },
+    {
+      "name": "Responsiveness",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Motion & interaction",
+      "before": 3,
+      "after": 9
+    },
+    {
+      "name": "Accessibility",
+      "before": 2,
+      "after": 9
+    },
+    {
+      "name": "Copy",
+      "before": 2,
+      "after": 10
+    },
+    {
+      "name": "Robustness & performance",
+      "before": 4,
+      "after": 9
+    }
+  ],
+  "critique": [
+    {
+      "priority": "P0",
+      "title": "The proof is made up",
+      "detail": "\"10,000+ freelancers\", \"$2B+ tracked\", \"4.9★\" and a strip of logos Ledgerline can't back up. Priya is about to hand over bank access; one claim that smells invented costs the whole page its trust.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P0",
+      "title": "Focus is removed and contrast fails",
+      "detail": "`*:focus { outline: none }` hides where keyboard users are. Body copy is #d1d5db and #c4b5fd on a purple gradient, well under 4.5:1 in places.",
+      "lens": "harden"
+    },
+    {
+      "priority": "P1",
+      "title": "The hero doesn't say what it does",
+      "detail": "\"Supercharge Your Finances with AI-Powered Bookkeeping\" over a 100vh centered gradient. Taxes, invoices and bank sync don't appear until the third scroll.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P1",
+      "title": "The product shot is a decorative bar chart",
+      "detail": "Rounded gradient bars with no axes, labels or values. It shows nothing Priya would actually see in the app.",
+      "lens": "layout"
+    },
+    {
+      "priority": "P1",
+      "title": "Six identical emoji cards",
+      "detail": "Centered icon, bold title and two lines of filler, six times. Nothing is ranked, so the one feature that matters to Priya, tax estimates, has the same weight as \"Lightning Fast\".",
+      "lens": "distill"
+    },
+    {
+      "priority": "P2",
+      "title": "No dark mode, and the form says \"Submit\"",
+      "detail": "No `prefers-color-scheme` handling. The final form button is labelled \"Submit\" and has no error, loading or success state.",
+      "lens": "polish"
+    }
+  ],
+  "changes": [
+    {
+      "lens": "clarify",
+      "before": "<h1>Supercharge Your Finances with AI-Powered Bookkeeping 🚀</h1>",
+      "after": "<h1>Your quarterly tax bill, worked out <em>every time you get paid.</em></h1>",
+      "why": "Names Priya's actual problem in the first line she reads."
+    },
+    {
+      "lens": "delight",
+      "before": "Static dashboard screenshot in a fake browser frame",
+      "after": "<figure data-pay>: radios for $850 / $4,200 / $12,000; split(4200) → move $1,281 (30.5%): SE $592, federal $504, Colorado $185; Q4 meter $2,780 of $3,412, $632 to go",
+      "why": "She sees the one number she needs, for a payment like hers, before she signs up."
+    },
+    {
+      "lens": "animate",
+      "before": "transition: all 0.3s ease-in on cards; nothing moves when data changes",
+      "after": "Split bar segments clip-path: inset(0 calc(100% - var(--a)) 0 0) transitioned 260ms cubic-bezier(0.23, 1, 0.32, 1); totals roll over 260ms; reduced motion swaps to a 150ms fade",
+      "why": "Motion shows where the money goes when the payment changes, and nothing else moves."
+    },
+    {
+      "lens": "clarify",
+      "before": "Every tile shows a happy-path checkmark",
+      "after": "Bank tile: Synced 2 min ago · Importing 214 of 1,280 · Meridian Savings needs sign-in + Reconnect · Banco Atlântico do Porto (EUR). Invoice tile: paid · 12 days late, 2nd reminder Fri Oct 24 · Email bounced · Sent, due Nov 19",
+      "why": "Shows how the product behaves when banks and clients don't, which is what she's worried about."
+    },
+    {
+      "lens": "harden",
+      "before": "Generic ✓ icons in brand gradient",
+      "after": "Mark.astro: 14px status marks ok / run (spinning arc) / warn / fail / idle (dashed), role=\"img\" with aria-label; colour carries state only",
+      "why": "Small, precise marks read at a glance and still make sense without colour."
+    },
+    {
+      "lens": "delight",
+      "before": "\"AI categorizes everything automatically!\"",
+      "after": "Fernwood Coffee Co. −$38.60 \"Needs you\" with Client meal / Personal buttons that resolve to \"Meals, 50% deductible\" + Undo",
+      "why": "Shows the honest version of automation: it asks once, and lets her change her mind."
+    },
+    {
+      "lens": "colorize",
+      "before": "linear-gradient(90deg, #6366f1, #ec4899); v1 accent #4b3bc4",
+      "after": "--bg: #f8f7f3; --accent: #1d5a85 (petrol ink); dark --bg: #101417, --surface: #171c20, --accent: #86bde3, with its own segment and warning ramps",
+      "why": "Moves out of the default indigo family into a ledger-ink colour, and dark mode is designed rather than inverted."
+    },
+    {
+      "lens": "typeset",
+      "before": ".hero h1 { font-size: 64px; font-weight: 800; } in 16 sizes",
+      "after": "Fraunces Variable (opsz + SOFT 30, italic 460 for the emphasis), --t-h1: clamp(2.375rem, 1.6rem + 2.8vw, 4rem); tabular lining numerals on every amount",
+      "why": "A warm display face with a real italic gives the page a voice, and the money columns line up."
+    },
+    {
+      "lens": "layout",
+      "before": "6 × .card { text-align: center; } with emoji icons",
+      "after": "12-column bento: tax chart 7 cols, bank sync 5, sorting 6, invoices 6; Q4 bar drawn as $2,780 solid + dashed $632 still to set aside",
+      "why": "Ranks features by what Priya cares about and shows each one working."
+    }
+  ],
+  "tells": [
+    "Purple-to-pink gradient hero",
+    "Gradient text on the logo and step numbers",
+    "\"Supercharge\" and \"AI-Powered\" hero copy",
+    "Invented stats (10,000+, $2B+, 4.9★)",
+    "Fake customer logo strip",
+    "Six identical centered emoji feature cards",
+    "Decorative chart with no axes or values",
+    "Uppercase eyebrow kickers above every heading",
+    "Gradient letter avatars with star ratings",
+    "\"Most Popular\" card with a glow and scale(1.05)",
+    "transition: all 0.3s ease-in",
+    "*:focus { outline: none }",
+    "Gray text on a colored background",
+    "\"Submit\" button label",
+    "No dark mode"
+  ]
+}

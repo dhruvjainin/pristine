@@ -1,0 +1,452 @@
+---
+import Base from "../layouts/Base.astro";
+import Compare from "../components/Compare.astro";
+import Copy from "../components/Copy.astro";
+import { examples } from "../data/examples";
+import { DIMENSIONS } from "../data/schema";
+import { commands, routes, lenses, targets, levels } from "../data/commands";
+import { laws, lawGroups } from "../data/laws";
+
+const sprout = [
+  { slug: "agent-fanout", name: "Agent Fanout", d: "A tree of agents, each with its model, tools, task, status and run time. Lines draw in as agents start." },
+  { slug: "status", name: "Status", d: "Nine states in three sizes. Colour only where the state needs attention." },
+  { slug: "state-panel", name: "State Panel", d: "Empty, loading and error states that say what happened and what to do next." },
+  { slug: "sidebar", name: "Sidebar", d: "Workspace nav with groups, counts and a collapse that keeps your place." },
+  { slug: "settings-list", name: "Settings List", d: "Label, help text and control on one line, with a clear saved state." },
+  { slug: "command", name: "Command", d: "A command palette that filters inline and works from the keyboard alone." },
+];
+
+const hero = examples.find((e) => e.slug === "saas-landing") ?? examples[0];
+const heroNotes = hero?.critique.slice(0, 3) ?? [];
+const install = "npx skills add maddhruv/pristine";
+---
+<Base title="Pristine: a design director for your coding agent" description="An agent skill that screenshots your UI, scores it out of 10 against your real users, and fixes it. Built for Claude Code, Copilot, and any agent that reads SKILL.md.">
+  <section class="hero">
+    <div class="container">
+      <div class="hero__copy">
+        <p class="eyebrow">An agent skill for Claude Code, Copilot and more</p>
+        <h1>Your agent ships UI.<br /><em>Pristine</em> makes it look designed.</h1>
+        <p class="lede">It screenshots your real page, scores it out of 10 through your users' eyes, and fixes what holds it back. <span class="lede__more">In light and dark, on desktop and mobile, and it looks again before it says it's done.</span></p>
+        <div class="hero__cta">
+          <Copy cmd={install} size="lg" label="Copy install command" />
+          <a class="btn btn--ghost" href="#examples">See 8 real before/afters</a>
+        </div>
+      </div>
+
+      {hero && (
+        <div class="hero__proof">
+          <Compare slug={hero.slug} title={hero.title} before={hero.before.score} after={hero.after.score} hasDark={hero.hasDark} eager />
+          <ol class="marks" aria-label={`What the critique flagged on the ${hero.title.toLowerCase()} before`}>
+            {heroNotes.map((c) => (
+              <li class="mark">
+                <span class="mark__p mono">{c.priority}</span>
+                <p class="mark__t">{c.title}</p>
+                <p class="mark__lens mono">Lens: {c.lens}</p>
+              </li>
+            ))}
+          </ol>
+          <p class="hero__caption">Left is what an agent shipped on its own. Right is the same page after <code>{hero.command}</code>. <a href={`/examples/${hero.slug}`}>Read the full critique</a></p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section" id="commands" aria-labelledby="commands-h">
+    <div class="container">
+      <div class="section__head">
+        <p class="eyebrow">Commands</p>
+        <h2 id="commands-h">Four commands. Each one looks before it judges.</h2>
+        <p class="lede">Every command reads your <code>DESIGN.md</code>, captures the real UI, and holds it to the same craft floor. Point any of them at a URL, a screenshot, a file, or a feature name.</p>
+      </div>
+
+      <ol class="cmds">
+        {commands.map((c, i) => (
+          <li class="cmd">
+            <div class="cmd__name">
+              <span class="cmd__n mono">0{i + 1}</span>
+              <h3><a class="cmd__link" href={`/docs/${c.name}/`}><code>{c.name}</code></a></h3>
+              <span class:list={["cmd__badge mono", { "is-ro": !c.edits }]}>{c.edits ? "edits code" : "read-only"}</span>
+            </div>
+            <div class="cmd__body">
+              <p class="cmd__does">{c.does}</p>
+              <p class="cmd__when"><span class="mono">When</span> {c.when}</p>
+              <Copy cmd={c.usage} label={`Copy ${c.name} example`} />
+            </div>
+            <ul class="cmd__out">
+              {c.out.map((o) => <li>{o}</li>)}
+            </ul>
+          </li>
+        ))}
+      </ol>
+
+      <div class="grid2">
+        <div class="panel">
+          <h3>Just type <code>/pristine</code></h3>
+          <p>A bare invocation routes by what you ask for.</p>
+          <table class="routes">
+            <caption class="visually-hidden">How a bare /pristine routes</caption>
+            <thead><tr><th scope="col">You say</th><th scope="col">It runs</th></tr></thead>
+            <tbody>
+              {routes.map((r) => <tr><td>{r.ask}</td><td class="mono">{r.to}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>Point it at anything</h3>
+          <p>Four kinds of target, resolved before any work starts.</p>
+          <dl class="targets">
+            {targets.map((t) => (<div><dt>{t.kind}</dt><dd class="mono">{t.eg}</dd></div>))}
+          </dl>
+          <h3 class="panel__sub">Or force a Lens</h3>
+          <p><code>/pristine polish bolder animate</code> runs exactly those. Sixteen in all:</p>
+          <ul class="chips">{lenses.map((l) => <li class="mono"><a href={`/docs/${l}/`}>{l}</a></li>)}</ul>
+        </div>
+      </div>
+      <p class="cmds__more"><a class="btn btn--ghost" href="/docs/">Full command reference, with examples</a></p>
+    </div>
+  </section>
+
+  <section class="section" id="examples" aria-labelledby="examples-h">
+    <div class="container">
+      <div class="section__head">
+        <p class="eyebrow">Examples</p>
+        <h2 id="examples-h">Eight surfaces, before and after.</h2>
+        <p class="lede">Each "before" is what a coding agent typically ships unaided. Each "after" is the same product with the same content, after one Pristine run. Both are live pages; open them, resize them, tab through them.</p>
+      </div>
+      <ul class="cards">
+        {examples.map((e) => (
+          <li class="card">
+            <a href={`/examples/${e.slug}`} class="card__link">
+              <div class="card__shots">
+                {(["before", "after"] as const).map((side) => (
+                  <figure class="card__shot">
+                    <img src={`/shots/${e.slug}/${side}/${e.slug === "mobile-web" ? "mobile" : "desktop"}-light.webp`} data-light={`/shots/${e.slug}/${side}/${e.slug === "mobile-web" ? "mobile" : "desktop"}-light.webp`} data-dark={`/shots/${e.slug}/${side}/${e.slug === "mobile-web" ? "mobile" : "desktop"}-dark.webp`} alt="" width="1200" loading="lazy" decoding="async" />
+                    <figcaption class="mono">{side}</figcaption>
+                  </figure>
+                ))}
+              </div>
+              <div class="card__meta">
+                <p class="eyebrow">{e.mode}</p>
+                <h3>{e.title}</h3>
+                <p class="card__blurb">{e.blurb}</p>
+                <p class="card__score mono num" aria-label={`Score ${e.before.score} before, ${e.after.score} after`}>
+                  <span class="pen">{e.before.score.toFixed(1)}</span>
+                  <svg width="20" height="10" viewBox="0 0 20 10" aria-hidden="true"><path d="M1 5h17M14 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.25"/></svg>
+                  <span class="ok">{e.after.score.toFixed(1)}</span>
+                </p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="built" aria-labelledby="built-h">
+    <div class="container">
+      <div class="section__head">
+        <p class="eyebrow">Built with Pristine</p>
+        <h2 id="built-h">Sprout: 102 components, every one through <code>/pristine</code>.</h2>
+        <p class="lede">A React 19 and Tailwind 4 component library on Base UI, in light and dark. Each component was designed, critiqued and polished with the skill, and each shows its real states, not a happy path.</p>
+      </div>
+      <a class="sprout__hero" href="https://sprout.tulipfarm.ai/" target="_blank" rel="noopener">
+        <img src="/shots/sprout/home-light.webp" data-light="/shots/sprout/home-light.webp" data-dark="/shots/sprout/home-dark.webp" width="1200" height="750" alt="Sprout home page: A foundation for your next interface." loading="lazy" decoding="async" />
+        <span class="sprout__visit">sprout.tulipfarm.ai <span aria-hidden="true">↗</span><span class="visually-hidden">(opens in a new tab)</span></span>
+      </a>
+      <ul class="sprout">
+        {sprout.map((c) => (
+          <li>
+            <a class="sprout__card" href={`https://sprout.tulipfarm.ai/components/${c.slug}/`} target="_blank" rel="noopener">
+              <span class="sprout__shot">
+                <img src={`/shots/sprout/${c.slug}-light.webp`} data-light={`/shots/sprout/${c.slug}-light.webp`} data-dark={`/shots/sprout/${c.slug}-dark.webp`} width="846" height="560" alt={`${c.name} component, live demo`} loading="lazy" decoding="async" />
+              </span>
+              <span class="sprout__meta">
+                <b>{c.name} <span aria-hidden="true">↗</span><span class="visually-hidden">(opens in a new tab)</span></b>
+                <span>{c.d}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="how" aria-labelledby="how-h">
+    <div class="container">
+      <div class="section__head">
+        <p class="eyebrow">How it judges</p>
+        <h2 id="how-h">No guessing from the code. It looks.</h2>
+        <p class="lede">Before scoring and after every fix, Pristine captures the target in four cells, using whatever browser your agent has: Claude in Chrome, a Playwright MCP, or its own bundled script.</p>
+      </div>
+      <div class="how">
+        <div class="matrix" role="table" aria-label="Capture Matrix">
+          <div role="row" class="matrix__row matrix__head"><span role="columnheader"></span><span role="columnheader" class="mono">Desktop 1440</span><span role="columnheader" class="mono">Mobile 390</span></div>
+          <div role="row" class="matrix__row"><span role="rowheader" class="mono">Light</span><span role="cell" class="cell cell--light"><i></i></span><span role="cell" class="cell cell--light cell--m"><i></i></span></div>
+          <div role="row" class="matrix__row"><span role="rowheader" class="mono">Dark</span><span role="cell" class="cell cell--dark"><i></i></span><span role="cell" class="cell cell--dark cell--m"><i></i></span></div>
+        </div>
+        <div>
+          <h3 class="how__h">Eleven Dimensions, scored out of 10</h3>
+          <ol class="dims">{DIMENSIONS.map((d) => <li>{d}</li>)}</ol>
+          <h3 class="how__h how__h--gap">Placed on a Level first</h3>
+          <ul class="levels">
+            {levels.map((l) => (
+              <li><span class="levels__n mono num">{l.n}</span><div><b>{l.name}</b> <span>{l.d}</span></div></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="laws" aria-labelledby="laws-h">
+    <div class="container">
+      <div class="section__head">
+        <p class="eyebrow">The laws</p>
+        <h2 id="laws-h">Twenty laws behind every score.</h2>
+        <p class="lede">Taste isn't a vibe. Every critique finding and every fix traces back to one of these, and to the Lens that applies it. Twenty is too many to hold at once, so they come in five groups.</p>
+      </div>
+      <div class="laws">
+        {lawGroups.map((g, gi) => (
+          <details class="lawset" open data-lawset>
+            <summary class="lawset__head">
+              <span class="lawset__n mono num">{laws.filter((l) => l.group === g.id).length} laws</span>
+              <h3>{g.name}</h3>
+              <p>{g.d}</p>
+            </summary>
+            <ol class="lawset__list" start={lawGroups.slice(0, gi).reduce((n, x) => n + laws.filter((l) => l.group === x.id).length, 0) + 1}>
+              {laws.filter((l) => l.group === g.id).map((l) => (
+                <li class="law">
+                  <h4>{l.name}</h4>
+                  <p class="law__says">{l.says}</p>
+                  <p class="law__does">{l.does}</p>
+                  <p class="law__lens mono">{l.lens}</p>
+                </li>
+              ))}
+            </ol>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="install" aria-labelledby="install-h">
+    <div class="container">
+      <div class="section__head">
+        <p class="eyebrow">Install</p>
+        <h2 id="install-h">Two lines, then <code>/pristine init</code>.</h2>
+      </div>
+      <div class="install">
+        <div class="install__step">
+          <h3>Claude Code</h3>
+          <p>Add the marketplace, then install the plugin. Updates itself.</p>
+          <Copy cmd="/plugin marketplace add maddhruv/pristine" wrap label="Copy Claude Code marketplace command" />
+          <Copy cmd="/plugin install pristine@pristine" wrap label="Copy Claude Code install command" />
+        </div>
+        <div class="install__step">
+          <h3>Codex</h3>
+          <p>Same marketplace, from the Codex CLI.</p>
+          <Copy cmd="codex plugin marketplace add maddhruv/pristine" wrap label="Copy Codex marketplace command" />
+          <Copy cmd="codex plugin add pristine@pristine" wrap label="Copy Codex install command" />
+        </div>
+        <div class="install__step">
+          <h3>GitHub Copilot</h3>
+          <p>CLI and VS Code.</p>
+          <Copy cmd="copilot plugin marketplace add maddhruv/pristine" wrap label="Copy Copilot marketplace command" />
+          <Copy cmd="copilot plugin install pristine@pristine" wrap label="Copy Copilot install command" />
+        </div>
+        <div class="install__step">
+          <h3>Any other agent</h3>
+          <p>Copies the skill where your agents look for it.</p>
+          <Copy cmd={install} wrap label="Copy install command" />
+        </div>
+      </div>
+      <p class="install__next">Then, in your project: <code>/pristine init</code> to write <code>DESIGN.md</code>, and <code>/pristine</code> on whatever you're building.</p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const root = document.documentElement;
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const sync = () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : mq.matches;
+    document.querySelectorAll<HTMLImageElement>("img[data-dark]").forEach((img) => {
+      const src = dark ? img.dataset.dark! : img.dataset.light!;
+      if (img.getAttribute("src") !== src) img.src = src;
+    });
+  };
+  sync();
+  mq.addEventListener("change", sync);
+  new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+  if (matchMedia("(max-width: 640px)").matches) {
+    document.querySelectorAll<HTMLDetailsElement>("[data-lawset]").forEach((d, i) => { if (i > 0) d.open = false; });
+  }
+</script>
+
+<style>
+  .hero { padding-block: var(--s-7) var(--s-9); }
+  .hero__copy { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+  .hero .lede { max-width: 62ch; }
+  .hero h1 { font-size: var(--text-4xl); font-weight: 380; }
+  .hero h1 em { font-style: italic; font-weight: 400; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; margin-top: var(--s-2); }
+  .hero__cta :global(.copy) { flex: 0 1 420px; }
+  .hero__proof { display: grid; gap: var(--s-5); margin-top: var(--s-7); }
+  .hero__caption { color: var(--ink-2); font-size: var(--text-sm); max-width: 72ch; }
+  .marks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s-4); }
+  .mark { display: grid; gap: var(--s-1); align-content: start; padding-left: var(--s-4); border-left: 2px solid var(--pen); }
+  .mark__p { font-size: var(--text-xs); color: var(--pen); font-weight: 600; }
+  .mark__t { font: italic 400 var(--text-lg)/1.35 var(--font-display); color: var(--ink); }
+  .mark__lens { font-size: var(--text-xs); color: var(--ink-3); }
+  @media (max-width: 640px) {
+    .hero { padding-top: var(--s-6); }
+    .hero__copy { gap: var(--s-4); }
+    .hero .lede { font-size: var(--text-md); }
+    .lede__more { display: none; }
+    .hero__cta :global(.copy) { flex-basis: 100%; }
+    .hero__cta .btn { display: none; }
+    .hero__proof { margin-top: var(--s-6); }
+  }
+
+  .cmds { list-style: none; margin: 0 0 var(--s-8); padding: 0; border-top: 1px solid var(--ink); }
+  .cmd { display: grid; grid-template-columns: 220px minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s-6); padding-block: var(--s-6); border-bottom: 1px solid var(--rule); }
+  .cmd__name { display: grid; gap: var(--s-2); align-content: start; }
+  .cmd__link { color: inherit; text-decoration: none; }
+  .cmd__link:hover code { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .cmds__more { margin-top: var(--s-6); }
+  .chips a { color: inherit; text-decoration: none; }
+  .chips a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .cmd__n { font-size: var(--text-xs); color: var(--ink-3); }
+  .cmd__name h3 { font-size: var(--text-2xl); }
+  .cmd__name h3 code { font-family: var(--font-display); font-size: 1em; font-style: italic; }
+  .cmd__badge { justify-self: start; font-size: var(--text-xs); padding: 3px 7px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-2); }
+  .cmd__badge.is-ro { border-color: color-mix(in oklab, var(--ok) 40%, var(--rule)); color: var(--ok); }
+  .cmd__body { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-3); align-content: start; min-width: 0; }
+  .cmd__does { font-size: var(--text-lg); line-height: 1.45; }
+  .cmd__when { color: var(--ink-2); font-size: var(--text-sm); }
+  .cmd__when .mono { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; margin-right: var(--s-2); color: var(--ink-3); }
+  .cmd__out { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-2); font-size: var(--text-sm); color: var(--ink-2); align-content: start; }
+  .cmd__out li { padding-left: var(--s-4); position: relative; }
+  .cmd__out li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 8px; height: 1px; background: var(--ink-3); }
+  @media (max-width: 960px) { .cmd { grid-template-columns: 1fr; gap: var(--s-4); } .cmd__name { grid-auto-flow: column; justify-content: start; align-items: center; gap: var(--s-3); } }
+
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
+  @media (max-width: 960px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+  .panel { padding: var(--s-6); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); display: grid; gap: var(--s-3); align-content: start; }
+  @media (max-width: 640px) { .panel { padding: var(--s-5); } }
+  .panel h3 { font-size: var(--text-xl); }
+  .panel h3 code { font-size: 0.85em; }
+  .panel > p { color: var(--ink-2); font-size: var(--text-sm); }
+  .panel__sub { margin-top: var(--s-4); }
+  .routes { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+  .routes th { text-align: left; font: 500 var(--text-xs)/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); padding: var(--s-2) 0; border-bottom: 1px solid var(--rule); }
+  .routes td { padding: var(--s-3) 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .routes td.mono { text-align: right; padding-left: var(--s-4); white-space: nowrap; }
+  .routes th:last-child { text-align: right; }
+  .targets { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3) var(--s-5); }
+  .targets div { border-top: 1px solid var(--rule); padding-top: var(--s-2); min-width: 0; }
+  .targets dt { font-weight: 600; font-size: var(--text-sm); }
+  .targets dd { margin: 0; color: var(--ink-2); font-size: var(--text-xs); overflow-wrap: anywhere; }
+  .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips li { font-size: var(--text-xs); padding: 4px 8px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-2); }
+
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: var(--s-7) var(--s-5); }
+  .card__link { display: grid; gap: var(--s-4); text-decoration: none; border-radius: var(--radius); }
+  .card__shots { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+  .card__shot { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface-2); }
+  .card__shot img { display: block; width: 100%; height: auto; transition: transform var(--dur-reveal) var(--ease-out); }
+  .card__shot figcaption { position: absolute; left: 6px; bottom: 6px; padding: 3px 6px; border-radius: 3px; font-size: var(--text-xs); background: var(--ink); color: var(--on-ink); }
+  @media (hover: hover) and (pointer: fine) {
+    .card__link:hover .card__shot img { transform: translateY(-32px); }
+    .card__link:hover h3 { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  }
+  .card__meta { display: grid; gap: var(--s-2); }
+  .card__meta h3 { font-size: var(--text-xl); }
+  .card__blurb { color: var(--ink-2); font-size: var(--text-sm); }
+  .card__score { display: flex; align-items: center; gap: var(--s-2); font-size: var(--text-md); font-weight: 600; color: var(--ink-3); }
+
+  .how { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-8); align-items: start; }
+  @media (max-width: 960px) { .how { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); } }
+  .matrix { display: grid; gap: var(--s-3); }
+  .matrix__row { display: grid; grid-template-columns: 56px 1fr 0.42fr; gap: var(--s-3); align-items: start; }
+  .matrix__row > [role=rowheader] { padding-top: var(--s-2); }
+  .matrix__head span { font-size: var(--text-xs); color: var(--ink-3); }
+  .matrix__row > .mono { font-size: var(--text-xs); color: var(--ink-2); }
+  .cell { aspect-ratio: 1440 / 900; border-radius: 8px; border: 1px solid var(--rule); padding: 10%; display: grid; }
+  .cell--m { aspect-ratio: 390 / 844; justify-self: start; width: 100%; }
+  .cell i { display: block; border-radius: 3px; background: linear-gradient(var(--c) 0 12%, transparent 12% 22%, var(--c2) 22% 30%, transparent 30% 40%, var(--c2) 40% 46%, transparent 46%); }
+  .cell--light { background: #fbf8f1; --c: #1b1916; --c2: #cfc6b5; }
+  .cell--dark { background: #1c1915; border-color: #332e27; --c: #eee8dc; --c2: #4a443b; }
+  .how__h { font-size: var(--text-xl); margin-bottom: var(--s-4); }
+  .how__h--gap { margin-top: var(--s-7); }
+  .dims { margin: 0; padding: 0; list-style: none; counter-reset: d; columns: 2; column-gap: var(--s-6); font-size: var(--text-sm); }
+  .dims li { counter-increment: d; padding: var(--s-2) 0; border-top: 1px solid var(--rule); break-inside: avoid; }
+  .dims li::before { content: counter(d, decimal-leading-zero); font: 500 var(--text-xs) var(--font-mono); color: var(--ink-3); margin-right: var(--s-3); }
+  .levels { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-3); }
+  .levels li { display: grid; grid-template-columns: 40px 1fr; gap: var(--s-3); font-size: var(--text-sm); color: var(--ink-2); }
+  .levels b { color: var(--ink); font-weight: 600; }
+  .levels__n { font-size: var(--text-xl); line-height: 1.1; color: var(--ink); }
+  @media (max-width: 420px) { .dims { columns: 1; } }
+
+  .install { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-5); }
+  @media (max-width: 1100px) { .install { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .install { grid-template-columns: minmax(0, 1fr); } }
+  .install__step { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-3); align-content: start; padding-top: var(--s-4); border-top: 1px solid var(--ink); min-width: 0; }
+  .install__step h3 { font-size: var(--text-xl); }
+  .install__step p { color: var(--ink-2); font-size: var(--text-sm); }
+  .install__next { margin-top: var(--s-7); font-size: var(--text-lg); color: var(--ink-2); }
+  .install__next code { color: var(--ink); }
+  #install h2 code { font-family: var(--font-display); font-style: italic; font-size: 0.95em; }
+
+
+  #built h2 code { font-family: var(--font-display); font-style: italic; font-size: 0.95em; }
+  .sprout__hero { position: relative; display: block; aspect-ratio: 1440 / 640; overflow: hidden; border: 1px solid var(--rule); border-radius: var(--radius); margin-bottom: var(--s-6); }
+  .sprout__hero img { display: block; width: 100%; height: auto; }
+  .sprout__visit { position: absolute; right: var(--s-3); bottom: var(--s-3); padding: 6px 10px; border-radius: var(--radius-sm); font-size: var(--text-sm); background: var(--ink); color: var(--on-ink); }
+  @media (max-width: 640px) { .sprout__visit { right: var(--s-2); bottom: var(--s-2); padding: 3px 6px; font-size: var(--text-xs); } }
+  .sprout { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--s-6) var(--s-5); }
+  .sprout__card { display: grid; gap: var(--s-3); text-decoration: none; color: inherit; border-radius: var(--radius); }
+  .sprout__shot { display: block; aspect-ratio: 846 / 560; overflow: hidden; border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+  .sprout__shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-reveal) var(--ease-out); }
+  .sprout__meta { display: grid; gap: var(--s-1); font-size: var(--text-sm); color: var(--ink-2); }
+  .sprout__meta b { font-size: var(--text-md); color: var(--ink); font-weight: 600; }
+  @media (hover: hover) and (pointer: fine) {
+    .sprout__card:hover .sprout__shot img { transform: scale(1.02); }
+    .sprout__card:hover b, .sprout__hero:hover .sprout__visit { text-decoration: underline; text-underline-offset: 3px; }
+  }
+
+  .laws { display: grid; gap: var(--s-7); counter-reset: law; }
+  .lawset { border-top: 1px solid var(--ink); }
+  .lawset__head { list-style: none; cursor: pointer; display: grid; grid-template-columns: 220px minmax(0, 1fr) auto; align-items: baseline; gap: var(--s-2) var(--s-6); padding-block: var(--s-4); border-radius: var(--radius-sm); }
+  .lawset__head::-webkit-details-marker { display: none; }
+  .lawset__head h3 { grid-column: 1; grid-row: 1; font-size: var(--text-2xl); font-style: italic; font-weight: 400; }
+  .lawset__head p { grid-column: 2; grid-row: 1; color: var(--ink-2); font-size: var(--text-md); }
+  .lawset__n { grid-column: 3; grid-row: 1; display: inline-flex; align-items: center; gap: var(--s-2); font-size: var(--text-xs); color: var(--ink-3); }
+  .lawset__n::after { content: ""; width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-state) var(--ease-out); }
+  .lawset[open] .lawset__n::after { transform: translateY(2px) rotate(225deg); }
+  .lawset__head:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  @media (hover: hover) and (pointer: fine) { .lawset__head:hover h3 { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; } }
+  .lawset__list { list-style: none; margin: 0; padding: var(--s-3) 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: var(--s-6) var(--s-5); }
+  .law { counter-increment: law; display: grid; gap: var(--s-2); align-content: start; padding-top: var(--s-3); border-top: 1px solid var(--rule); }
+  .law h4 { font: 500 var(--text-lg)/1.25 var(--font-display); }
+  .law h4::before { content: counter(law, decimal-leading-zero); display: block; font: 500 var(--text-xs)/1.6 var(--font-mono); color: var(--ink-3); }
+  .law__says { color: var(--ink); font: italic 400 var(--text-md)/1.4 var(--font-display); }
+  .law__does { color: var(--ink-2); font-size: var(--text-sm); }
+  .law__lens { font-size: var(--text-xs); color: var(--ink-3); }
+  .law__lens::before { content: "Lens  "; white-space: pre; text-transform: uppercase; letter-spacing: 0.06em; }
+  @media (max-width: 960px) {
+    .lawset__head { grid-template-columns: minmax(0, 1fr) auto; }
+    .lawset__head p { grid-column: 1 / -1; grid-row: 2; font-size: var(--text-sm); }
+    .lawset__n { grid-column: 2; }
+  }
+  @media (max-width: 640px) {
+    .laws { gap: 0; }
+    .lawset__head { min-height: 44px; }
+    .lawset__head h3 { font-size: var(--text-xl); }
+    .lawset__list { padding-bottom: var(--s-6); }
+  }
+  @media (prefers-reduced-motion: reduce) { .lawset__n::after { transition: none; } }
+
+  @media (prefers-reduced-motion: reduce) { .sprout__shot img { transition: none; } .sprout__card:hover .sprout__shot img { transform: none; } .card__shot img { transition: none; } .card__link:hover .card__shot img { transform: none; } }
+</style>

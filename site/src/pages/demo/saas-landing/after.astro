@@ -1,0 +1,955 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/fraunces/full.css";
+import "@fontsource-variable/fraunces/full-italic.css";
+import Icon from "../../../components/demo/saas-landing/Icon.astro";
+import Mark from "../../../components/demo/saas-landing/Mark.astro";
+import { split, usd, PAYMENTS } from "../../../components/demo/saas-landing/model";
+
+const DEFAULT = 1;
+const s = split(PAYMENTS[DEFAULT].amount);
+const pc = (n: number, of: number) => `${((n / of) * 100).toFixed(2)}%`;
+const splitVars = `--a:${pc(s.se, s.payment)};--b:${pc(s.se + s.fed, s.payment)};--c:${pc(s.tax, s.payment)}`;
+const meterVars = `--p1:${pc(s.q4SavedBefore, s.q4Estimate)};--p2:${pc(s.q4Saved, s.q4Estimate)}`;
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#101417" media="(prefers-color-scheme: dark)" />
+<title>Ledgerline: bookkeeping and quarterly taxes for freelancers</title>
+<meta name="description" content="Ledgerline syncs your bank, sorts expenses, chases late invoices, and tells you what to set aside for quarterly taxes every time a client pays." />
+<script is:inline>document.documentElement.classList.add("js");</script>
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    --bg: #f8f7f3;
+    --surface: #ffffff;
+    --surface-2: #f2f0eb;
+    --surface-3: #ffffff;
+    --ink: #1a1f24;
+    --ink-2: #434a52;
+    --ink-3: #626a72;
+    --line: #e4e1da;
+    --line-2: #d3cfc6;
+    --line-strong: #8a9097;
+    --accent: #1d5a85;
+    --accent-hover: #236a9a;
+    --accent-press: #174b6f;
+    --accent-ink: #1a5480;
+    --on-accent: #ffffff;
+    --accent-soft: #e5eef4;
+    --seg-2: #6b97b6;
+    --seg-3: #b3cbdc;
+    --success: #1f6b47;
+    --success-soft: #e2f1e8;
+    --warning: #8a5a00;
+    --warning-mark: #c98a12;
+    --warning-soft: #fbf0d9;
+    --error: #b42318;
+    --error-soft: #fbe6e3;
+    --focus: #1d5a85;
+    --shadow-card: 0 1px 2px rgb(26 31 36 / 0.05), 0 18px 40px -20px rgb(26 31 36 / 0.22);
+    --cta-bg: #1a1f24; --cta-ink: #f8f7f3; --cta-btn: #f8f7f3; --cta-btn-ink: #1a1f24; --cta-btn-hover: #ecebe6;
+    --cta-err: #f6a49b; --cta-ok: #9fdcb9;
+
+    --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+
+    --t-xs: 0.8125rem;
+    --t-sm: 0.875rem;
+    --t-md: 0.9375rem;
+    --t-base: 1.0625rem;
+    --t-lg: 1.25rem;
+    --t-xl: 1.5rem;
+    --t-h2: clamp(1.875rem, 1.4rem + 1.6vw, 2.75rem);
+    --t-h1: clamp(2.375rem, 1.6rem + 2.8vw, 4rem);
+
+    --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+    --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+    --gutter: clamp(16px, 4vw, 40px);
+    --max: 1200px;
+    --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --dur-press: 140ms; --dur-small: 180ms; --dur-medium: 260ms;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101417;
+      --surface: #171c20;
+      --surface-2: #1f262b;
+      --surface-3: #232b31;
+      --ink: #e7ebee;
+      --ink-2: #b6bfc6;
+      --ink-3: #8f9aa2;
+      --line: #273036;
+      --line-2: #323c43;
+      --line-strong: #66737c;
+      --accent: #86bde3;
+      --accent-hover: #9bcaea;
+      --accent-press: #74aed8;
+      --accent-ink: #9dcbec;
+      --on-accent: #0c1820;
+      --accent-soft: #19303f;
+      --seg-2: #4f7f9f;
+      --seg-3: #2f4c60;
+      --success: #74cf9c;
+      --success-soft: #16301f;
+      --warning: #e8b65c;
+      --warning-mark: #e0a744;
+      --warning-soft: #33280f;
+      --error: #f2877d;
+      --error-soft: #3a1c19;
+      --focus: #9dcbec;
+      --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 24px 48px -24px rgb(0 0 0 / 0.8);
+      --cta-bg: #1f262b; --cta-ink: #e7ebee; --cta-btn: #86bde3; --cta-btn-ink: #0c1820; --cta-btn-hover: #9bcaea;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; scroll-padding-top: 88px; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink-2);
+    font-family: var(--font-sans);
+    font-size: var(--t-base);
+    line-height: 1.6;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    caret-color: var(--accent);
+    accent-color: var(--accent);
+    overflow-x: clip;
+  }
+  ::selection { background: var(--accent-soft); color: var(--ink); }
+  html { scrollbar-color: var(--line-strong) var(--bg); }
+  h1, h2, h3 { color: var(--ink); margin: 0; text-wrap: balance; }
+  p { margin: 0; text-wrap: pretty; }
+  ul, ol, dl, dd, figure, fieldset { margin: 0; padding: 0; }
+  ul, ol { list-style: none; }
+  fieldset { border: 0; min-width: 0; }
+  a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  button { font: inherit; color: inherit; }
+  .icon { flex-shrink: 0; display: block; }
+  .num { font-variant-numeric: tabular-nums lining-nums; }
+  .wrap { max-width: var(--max); margin-inline: auto; padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right)); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .js-only { display: none !important; }
+  .js .js-only { display: revert !important; }
+  .js .no-js { display: none !important; }
+
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--r-xs); }
+
+  .skip { position: absolute; left: var(--s-4); top: -100px; background: var(--surface); color: var(--ink); padding: var(--s-3) var(--s-4); border-radius: var(--r-sm); z-index: 50; }
+  .skip:focus-visible { top: var(--s-3); }
+
+  /* Status marks: colour marks state only */
+  .mark { display: inline-grid; place-items: center; flex-shrink: 0; width: 14px; height: 14px; --mark-ink: var(--surface); }
+  .mark svg { display: block; }
+  .mark--ok { color: var(--success); }
+  .mark--run { color: var(--accent); }
+  .mark--warn { color: var(--warning-mark); --mark-ink: #1a1f24; }
+  .mark--fail { color: var(--error); }
+  .mark--idle { color: var(--line-strong); }
+  @media (prefers-reduced-motion: no-preference) {
+    .mark-arc { transform-origin: 7px 7px; animation: spin 1.1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+    min-height: 48px; padding: 0 var(--s-5);
+    border-radius: var(--r-sm); border: 1px solid transparent;
+    font: 600 1rem/1.2 var(--font-sans); letter-spacing: -0.006em;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+    touch-action: manipulation; user-select: none; -webkit-user-select: none;
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-small) ease, border-color var(--dur-small) ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: var(--on-accent); }
+  .btn-primary:active { background: var(--accent-press); }
+  .btn-quiet { background: transparent; color: var(--ink); border-color: var(--line-2); }
+  .btn-sm { min-height: 44px; padding: 0 var(--s-4); font-size: var(--t-sm); }
+  .btn[disabled] { opacity: 0.6; cursor: progress; transform: none; }
+  .btn .icon { transition: transform var(--dur-small) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-quiet:hover { border-color: var(--line-strong); background: var(--surface); }
+    .btn:hover .icon-arrow { transform: translateX(2px); }
+    a:hover { text-decoration-thickness: 2px; }
+  }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 94%, transparent); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top); }
+  .nav-inner { display: flex; align-items: center; gap: var(--s-5); height: 64px; }
+  .brand { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ink); text-decoration: none; font-weight: 650; font-size: 1.0625rem; letter-spacing: -0.012em; min-height: 44px; }
+  .brand svg { color: var(--accent); }
+  .nav-links { display: flex; gap: var(--s-1); margin-left: var(--s-4); }
+  .nav-links a { color: var(--ink-2); text-decoration: none; font-size: var(--t-md); font-weight: 500; padding: 10px var(--s-3); border-radius: var(--r-sm); transition: color var(--dur-small) ease, background-color var(--dur-small) ease; }
+  @media (hover: hover) and (pointer: fine) { .nav-links a:hover { color: var(--ink); background: var(--surface-2); } }
+  .nav-actions { margin-left: auto; display: flex; align-items: center; gap: var(--s-2); }
+  .login { color: var(--ink-2); text-decoration: none; font-size: var(--t-md); font-weight: 500; padding: var(--s-3); min-height: 44px; display: inline-flex; align-items: center; }
+  .menu { position: relative; display: none; }
+  .menu summary { list-style: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-sm); color: var(--ink); cursor: pointer; }
+  .menu summary::-webkit-details-marker { display: none; }
+  .menu-panel { position: absolute; right: 0; top: calc(100% + var(--s-2)); width: min(280px, calc(100vw - 2 * var(--gutter))); background: var(--surface-3); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: var(--s-2); transform-origin: top right; }
+  .menu[open] .menu-panel { animation: pop var(--dur-small) var(--ease-out); }
+  .menu-panel a { display: flex; align-items: center; min-height: 44px; padding: 0 var(--s-3); border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 500; }
+  @keyframes pop { from { opacity: 0; transform: scale(0.95); } }
+
+  /* Hero */
+  .hero { padding-block: var(--s-8) var(--s-9); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 10fr) minmax(0, 11fr); gap: var(--s-8); align-items: center; }
+  .hero h1 { font-family: var(--font-display); font-optical-sizing: auto; font-variation-settings: "SOFT" 30; font-size: var(--t-h1); font-weight: 540; line-height: 1.02; letter-spacing: -0.028em; }
+  .hero h1 em { font-style: italic; font-weight: 460; color: var(--accent-ink); }
+  .hero-lede { margin-top: var(--s-5); font-size: var(--t-lg); line-height: 1.55; color: var(--ink-2); max-width: 36ch; }
+  .hero-ctas { margin-top: var(--s-6); display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .hero-note { margin-top: var(--s-4); font-size: var(--t-sm); color: var(--ink-3); display: flex; align-items: center; gap: var(--s-2); }
+
+  /* Signature: the payment splitter */
+  .pay { background: var(--surface-3); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-card); padding: var(--s-5); font-size: var(--t-sm); position: relative; }
+  .pay-status { display: flex; align-items: center; gap: var(--s-2); color: var(--ink-3); font-size: var(--t-xs); font-weight: 500; }
+  .pay-status time { margin-left: auto; }
+  .pay-from { margin-top: var(--s-3); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--s-1) var(--s-4); padding-bottom: var(--s-4); border-bottom: 1px solid var(--line); }
+  .pay-from b { display: block; color: var(--ink); font-weight: 600; font-size: var(--t-base); letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pay-from small { color: var(--ink-3); font-size: var(--t-xs); }
+  .pay-amt { color: var(--ink); font-weight: 600; font-size: var(--t-base); }
+
+  .pay-try { margin-top: var(--s-4); }
+  .pay-try legend { font-size: var(--t-xs); color: var(--ink-3); font-weight: 500; margin-bottom: var(--s-2); padding: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .chips input { position: absolute; opacity: 0; pointer-events: none; }
+  .chips label {
+    display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--s-3);
+    border: 1px solid var(--line-2); border-radius: 999px; color: var(--ink-2); font-weight: 500; font-size: var(--t-sm);
+    cursor: pointer; user-select: none; -webkit-user-select: none; position: relative;
+    transition: background-color var(--dur-small) ease, border-color var(--dur-small) ease, color var(--dur-small) ease, transform var(--dur-press) var(--ease-out);
+  }
+  .chips label::after { content: ""; position: absolute; inset: -4px; }
+  .chips label:active { transform: scale(0.97); }
+  .chips input:checked + label { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .chips input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) { .chips input:not(:checked) + label:hover { border-color: var(--line-strong); color: var(--ink); } }
+
+  .aside { margin-top: var(--s-5); display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s-1) var(--s-4); }
+  .aside-label { width: 100%; font-size: var(--t-xs); color: var(--ink-3); font-weight: 500; }
+  .aside-big { font-family: var(--font-display); font-optical-sizing: auto; font-size: clamp(2.5rem, 2rem + 1.6vw, 3.25rem); font-weight: 520; letter-spacing: -0.03em; line-height: 1; color: var(--ink); font-feature-settings: "tnum", "lnum"; }
+  .aside-pct { color: var(--ink-3); font-size: var(--t-sm); }
+  .aside-pct b { color: var(--ink); font-weight: 600; }
+
+  .bar { position: relative; height: 14px; margin-top: var(--s-4); }
+  .bar > i { position: absolute; inset: 0; transition: clip-path var(--dur-medium) var(--ease-out); }
+  .seg-se { background: var(--accent); clip-path: inset(0 calc(100% - var(--a)) 0 0 round 3px); }
+  .seg-fed { background: var(--seg-2); clip-path: inset(0 calc(100% - var(--b)) 0 calc(var(--a) + 2px) round 3px); }
+  .seg-st { background: var(--seg-3); clip-path: inset(0 calc(100% - var(--c)) 0 calc(var(--b) + 2px) round 3px); }
+  .seg-keep { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); clip-path: inset(0 0 0 calc(var(--c) + 2px) round 3px); }
+
+  .legend { margin-top: var(--s-4); display: grid; grid-template-columns: 10px minmax(0, 1fr) auto auto; align-items: center; gap: var(--s-2) var(--s-3); }
+  .legend dt, .legend dd { display: contents; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; }
+  .legend .name { color: var(--ink-2); min-width: 0; }
+  .legend .rate { color: var(--ink-3); font-size: var(--t-xs); text-align: right; }
+  .legend .val { color: var(--ink); font-weight: 500; text-align: right; min-width: 6ch; }
+  .legend .keep-row { color: var(--ink); font-weight: 600; }
+  .legend hr { grid-column: 1 / -1; border: 0; border-top: 1px dashed var(--line-2); margin: 2px 0; width: 100%; }
+
+  .bracket { position: relative; margin-top: var(--s-4); min-height: 3.2em; font-size: var(--t-xs); line-height: 1.5; }
+  .bracket p { display: flex; gap: var(--s-2); align-items: flex-start; color: var(--ink-2); transition: opacity var(--dur-medium) var(--ease-out); }
+  .bracket .mark { margin-top: 2px; }
+  .bracket p[data-when="cross"] { position: absolute; inset: 0 0 auto 0; opacity: 0; }
+  .bracket[data-cross="true"] p[data-when="cross"] { opacity: 1; }
+  .bracket[data-cross="true"] p[data-when="low"] { opacity: 0; }
+
+  .q4 { margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--line); }
+  .q4-row { display: flex; justify-content: space-between; gap: var(--s-3); font-size: var(--t-xs); color: var(--ink-3); font-weight: 500; }
+  .q4-row b { color: var(--ink); font-weight: 600; }
+  .meter { position: relative; height: 8px; margin-top: var(--s-2); border-radius: 999px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+  .meter > i { position: absolute; inset: 0; transition: clip-path var(--dur-medium) var(--ease-out); }
+  .m-prior { background: var(--line-strong); clip-path: inset(0 calc(100% - var(--p1)) 0 0 round 999px); }
+  .m-now { background: var(--accent); clip-path: inset(0 calc(100% - var(--p2)) 0 calc(var(--p1) + 2px) round 999px); }
+  .q4-legend { margin-top: var(--s-2); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-1) var(--s-3); font-size: var(--t-xs); color: var(--ink-3); }
+  .q4-legend b { color: var(--ink); font-weight: 600; }
+  .pay figcaption { margin-top: var(--s-4); font-size: var(--t-xs); color: var(--ink-3); }
+
+  .roll { transition: opacity 150ms ease; }
+  .roll.is-swapping { opacity: 0.35; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pay { animation: rise 520ms var(--ease-out) 60ms both; }
+    .pay .bar, .pay .meter { animation: draw 700ms var(--ease-out) 360ms both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+    @keyframes draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pay { animation: fade 200ms ease both; }
+    .menu[open] .menu-panel { animation: fade 150ms ease; }
+    .bar > i, .meter > i { transition: opacity 150ms ease; }
+    @keyframes fade { from { opacity: 0.4; } }
+  }
+
+  /* Proof strip */
+  .proof { border-block: 1px solid var(--line); }
+  .proof-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5) var(--s-7); padding-block: var(--s-6); }
+  .proof-item { display: flex; gap: var(--s-3); align-items: flex-start; }
+  .proof-item .icon { color: var(--ink-3); margin-top: 3px; }
+  .proof-item strong { display: block; color: var(--ink); font-weight: 600; font-size: 1rem; letter-spacing: -0.006em; }
+  .proof-item span { font-size: var(--t-sm); color: var(--ink-3); line-height: 1.5; }
+
+  /* Sections */
+  .section { padding-block: var(--s-10) 0; }
+  .section-head { max-width: 680px; margin-bottom: var(--s-7); }
+  .section h2, .h2 { font-family: var(--font-display); font-optical-sizing: auto; font-variation-settings: "SOFT" 30; font-size: var(--t-h2); font-weight: 540; line-height: 1.08; letter-spacing: -0.022em; }
+  .section-head p { margin-top: var(--s-4); font-size: var(--t-lg); line-height: 1.55; max-width: 52ch; }
+
+  /* Bento */
+  .bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s-4); }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-6); display: flex; flex-direction: column; gap: var(--s-5); min-width: 0; }
+  .tile h3 { font-size: var(--t-xl); font-weight: 640; letter-spacing: -0.018em; line-height: 1.2; }
+  .tile p.lead { margin-top: var(--s-2); max-width: 46ch; }
+  .tile-tax { grid-column: span 7; }
+  .tile-bank { grid-column: span 5; }
+  .tile-sort { grid-column: span 6; }
+  .tile-chase { grid-column: span 6; }
+  .viz { margin-top: auto; background: var(--surface-2); border-radius: var(--r-md); padding: var(--s-4); font-size: var(--t-sm); }
+  .viz-flush { padding: var(--s-2) var(--s-4); }
+
+  .chart { width: 100%; height: auto; display: block; }
+  .chart .axis { stroke: var(--line-strong); }
+  .chart .grid { stroke: var(--line-2); stroke-dasharray: 2 3; }
+  .chart .paid { fill: var(--ink-3); }
+  .chart .est-saved { fill: var(--accent); }
+  .chart .est-left { fill: var(--accent-soft); stroke: var(--accent); stroke-dasharray: 3 3; }
+  .chart text { fill: var(--ink-3); font: 500 12px var(--font-sans); font-variant-numeric: tabular-nums; }
+  .chart .val { fill: var(--ink); font-weight: 600; }
+  .chart .q { fill: var(--ink-2); font-weight: 600; }
+  .chart .due { fill: var(--accent-ink); font-weight: 600; }
+  .chart .ok-dot { fill: var(--success); }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); margin-top: var(--s-3); font-size: var(--t-xs); color: var(--ink-3); }
+  .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .js .chart rect { transform-box: fill-box; transform-origin: bottom; transition: transform 600ms var(--ease-out); }
+    .js .chart:not(.is-in) rect { transform: scaleY(0.02); }
+    .js .chart rect:nth-of-type(2) { transition-delay: 50ms; }
+    .js .chart rect:nth-of-type(3) { transition-delay: 100ms; }
+    .js .chart rect:nth-of-type(n+4) { transition-delay: 150ms; }
+  }
+
+  .rows { display: grid; }
+  .row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 2px var(--s-3); padding: var(--s-3) 0; border-top: 1px solid var(--line); }
+  .row:first-child { border-top: 0; }
+  .row-main { min-width: 0; }
+  .row-main b { display: block; color: var(--ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-main small { display: block; font-size: var(--t-xs); color: var(--ink-3); }
+  .row-main small.warn { color: var(--warning); }
+  .row-main small.fail { color: var(--error); }
+  .row-side { font-size: var(--t-xs); color: var(--ink-3); text-align: right; white-space: nowrap; }
+  .row-amt { color: var(--ink); font-weight: 500; text-align: right; white-space: nowrap; }
+
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px var(--s-2); border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
+  .chip.warn { background: var(--warning-soft); box-shadow: none; color: var(--warning); }
+
+  .tx { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-1) var(--s-3); padding: var(--s-3) 0; border-top: 1px solid var(--line); align-items: center; }
+  .tx:first-child { border-top: 0; }
+  .tx-name { color: var(--ink); font-weight: 500; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tx-amt { color: var(--ink); text-align: right; }
+  .tx-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); min-width: 0; color: var(--ink-3); font-size: var(--t-xs); }
+  .tx-meta .icon { color: var(--ink-3); }
+  .review { display: grid; }
+  .review > * { grid-area: 1 / 1; transition: opacity var(--dur-medium) var(--ease-out); }
+  .review [data-resolved] { opacity: 0; visibility: hidden; }
+  .review.is-done [data-ask] { opacity: 0; visibility: hidden; }
+  .review.is-done [data-resolved] { opacity: 1; visibility: visible; }
+  .ask { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+  .pick {
+    min-height: 32px; padding: 0 var(--s-3); border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface);
+    color: var(--ink); font-size: var(--t-xs); font-weight: 600; cursor: pointer; position: relative;
+    transition: transform var(--dur-press) var(--ease-out), border-color var(--dur-small) ease;
+  }
+  .pick::after { content: ""; position: absolute; inset: -6px -2px; }
+  .pick:active { transform: scale(0.97); }
+  @media (hover: hover) and (pointer: fine) { .pick:hover { border-color: var(--line-strong); } }
+  .resolved { display: flex; align-items: center; gap: var(--s-2); }
+  .undo { background: none; border: 0; padding: 0 var(--s-1); min-height: 32px; color: var(--accent-ink); font-size: var(--t-xs); font-weight: 600; text-decoration: underline; text-underline-offset: 0.18em; cursor: pointer; position: relative; }
+  .undo::after { content: ""; position: absolute; inset: -6px -4px; }
+  .rule { margin-top: var(--s-2); padding-top: var(--s-3); border-top: 1px solid var(--line); font-size: var(--t-xs); color: var(--ink-2); display: flex; gap: var(--s-2); align-items: flex-start; }
+  .rule .icon { color: var(--ink-3); margin-top: 1px; }
+
+  /* Steps */
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); counter-reset: step; }
+  .steps li { counter-increment: step; padding-top: var(--s-5); border-top: 1px solid var(--line-strong); }
+  .steps li::before { content: counter(step); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line-2); font-size: var(--t-sm); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; margin-bottom: var(--s-4); }
+  .steps h3 { font-size: var(--t-lg); font-weight: 640; letter-spacing: -0.012em; }
+  .steps p { margin-top: var(--s-2); }
+  .steps .time { display: inline-flex; align-items: center; gap: 6px; margin-top: var(--s-3); font-size: var(--t-sm); color: var(--ink-3); }
+
+  /* Testimonial */
+  .story-inner { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--s-8); align-items: end; padding-block: var(--s-8); border-block: 1px solid var(--line); }
+  .story blockquote { margin: 0; font-family: var(--font-display); font-optical-sizing: auto; font-variation-settings: "SOFT" 50; font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.25rem); font-weight: 400; line-height: 1.28; letter-spacing: -0.015em; color: var(--ink); text-wrap: pretty; }
+  .story blockquote mark { background: none; color: var(--accent-ink); font-style: italic; }
+  .who { display: flex; gap: var(--s-3); align-items: center; }
+  .initials { width: 48px; height: 48px; border-radius: 50%; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); display: grid; place-items: center; font-weight: 600; flex-shrink: 0; }
+  .who b { display: block; color: var(--ink); font-weight: 600; }
+  .who span { font-size: var(--t-sm); color: var(--ink-3); }
+  .story-note { margin-top: var(--s-4); font-size: var(--t-xs); color: var(--ink-3); }
+
+  /* Pricing teaser */
+  .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+  .plan { padding: var(--s-6); border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--s-2); }
+  .plan:first-child { border-left: 0; }
+  .plan.rec { background: var(--accent-soft); }
+  .plan-name { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); font-size: var(--t-sm); font-weight: 600; color: var(--ink); }
+  .badge { font-size: 0.75rem; font-weight: 600; color: var(--accent-ink); background: var(--surface); border-radius: 999px; padding: 2px var(--s-2); }
+  .price { font-family: var(--font-display); font-optical-sizing: auto; font-size: 2.5rem; font-weight: 520; letter-spacing: -0.03em; color: var(--ink); line-height: 1.1; font-feature-settings: "tnum", "lnum"; }
+  .price small { font-family: var(--font-sans); font-size: var(--t-sm); font-weight: 500; color: var(--ink-3); letter-spacing: 0; }
+  .plan p { font-size: var(--t-sm); color: var(--ink-2); }
+  .plans-foot { margin-top: var(--s-5); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
+  .plans-foot p { font-size: var(--t-sm); color: var(--ink-3); }
+
+  /* FAQ */
+  .faq-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--s-8); }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:last-child { border-bottom: 1px solid var(--line); }
+  .faq summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); min-height: 64px; padding-block: var(--s-4); color: var(--ink); font-weight: 600; font-size: var(--t-base); cursor: pointer; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary .icon { color: var(--ink-3); transition: transform var(--dur-medium) var(--ease-out); }
+  .faq details[open] summary .icon { transform: rotate(180deg); }
+  .faq details p { padding-bottom: var(--s-5); max-width: 62ch; }
+  @media (hover: hover) and (pointer: fine) { .faq summary:hover .icon { color: var(--ink); } }
+
+  /* Final CTA */
+  .final { padding-block: var(--s-10) var(--s-9); }
+  .final-card { background: var(--cta-bg); color: var(--cta-ink); border-radius: var(--r-lg); padding: clamp(var(--s-6), 5vw, var(--s-8)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-7); align-items: center; }
+  .final-card h2 { color: var(--cta-ink); }
+  .final-card p { color: color-mix(in srgb, var(--cta-ink) 78%, transparent); margin-top: var(--s-3); }
+  .signup label { display: block; font-size: var(--t-sm); font-weight: 600; margin-bottom: var(--s-2); color: var(--cta-ink); }
+  .signup-row { display: flex; gap: var(--s-2); }
+  .signup input {
+    flex: 1; min-width: 0; min-height: 48px; padding: 0 var(--s-4);
+    border-radius: var(--r-sm); border: 1px solid color-mix(in srgb, var(--cta-ink) 40%, transparent);
+    background: color-mix(in srgb, var(--cta-ink) 7%, var(--cta-bg)); color: var(--cta-ink);
+    font: 400 1rem var(--font-sans); caret-color: var(--cta-ink);
+  }
+  .signup input::placeholder { color: color-mix(in srgb, var(--cta-ink) 62%, transparent); }
+  .signup input:focus-visible { outline: 2px solid var(--cta-ink); outline-offset: 2px; }
+  .signup input[aria-invalid="true"] { border-color: var(--cta-err); }
+  .signup .btn-primary { background: var(--cta-btn); color: var(--cta-btn-ink); }
+  .signup .btn-primary:focus-visible { outline-color: var(--cta-ink); }
+  @media (hover: hover) and (pointer: fine) { .signup .btn-primary:hover { background: var(--cta-btn-hover); } }
+  .signup .hint { margin-top: var(--s-2); font-size: var(--t-sm); color: color-mix(in srgb, var(--cta-ink) 78%, transparent); min-height: 1.5em; }
+  .signup .hint.err { color: var(--cta-err); }
+  .signup .hint.ok { color: var(--cta-ok); }
+
+  /* Footer */
+  .footer { border-top: 1px solid var(--line); padding-block: var(--s-7) calc(var(--s-7) + env(safe-area-inset-bottom)); font-size: var(--t-sm); color: var(--ink-3); }
+  .footer-grid { display: flex; flex-wrap: wrap; gap: var(--s-5); justify-content: space-between; align-items: center; }
+  .footer nav { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-2); }
+  .footer a { color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-2); }
+  @media (hover: hover) and (pointer: fine) { .footer a:hover { color: var(--ink); text-decoration: underline; } }
+
+  /* Responsive */
+  @media (max-width: 1080px) {
+    .hero-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); }
+    .hero-lede { max-width: 48ch; }
+    .pay { max-width: 640px; }
+    .tile-tax, .tile-bank, .tile-sort, .tile-chase { grid-column: span 12; }
+    .story-inner, .faq-grid, .final-card { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+  }
+  @media (max-width: 860px) {
+    .nav-links, .login { display: none; }
+    .menu { display: block; }
+    .proof-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+    .steps { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+    .plans { grid-template-columns: minmax(0, 1fr); }
+    .plan { border-left: 0; border-top: 1px solid var(--line); }
+    .plan:first-child { border-top: 0; }
+  }
+  @media (max-width: 640px) {
+    .hero { padding-block: var(--s-6) var(--s-8); }
+    .hero-lede { font-size: 1.125rem; }
+    .hero-ctas .btn { flex: 1 1 100%; }
+    .pay { padding: var(--s-4); margin-inline: calc(-1 * var(--s-1)); }
+    .legend { grid-template-columns: 10px minmax(0, 1fr) auto; }
+    .legend .rate { display: none; }
+    .tile { padding: var(--s-5); }
+    .viz { padding: var(--s-3); }
+    .section { padding-block: var(--s-9) 0; }
+    .signup-row { flex-direction: column; }
+    .nav-cta-label-long { display: none; }
+    .final { padding-block: var(--s-9) var(--s-8); }
+  }
+  @media (min-width: 641px) { .nav-cta-label-short { display: none; } }
+</style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Ledgerline home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.75"/><path d="M8 8v8h8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ledgerline
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="/demo/pricing/after">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="login" href="#">Log in</a>
+        <a class="btn btn-primary btn-sm" href="#start"><span class="nav-cta-label-long">Start 30-day trial</span><span class="nav-cta-label-short">Start trial</span></a>
+        <details class="menu">
+          <summary aria-label="Menu"><Icon name="menu" /></summary>
+          <div class="menu-panel">
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="/demo/pricing/after">Pricing</a>
+            <a href="#faq">FAQ</a>
+            <a href="#">Log in</a>
+          </div>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <h1>Your quarterly tax bill, worked out <em>every time you get paid.</em></h1>
+          <p class="hero-lede">Ledgerline syncs your bank, sorts expenses as they land, chases late invoices for you, and tells you exactly what to set aside before each quarterly payment.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="#start">Start 30-day trial <Icon name="arrow" size={18} class="icon-arrow" /></a>
+            <a class="btn btn-quiet" href="/demo/pricing/after">See pricing</a>
+          </div>
+          <p class="hero-note"><Icon name="check" size={16} /> No card needed. Built for freelancers and studios of up to 15.</p>
+        </div>
+
+        <figure class="pay" aria-labelledby="pay-cap" data-pay style={`${splitVars};${meterVars}`}>
+          <p class="pay-status"><Mark state="ok" label="Received" /> Payment received <time datetime="2026-10-22T14:14">Today, 2:14 pm</time></p>
+          <div class="pay-from">
+            <div style="min-width:0"><b data-f="payer">{PAYMENTS[DEFAULT].payer}</b><small data-f="ref">{PAYMENTS[DEFAULT].ref}</small></div>
+            <span class="pay-amt num" data-f="payment">+{usd(s.payment)}</span>
+          </div>
+
+          <fieldset class="pay-try js-only">
+            <legend>Try another payment</legend>
+            <div class="chips">
+              {PAYMENTS.map((p, i) => (
+                <>
+                  <input type="radio" name="payment" id={`pay-${i}`} value={i} checked={i === DEFAULT} />
+                  <label for={`pay-${i}`} class="num">{usd(p.amount)}</label>
+                </>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="aside">
+            <p class="aside-label">Move to tax savings</p>
+            <p class="aside-big roll" data-f="tax">{usd(s.tax)}</p>
+            <p class="aside-pct"><b class="roll num" data-f="pct">{s.pct}%</b> of this payment</p>
+          </div>
+
+          <div class="bar" aria-hidden="true"><i class="seg-se"></i><i class="seg-fed"></i><i class="seg-st"></i><i class="seg-keep"></i></div>
+
+          <dl class="legend num">
+            <dt><i class="sw" style="background:var(--accent)"></i><span class="name">Self-employment tax</span></dt>
+            <dd><span class="rate">14.1%</span><span class="val roll" data-f="se">{usd(s.se)}</span></dd>
+            <dt><i class="sw" style="background:var(--seg-2)"></i><span class="name">Federal income tax</span></dt>
+            <dd><span class="rate roll" data-f="fedRate">{s.crosses ? "12–22%" : "12%"}</span><span class="val roll" data-f="fed">{usd(s.fed)}</span></dd>
+            <dt><i class="sw" style="background:var(--seg-3)"></i><span class="name">Colorado income tax</span></dt>
+            <dd><span class="rate">4.4%</span><span class="val roll" data-f="state">{usd(s.state)}</span></dd>
+            <hr />
+            <dt><i class="sw" style="background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-strong)"></i><span class="name keep-row">Yours to spend</span></dt>
+            <dd><span class="rate"></span><span class="val keep-row roll" data-f="keep">{usd(s.keep)}</span></dd>
+          </dl>
+
+          <div class="bracket" data-cross={String(s.crosses)}>
+            <p data-when="low"><Mark state="ok" label="On track" /> <span>All of this payment falls in your 12% federal bracket.</span></p>
+            <p data-when="cross" aria-hidden={s.crosses ? undefined : "true"}><Mark state="warn" label="Heads up" /> <span><b>$7,600 of this payment falls in the 22% bracket.</b> Ledgerline raised your federal rate for the rest of the year.</span></p>
+          </div>
+
+          <div class="q4">
+            <p class="q4-row"><span><b>Q4 estimate</b>, due Jan 15</span><span class="num">85 days left</span></p>
+            <div class="meter" aria-hidden="true"><i class="m-prior"></i><i class="m-now"></i></div>
+            <p class="q4-legend num"><span><b class="roll" data-f="q4Saved">{usd(s.q4Saved)}</b> of <span class="roll" data-f="q4Estimate">{usd(s.q4Estimate)}</span> set aside</span><span>{usd(s.q4Left)} to go</span></p>
+          </div>
+          <figcaption id="pay-cap">Estimate for a single filer in Colorado, using this year's income so far. Not tax advice.</figcaption>
+          <p class="sr-only" aria-live="polite" data-live></p>
+        </figure>
+      </div>
+    </section>
+
+    <section class="proof" aria-label="What you can count on">
+      <div class="wrap proof-grid">
+        <div class="proof-item"><Icon name="shield" /><p><strong>Read-only bank access</strong><span>Ledgerline can see transactions. It can never move money.</span></p></div>
+        <div class="proof-item"><Icon name="users" /><p><strong>Your accountant rides free</strong><span>Invite them on any plan; their seat costs nothing.</span></p></div>
+        <div class="proof-item"><Icon name="download" /><p><strong>Leave with everything</strong><span>Export to CSV, PDF, or QBO at any time, even after you cancel.</span></p></div>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="features-title">The boring parts of running a one-person business, handled.</h2>
+          <p>Four jobs Ledgerline does in the background, and the moments it asks for you.</p>
+        </div>
+
+        <div class="bento">
+          <article class="tile tile-tax">
+            <div>
+              <h3>Know the quarterly number before it's due</h3>
+              <p class="lead">Every payment that lands updates your estimate and tells you what to move to savings, based on your state and filing status.</p>
+            </div>
+            <figure class="viz">
+              <svg class="chart" viewBox="0 0 560 206" role="img" aria-labelledby="chart-t chart-d" data-chart>
+                <title id="chart-t">Estimated tax payments by quarter, 2026</title>
+                <desc id="chart-d">Q1 $2,950 paid April 15. Q2 $3,180 paid June 13. Q3 $3,060 paid September 12. Q4 estimated at $3,412, due January 15; $2,780 set aside so far.</desc>
+                <line class="grid" x1="48" x2="552" y1="40" y2="40" />
+                <line class="grid" x1="48" x2="552" y1="95" y2="95" />
+                <line class="axis" x1="48" x2="552" y1="150" y2="150" />
+                <text x="40" y="44" text-anchor="end">$4k</text>
+                <text x="40" y="99" text-anchor="end">$2k</text>
+                <text x="40" y="154" text-anchor="end">$0</text>
+                <rect class="paid" x="78" y="69" width="72" height="81" rx="2" />
+                <rect class="paid" x="204" y="62.5" width="72" height="87.5" rx="2" />
+                <rect class="paid" x="330" y="66" width="72" height="84" rx="2" />
+                <rect class="est-left" x="456.5" y="56.5" width="71" height="93" rx="2" />
+                <rect class="est-saved" x="456" y="73.5" width="72" height="76.5" rx="2" />
+                <text class="val" x="114" y="61" text-anchor="middle">$2,950</text>
+                <text class="val" x="240" y="54" text-anchor="middle">$3,180</text>
+                <text class="val" x="366" y="58" text-anchor="middle">$3,060</text>
+                <text class="val" x="492" y="48" text-anchor="middle">$3,412</text>
+                <text class="q" x="114" y="172" text-anchor="middle">Q1</text>
+                <text class="q" x="240" y="172" text-anchor="middle">Q2</text>
+                <text class="q" x="366" y="172" text-anchor="middle">Q3</text>
+                <text class="q" x="492" y="172" text-anchor="middle">Q4</text>
+                <circle class="ok-dot" cx="80" cy="186" r="4" /><text x="90" y="190">Paid Apr 15</text>
+                <circle class="ok-dot" cx="206" cy="186" r="4" /><text x="216" y="190">Paid Jun 13</text>
+                <circle class="ok-dot" cx="332" cy="186" r="4" /><text x="342" y="190">Paid Sep 12</text>
+                <text class="due" x="492" y="190" text-anchor="middle">Due Jan 15</text>
+              </svg>
+              <figcaption class="chart-legend"><span><i style="background:var(--ink-3)"></i>Paid</span><span><i style="background:var(--accent)"></i>Set aside for Q4</span><span><i style="background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)"></i>Still to set aside, $632</span></figcaption>
+            </figure>
+          </article>
+
+          <article class="tile tile-bank">
+            <div>
+              <h3>Bank sync that keeps up</h3>
+              <p class="lead">Checking, savings, and cards in one feed. If a bank asks you to sign in again, you'll know the same day.</p>
+            </div>
+            <ul class="viz viz-flush rows">
+              <li class="row"><Mark state="ok" label="Synced" /><span class="row-main"><b>Harbor Credit Union · Checking ··4821</b><small>Synced 2 min ago</small></span><span class="row-side num">1,284 txns</span></li>
+              <li class="row"><Mark state="run" label="Importing" /><span class="row-main"><b>Fieldstone Rewards Card ··0077</b><small class="num">Importing 12 months: 214 of 1,280</small></span><span class="row-side num">17%</span></li>
+              <li class="row"><Mark state="warn" label="Needs you" /><span class="row-main"><b>Meridian Savings ··3310</b><small class="warn">Sign in again to resume syncing</small></span><a class="row-side" href="#start">Reconnect</a></li>
+              <li class="row"><Mark state="ok" label="Synced" /><span class="row-main"><b title="Banco Atlântico do Porto · Conta à Ordem ··9102">Banco Atlântico do Porto · Conta à Ordem ··9102</b><small>Synced 1 h ago · EUR</small></span><span class="row-side num">96 txns</span></li>
+            </ul>
+          </article>
+
+          <article class="tile tile-sort">
+            <div>
+              <h3>Expenses sorted as they land</h3>
+              <p class="lead">Ledgerline files each transaction under the right tax category. When it isn't sure, it asks once, and remembers.</p>
+            </div>
+            <div class="viz viz-flush">
+              <div class="tx">
+                <span class="tx-name">Tessellate Pro subscription</span><span class="tx-amt num">−$24.00</span>
+                <span class="tx-meta"><span class="chip">Software &amp; subscriptions</span> Sorted by your rule</span>
+              </div>
+              <div class="tx">
+                <span class="tx-name">Skyward Air, LIS → BER, seat 14C</span><span class="tx-amt num">−$186.40</span>
+                <span class="tx-meta"><span class="chip">Travel</span> Sorted automatically</span>
+              </div>
+              <div class="tx">
+                <span class="tx-name">Fernwood Coffee Co.</span><span class="tx-amt num">−$38.60</span>
+                <div class="tx-meta review" data-review>
+                  <div class="ask" data-ask>
+                    <span class="chip warn">Needs you</span>
+                    <span class="no-js">Client meal or personal?</span>
+                    <button class="pick js-only" type="button" data-pick="Meals, 50% deductible">Client meal</button>
+                    <button class="pick js-only" type="button" data-pick="Personal, not deductible">Personal</button>
+                  </div>
+                  <div class="resolved" data-resolved>
+                    <Mark state="ok" label="Filed" /><span class="chip" data-picked>Meals, 50% deductible</span>
+                    <button class="undo" type="button" data-undo>Undo</button>
+                  </div>
+                </div>
+              </div>
+              <p class="rule"><Icon name="refresh" size={16} /> Rule saved: anything from Tessellate goes to Software. Applied to 11 earlier transactions.</p>
+            </div>
+          </article>
+
+          <article class="tile tile-chase">
+            <div>
+              <h3>Invoices that chase themselves</h3>
+              <p class="lead">Polite reminders go out from your address on your schedule, and stop the moment the client pays.</p>
+            </div>
+            <ul class="viz viz-flush rows" aria-label="Recent invoices">
+              <li class="row"><Mark state="ok" label="Paid" /><span class="row-main"><b>#0142 · Harbor &amp; Pine Studio</b><small>Paid today. Reminders stopped.</small></span><span class="row-amt num">$4,200</span></li>
+              <li class="row"><Mark state="warn" label="Overdue" /><span class="row-main"><b>#0145 · Kestrel &amp; Daughters Furniture Restoration</b><small class="warn">12 days late. 2nd reminder Fri, Oct 24, 9:00 am</small></span><span class="row-amt num">$1,850</span></li>
+              <li class="row"><Mark state="fail" label="Failed" /><span class="row-main"><b>#0146 · Okoro Bakehouse</b><small class="fail">Email bounced: accounts@okorobakehouse.co</small></span><span class="row-amt num">$850</span></li>
+              <li class="row"><Mark state="idle" label="Waiting" /><span class="row-main"><b>#0147 · Lumen Orthodontics Group</b><small>Sent Oct 20. Due Nov 19</small></span><span class="row-amt num">$12,000</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="how-title">Set up over one coffee</h2>
+        </div>
+        <ol class="steps">
+          <li>
+            <h3>Connect your accounts</h3>
+            <p>Sign in to your bank through its own secure screen. Ledgerline pulls in the last 12 months.</p>
+            <span class="time"><Icon name="clock" size={16} /> About 3 minutes</span>
+          </li>
+          <li>
+            <h3>Check what it sorted</h3>
+            <p>Most transactions arrive categorized. You confirm the few it flags, like a coffee that might be a client meal.</p>
+            <span class="time"><Icon name="clock" size={16} /> About 10 minutes</span>
+          </li>
+          <li>
+            <h3>Move what it tells you</h3>
+            <p>When a client pays, you see the amount to set aside. Before each due date, you get the exact payment.</p>
+            <span class="time"><Icon name="clock" size={16} /> Seconds, each time you're paid</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="story section" aria-label="Customer story">
+      <div class="wrap">
+        <div class="story-inner">
+          <figure>
+            <blockquote>“I used to dread April. Now I move whatever Ledgerline says into savings when a client pays, and <mark>the quarterly payment is just there.</mark>”</blockquote>
+          </figure>
+          <div>
+            <div class="who">
+              <span class="initials" aria-hidden="true">MO</span>
+              <p><b>Mara Okafor</b><span>Illustrator, sole proprietor</span></p>
+            </div>
+            <p class="story-note">Illustrative customer story for this demo.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing" aria-labelledby="pricing-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="pricing-title">Three plans. Every one starts with 30 days free.</h2>
+          <p>Prices shown billed annually. Monthly billing is also available.</p>
+        </div>
+        <div class="plans">
+          <div class="plan">
+            <div class="plan-name">Starter</div>
+            <div class="price">$12<small> /mo</small></div>
+            <p>One bank connection, unlimited invoices, expense sorting.</p>
+          </div>
+          <div class="plan rec">
+            <div class="plan-name">Pro <span class="badge">Recommended</span></div>
+            <div class="price">$28<small> /mo</small></div>
+            <p>Adds quarterly tax estimates, invoice reminders, and 3 bank connections.</p>
+          </div>
+          <div class="plan">
+            <div class="plan-name">Business</div>
+            <div class="price">$56<small> /mo</small></div>
+            <p>Adds unlimited banks and seats for up to 15 people.</p>
+          </div>
+        </div>
+        <div class="plans-foot">
+          <a class="btn btn-quiet" href="/demo/pricing/after">Price it for your accounts <Icon name="arrow" size={18} class="icon-arrow" /></a>
+          <p>Cancel from Settings in one click. Your data stays exportable for 90 days.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq" id="faq" aria-labelledby="faq-title">
+      <div class="wrap faq-grid">
+        <h2 id="faq-title">Questions before you connect your bank</h2>
+        <div>
+          <details>
+            <summary>Can Ledgerline move money out of my account? <Icon name="chevron" /></summary>
+            <p>No. Bank connections are read-only. You sign in on your bank's own screen, Ledgerline never sees your password, and you can disconnect from Settings at any time.</p>
+          </details>
+          <details>
+            <summary>Does Ledgerline file my taxes? <Icon name="chevron" /></summary>
+            <p>No. It estimates what you owe each quarter and prepares clean reports for whoever files: you, your accountant, or tax software. On any plan you can add a year-end review by a licensed CPA.</p>
+          </details>
+          <details>
+            <summary>Can my accountant get access? <Icon name="chevron" /></summary>
+            <p>Yes. Invite them from Settings on any plan. Accountant seats are free and can be read-only or allowed to edit categories.</p>
+          </details>
+          <details>
+            <summary>What happens when the trial ends? <Icon name="chevron" /></summary>
+            <p>We email you three days before. If you don't pick a plan, your account becomes read-only; nothing is deleted and nothing is charged.</p>
+          </details>
+          <details>
+            <summary>How do I cancel? <Icon name="chevron" /></summary>
+            <p>Settings → Billing → Cancel plan. One click, no call. Your data stays exportable for 90 days afterwards.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final" id="start" aria-labelledby="final-title">
+      <div class="wrap">
+        <div class="final-card">
+          <div>
+            <h2 class="h2" id="final-title">Know next quarter's number before it's due.</h2>
+            <p>30 days free on any plan. No card needed.</p>
+          </div>
+          <form class="signup" action="#start" method="get" data-signup>
+            <label for="email">Work email</label>
+            <div class="signup-row">
+              <input id="email" name="email" type="email" required autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="send" placeholder="priya@studio.com" aria-describedby="email-hint" />
+              <button class="btn btn-primary" type="submit">Start 30-day trial</button>
+            </div>
+            <p class="hint" id="email-hint" aria-live="polite">We'll send a sign-in link. No password to make up.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <span>© 2026 Ledgerline, Inc.</span>
+      <nav aria-label="Footer">
+        <a href="/demo/pricing/after">Pricing</a>
+        <a href="#">Security</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    import { split, usd, PAYMENTS } from "../../../components/demo/saas-landing/model";
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    function roll(el: HTMLElement, to: number, fmt: (n: number) => string) {
+      const from = Number(el.dataset.v ?? to);
+      el.dataset.v = String(to);
+      if (from === to) return;
+      if (reduce.matches) {
+        el.classList.add("is-swapping");
+        setTimeout(() => { el.textContent = fmt(to); el.classList.remove("is-swapping"); }, 150);
+        return;
+      }
+      const start = performance.now();
+      const dur = 260;
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / dur);
+        el.textContent = fmt(Math.round(from + (to - from) * easeOut(t)));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    const pay = document.querySelector<HTMLElement>("[data-pay]");
+    if (pay) {
+      const f = (k: string) => pay.querySelector<HTMLElement>(`[data-f="${k}"]`)!;
+      const bracket = pay.querySelector<HTMLElement>(".bracket")!;
+      const live = pay.querySelector<HTMLElement>("[data-live]")!;
+      const pc = (n: number, of: number) => `${((n / of) * 100).toFixed(2)}%`;
+      const init = split(PAYMENTS[1].amount);
+      (["tax", "se", "fed", "state", "keep", "q4Saved", "q4Estimate"] as const).forEach((k) => (f(k).dataset.v = String(init[k])));
+
+      pay.querySelectorAll<HTMLInputElement>('input[name="payment"]').forEach((r) =>
+        r.addEventListener("change", () => {
+          const p = PAYMENTS[Number(r.value)];
+          const s = split(p.amount);
+          f("payer").textContent = p.payer;
+          f("ref").textContent = p.ref;
+          f("payment").textContent = `+${usd(p.amount)}`;
+          f("pct").textContent = `${s.pct}%`;
+          f("fedRate").textContent = s.crosses ? "12–22%" : "12%";
+          (["tax", "se", "fed", "state", "keep", "q4Saved", "q4Estimate"] as const).forEach((k) => roll(f(k), s[k], usd));
+          pay.style.setProperty("--a", pc(s.se, s.payment));
+          pay.style.setProperty("--b", pc(s.se + s.fed, s.payment));
+          pay.style.setProperty("--c", pc(s.tax, s.payment));
+          pay.style.setProperty("--p1", pc(s.q4SavedBefore, s.q4Estimate));
+          pay.style.setProperty("--p2", pc(s.q4Saved, s.q4Estimate));
+          bracket.dataset.cross = String(s.crosses);
+          bracket.querySelector('[data-when="cross"]')!.toggleAttribute("aria-hidden", !s.crosses);
+          bracket.querySelector('[data-when="low"]')!.toggleAttribute("aria-hidden", s.crosses);
+          live.textContent = `For a ${usd(p.amount)} payment from ${p.payer}, move ${usd(s.tax)} to tax savings. ${usd(s.keep)} is yours to spend.`;
+        })
+      );
+    }
+
+    const chart = document.querySelector<SVGElement>("[data-chart]");
+    if (chart) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { chart.classList.add("is-in"); io.disconnect(); } });
+      }, { rootMargin: "0px 0px -80px 0px" });
+      io.observe(chart);
+    }
+
+    const review = document.querySelector<HTMLElement>("[data-review]");
+    if (review) {
+      const picked = review.querySelector<HTMLElement>("[data-picked]")!;
+      const undo = review.querySelector<HTMLButtonElement>("[data-undo]")!;
+      review.querySelectorAll<HTMLButtonElement>("[data-pick]").forEach((b) =>
+        b.addEventListener("click", () => {
+          picked.textContent = b.dataset.pick!;
+          review.classList.add("is-done");
+          undo.focus({ preventScroll: true });
+        })
+      );
+      undo.addEventListener("click", () => {
+        review.classList.remove("is-done");
+        review.querySelector<HTMLButtonElement>("[data-pick]")!.focus({ preventScroll: true });
+      });
+    }
+
+    const form = document.querySelector<HTMLFormElement>("[data-signup]");
+    if (form) {
+      form.noValidate = true;
+      const input = form.querySelector<HTMLInputElement>("input")!;
+      const hint = form.querySelector<HTMLElement>(".hint")!;
+      const button = form.querySelector<HTMLButtonElement>("button")!;
+      const defaultHint = hint.textContent;
+      const setHint = (text: string | null, kind = "") => { hint.textContent = text; hint.className = `hint ${kind}`; };
+      input.addEventListener("input", () => {
+        if (input.getAttribute("aria-invalid") === "true" && input.validity.valid) {
+          input.removeAttribute("aria-invalid");
+          setHint(defaultHint);
+        }
+      });
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        input.value = input.value.trim();
+        if (!input.value || !input.validity.valid) {
+          input.setAttribute("aria-invalid", "true");
+          setHint(input.value ? "That email is missing something. Try the format name@studio.com." : "Enter your email so we can send your sign-in link.", "err");
+          input.focus();
+          return;
+        }
+        button.disabled = true;
+        button.textContent = "Sending link…";
+        setTimeout(() => {
+          button.disabled = false;
+          button.textContent = "Start 30-day trial";
+          setHint(`Check ${input.value} for your sign-in link. It expires in 30 minutes.`, "ok");
+        }, 700);
+      });
+    }
+  </script>
+</body>
+</html>

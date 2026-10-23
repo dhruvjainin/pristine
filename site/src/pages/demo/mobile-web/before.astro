@@ -1,0 +1,200 @@
+---
+import Qr from "../../../components/demo/mobile-web/Qr.astro";
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Platform</title>
+</head>
+<body>
+  <header class="appbar">
+    <button class="icon-btn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="logo">Platform</div>
+    <a href="#" class="login">Login</a>
+  </header>
+
+  <main class="content">
+    <section class="hero card">
+      <span class="badge">NEW</span>
+      <h1>Ride the city smarter</h1>
+      <p>Seamless, next-gen ticketing for Port Halden. Skip the line and tap into a better commute!</p>
+      <a href="#buy" class="cta">Get Started</a>
+    </section>
+
+    <section class="buy" id="buy">
+      <div class="section-head">
+        <h2>Buy Tickets</h2>
+        <a href="#" class="see-all">See all</a>
+      </div>
+      <div class="types">
+        <div class="type selected" data-type="single">
+          Single
+          <div class="price-tip">from €1.90</div>
+        </div>
+        <div class="type" data-type="day">
+          Day Pass
+          <div class="price-tip">from €5.40</div>
+        </div>
+        <div class="type" data-type="week">
+          7-Day <span class="badge sm">Soon</span>
+          <div class="price-tip">Coming soon</div>
+        </div>
+      </div>
+
+      <div class="form card">
+        <label>Zone</label>
+        <select id="zone">
+          <option value="A">A</option>
+          <option value="AB" selected>A+B</option>
+          <option value="ABC">A+B+C</option>
+        </select>
+        <label>Adults</label>
+        <input type="number" id="adults" value="2" min="0" />
+        <label>Reduced</label>
+        <input type="number" id="reduced" value="1" min="0" />
+        <label>Email for receipt</label>
+        <input type="text" id="email" placeholder="email" />
+      </div>
+    </section>
+
+    <section class="mine" id="mytickets">
+      <div class="section-head">
+        <h2>My Tickets</h2>
+        <a href="#" class="see-all">See all</a>
+      </div>
+      <div class="ticket card">
+        <div class="ticket-top">
+          <span class="badge">ACTIVE</span>
+          <span class="more" title="Ticket details: Single, Zones A+B, 2 adults, 1 reduced. Bought today 17:12.">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          </span>
+        </div>
+        <Qr label="QR code" seed={482177} size={140} />
+        <div class="exp">Expires 18:42</div>
+        <div class="actions">
+          <button class="mini">Refund</button>
+          <button class="mini">Share</button>
+          <button class="mini">Delete</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="fixed-bar">
+    <span id="total">Total: €7.00</span>
+    <button id="buy-btn">Buy</button>
+  </div>
+
+  <nav class="tabbar">
+    <a href="#" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#buy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 1 0-4V4H3z"/></svg>
+      <span>Tickets</span>
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h6"/></svg>
+      <span>Routes</span>
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg>
+      <span>Alerts</span>
+    </a>
+    <a href="#mytickets">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      <span>Me</span>
+    </a>
+  </nav>
+
+  <script>
+    const prices: Record<string, number> = { A: 1.9, AB: 2.8, ABC: 4.1 };
+    const zone = document.getElementById("zone") as HTMLSelectElement;
+    const adults = document.getElementById("adults") as HTMLInputElement;
+    const reduced = document.getElementById("reduced") as HTMLInputElement;
+    const total = document.getElementById("total")!;
+    let type = "single";
+    function calc() {
+      let p = prices[zone.value] * (type === "day" ? 2.9 : 1);
+      const t = p * Number(adults.value) + p * 0.5 * Number(reduced.value);
+      total.textContent = "Total: €" + t.toFixed(2);
+    }
+    document.querySelectorAll<HTMLElement>(".type").forEach((el) => {
+      el.addEventListener("click", () => {
+        document.querySelectorAll(".type").forEach((x) => x.classList.remove("selected"));
+        el.classList.add("selected");
+        type = el.dataset.type!;
+        calc();
+      });
+    });
+    [zone, adults, reduced].forEach((el) => el.addEventListener("change", calc));
+    document.getElementById("buy-btn")!.addEventListener("click", () => {
+      alert("Payment successful!");
+      location.hash = "mytickets";
+    });
+  </script>
+
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #f9fafb; color: #1f2937; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+    button:focus, input:focus, select:focus { outline: none; }
+
+    .appbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 12px; background: #0d9488; color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .icon-btn { background: none; border: none; color: white; padding: 4px; display: flex; cursor: pointer; }
+    .logo { flex: 1; font-weight: 600; font-size: 17px; }
+    .login { font-size: 13px; font-weight: 500; color: #ccfbf1; }
+
+    .content { max-width: 720px; margin: 0 auto; padding: 12px 12px 0; }
+    .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+
+    .badge { display: inline-block; background: #f97316; color: white; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+    .badge.sm { font-size: 9px; padding: 1px 6px; margin-left: 2px; }
+
+    .hero { padding: 16px; margin-bottom: 16px; }
+    .hero h1 { font-size: 20px; margin: 8px 0 4px; color: #111827; }
+    .hero p { font-size: 13px; color: #9ca3af; margin: 0 0 12px; line-height: 1.45; }
+    .cta { display: inline-block; background: #0d9488; color: white; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 999px; transition: all 0.3s ease-in; }
+    .cta:hover { background: #0f766e; }
+
+    .buy, .mine { margin-bottom: 16px; }
+    .section-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0 4px 8px; }
+    h2 { font-size: 15px; font-weight: 600; margin: 0; }
+    .see-all { font-size: 12px; color: #0d9488; }
+
+    .types { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .type { position: relative; background: #f0fdfa; color: #0f766e; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 999px; cursor: pointer; transition: all 0.3s ease-in; }
+    .type.selected { background: #0d9488; color: white; }
+    .price-tip { position: absolute; left: 50%; top: calc(100% + 4px); transform: translateX(-50%); background: #111827; color: white; font-size: 11px; padding: 3px 7px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.3s ease-in; z-index: 2; }
+    .type:hover .price-tip { opacity: 1; }
+
+    .form { display: grid; grid-template-columns: 96px 1fr; gap: 10px 12px; align-items: center; padding: 14px; }
+    .form label { font-size: 12px; color: #9ca3af; }
+    .form select, .form input { min-width: 0; font-size: 14px; padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; color: #1f2937; }
+
+    .ticket { display: inline-block; padding: 14px; text-align: center; }
+    .ticket-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .more { color: #9ca3af; cursor: help; display: flex; }
+    .exp { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .actions { display: flex; gap: 4px; justify-content: center; margin-top: 8px; }
+    .mini { font-size: 11px; padding: 3px 8px; border: none; background: #f0fdfa; color: #0f766e; border-radius: 999px; cursor: pointer; }
+
+    .fixed-bar { position: fixed; left: 0; right: 0; bottom: 52px; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; background: white; border-top: 1px solid #f3f4f6; box-shadow: 0 -2px 6px rgba(0,0,0,0.05); }
+    #total { font-size: 13px; color: #9ca3af; }
+    #buy-btn { background: #0d9488; color: white; border: none; padding: 6px 20px; border-radius: 999px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.3s ease-in; }
+    #buy-btn:hover { background: #0f766e; }
+
+    .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; height: 52px; display: flex; justify-content: space-around; align-items: center; background: white; border-top: 1px solid #e5e7eb; }
+    .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 1px; color: #9ca3af; font-size: 9px; }
+    .tabbar a.active { color: #0d9488; }
+    .tabbar svg { width: 18px; height: 18px; }
+  </style>
+</body>
+</html>

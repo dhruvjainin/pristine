@@ -1,0 +1,201 @@
+---
+import Base from "../../layouts/Base.astro";
+import Copy from "../../components/Copy.astro";
+import DocsNav from "../../components/DocsNav.astro";
+import { commandDocs, lensDocs, lensGroups, type CommandDoc, type LensDoc } from "../../data/docs";
+import { examples } from "../../data/examples";
+
+export function getStaticPaths() {
+  return [
+    ...commandDocs.map((c) => ({ params: { slug: c.slug }, props: { kind: "command" as const, c } })),
+    ...lensDocs.map((l) => ({ params: { slug: l.slug }, props: { kind: "lens" as const, l } })),
+  ];
+}
+type Props = { kind: "command"; c: CommandDoc } | { kind: "lens"; l: LensDoc };
+const p = Astro.props as Props;
+
+const all = [...commandDocs.map((c) => ({ slug: c.slug, name: c.name })), ...lensDocs.map((l) => ({ slug: l.slug, name: l.name }))];
+const slug = p.kind === "command" ? p.c.slug : p.l.slug;
+const i = all.findIndex((x) => x.slug === slug);
+const prev = all[i - 1];
+const next = all[i + 1];
+
+const used = p.kind === "command"
+  ? examples.filter((e) => e.command.startsWith(`/pristine ${p.c.slug}`))
+  : examples.filter((e) => e.changes.some((ch) => ch.lens === p.l.slug || (p.l.slug === "polish-details" && ch.lens === "polish")));
+const group = p.kind === "lens" ? lensGroups.find((g) => g.id === p.l.group) : undefined;
+const title = p.kind === "command" ? `/pristine ${p.c.name}` : p.l.name;
+const line = p.kind === "command" ? p.c.line : p.l.line;
+---
+<Base title={`${title} · Pristine docs`} description={line}>
+  <div class="container docs">
+    <aside class="docs__side"><DocsNav current={slug} /></aside>
+    <article class="docs__main">
+      <details class="mnav">
+        <summary>All commands and Lenses</summary>
+        <DocsNav current={slug} />
+      </details>
+
+      <header class="dhead">
+        {p.kind === "command"
+          ? <p class="eyebrow">Command <span class:list={["tag mono", { "is-ro": !p.c.edits }]}>{p.c.edits ? "edits code" : "read-only"}</span></p>
+          : <p class="eyebrow">Lens · {group?.name}</p>}
+        <h1><code>{title}</code></h1>
+        <p class="lede">{line}</p>
+        <p class="intro">{p.kind === "command" ? p.c.intro : p.l.intro}</p>
+      </header>
+
+      {p.kind === "command" ? (
+        <>
+          <section class="dsec" aria-labelledby="try-h">
+            <h2 id="try-h">Try it</h2>
+            <ul class="tries">
+              {p.c.tryIt.map((t, n) => (
+                <li><Copy cmd={t.cmd} wrap label={`Copy example ${n + 1}`} /><p>{t.note}</p></li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="dsec" aria-labelledby="how-h">
+            <h2 id="how-h">How it works</h2>
+            <ol class="steps">
+              {p.c.steps.map((s) => <li><h3>{s.t}</h3><p>{s.d}</p></li>)}
+            </ol>
+            <h3 class="sub">What you get</h3>
+            <ul class="ticks">{p.c.youGet.map((g) => <li>{g}</li>)}</ul>
+          </section>
+
+          <section class="dsec" aria-labelledby="check-h">
+            <h2 id="check-h">Check the result</h2>
+            <ul class="ticks">{p.c.check.map((g) => <li>{g}</li>)}</ul>
+            <div class="follow">
+              <h3 class="sub">Then follow up in plain words</h3>
+              <Copy cmd={p.c.followUp.cmd} wrap label="Copy follow-up" />
+              <p>{p.c.followUp.note}</p>
+            </div>
+          </section>
+
+          <section class="dsec" aria-labelledby="rel-h">
+            <h2 id="rel-h">Related</h2>
+            <ul class="chips">{p.c.related.map((r) => <li><a href={`/docs/${r}/`}><code>{commandDocs.some((c) => c.slug === r) ? `/pristine ${r}` : r}</code></a></li>)}</ul>
+          </section>
+        </>
+      ) : (
+        <>
+          <section class="dsec" aria-labelledby="when-h">
+            <h2 id="when-h">When to use it</h2>
+            <dl class="when">
+              <div><dt>It raises</dt><dd>{p.l.raises}</dd></div>
+              <div><dt>Skip it when</dt><dd>{p.l.skip}</dd></div>
+            </dl>
+          </section>
+
+          <section class="dsec" aria-labelledby="try-h">
+            <h2 id="try-h">Try it</h2>
+            <Copy cmd={p.l.tryIt.cmd} wrap label="Copy example" />
+            <p class="note">{p.l.tryIt.note}</p>
+          </section>
+
+          <section class="dsec" aria-labelledby="ex-h">
+            <h2 id="ex-h">What it changes</h2>
+            <table class="ba">
+              <caption class="visually-hidden">Typical before and after values for {p.l.name}</caption>
+              <thead><tr><th scope="col">Before</th><th scope="col">After</th></tr></thead>
+              <tbody>{p.l.examples.map((x) => <tr><td>{x.before}</td><td>{x.after}</td></tr>)}</tbody>
+            </table>
+          </section>
+
+          {p.l.laws.length > 0 && (
+            <section class="dsec" aria-labelledby="law-h">
+              <h2 id="law-h">Laws it applies</h2>
+              <ul class="chips">{p.l.laws.map((l) => <li><a href="/#laws">{l}</a></li>)}</ul>
+            </section>
+          )}
+        </>
+      )}
+
+      {used.length > 0 && (
+        <section class="dsec" aria-labelledby="used-h">
+          <h2 id="used-h">{p.kind === "command" ? "See it on real pages" : "Used in these examples"}</h2>
+          <ul class="used">
+            {used.map((e) => (
+              <li><a href={`/examples/${e.slug}/`}><span>{e.title}</span><span class="mono num">{e.before.score} → {e.after.score}</span></a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <nav class="pn" aria-label="Previous and next">
+        {prev ? <a href={`/docs/${prev.slug}/`}><span class="mono">Previous</span><code>{prev.name}</code></a> : <a href="/docs/"><span class="mono">Back to</span>Overview</a>}
+        {next && <a class="pn__next" href={`/docs/${next.slug}/`}><span class="mono">Next</span><code>{next.name}</code></a>}
+      </nav>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .docs { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--s-8); padding-block: var(--s-7) var(--s-9); }
+  .docs__side { position: sticky; top: 88px; align-self: start; max-height: calc(100dvh - 104px); overflow-y: auto; scrollbar-width: thin; }
+  .docs__main { min-width: 0; max-width: 760px; }
+  .mnav { display: none; }
+  @media (max-width: 960px) {
+    .docs { grid-template-columns: minmax(0, 1fr); padding-top: var(--s-5); }
+    .docs__side { display: none; }
+    .mnav { display: block; margin-bottom: var(--s-6); border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+    .mnav summary { cursor: pointer; padding: var(--s-3) var(--s-4); font-size: var(--text-sm); font-weight: 500; min-height: 44px; display: flex; align-items: center; }
+    .mnav[open] summary { border-bottom: 1px solid var(--rule); }
+    .mnav :global(.dnav) { padding: var(--s-2) var(--s-4) var(--s-4); }
+  }
+
+  .dhead { display: grid; gap: var(--s-3); margin-bottom: var(--s-8); }
+  .dhead h1 { font-size: var(--text-3xl); }
+  .dhead h1 code { font-family: var(--font-display); font-style: italic; font-weight: 400; }
+  .intro { color: var(--ink-2); max-width: 64ch; }
+  .tag { margin-left: var(--s-2); font-size: var(--text-xs); padding: 2px 6px; border: 1px solid var(--rule); border-radius: 4px; text-transform: none; letter-spacing: 0; }
+  .tag.is-ro { color: var(--ok); border-color: color-mix(in oklab, var(--ok) 40%, var(--rule)); }
+
+  .dsec { margin-bottom: var(--s-8); }
+  .dsec h2 { font-size: var(--text-2xl); margin-bottom: var(--s-4); }
+  .sub { font: 600 var(--text-md)/1.4 var(--font-body); margin: var(--s-6) 0 var(--s-3); }
+  .note, .follow p, .tries p { color: var(--ink-2); font-size: var(--text-sm); margin-top: var(--s-2); max-width: 64ch; }
+
+  .tries { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); }
+
+  .steps { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; gap: var(--s-4); }
+  .steps li { counter-increment: step; display: grid; grid-template-columns: 2rem minmax(0, 1fr); column-gap: var(--s-3); }
+  .steps li::before { content: counter(step); grid-row: span 2; font: 500 var(--text-sm)/1.6 var(--font-mono); color: var(--ink-3); }
+  .steps h3 { font: 600 var(--text-md)/1.4 var(--font-body); }
+  .steps p { color: var(--ink-2); font-size: var(--text-sm); }
+
+  .ticks { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s-2); color: var(--ink-2); max-width: 64ch; }
+
+  .when { display: grid; gap: var(--s-4); margin: 0; }
+  .when div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--rule); }
+  .when dt { font: 500 var(--text-xs)/1.8 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+  .when dd { margin: 0; color: var(--ink-2); }
+  @media (max-width: 640px) { .when div { grid-template-columns: minmax(0, 1fr); gap: var(--s-1); } }
+
+  .ba { width: 100%; border-collapse: collapse; font-size: var(--text-sm); table-layout: fixed; }
+  .ba th { text-align: left; font: 500 var(--text-xs)/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); padding: var(--s-2) var(--s-3) var(--s-2) 0; border-bottom: 1px solid var(--rule); }
+  .ba td { padding: var(--s-3) var(--s-3) var(--s-3) 0; border-bottom: 1px solid var(--rule); vertical-align: top; overflow-wrap: anywhere; }
+  .ba td:first-child { color: var(--ink-3); }
+
+  .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .chips a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--s-3); border: 1px solid var(--rule); border-radius: 999px; font-size: var(--text-sm); color: var(--ink); text-decoration: none; transition: border-color var(--dur-state) var(--ease-out); }
+
+  .used { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+  .used a { display: flex; justify-content: space-between; gap: var(--s-4); padding: var(--s-3) var(--s-2); border-bottom: 1px solid var(--rule); color: var(--ink); text-decoration: none; transition: background-color var(--dur-state) var(--ease-out); }
+  .used .num { color: var(--ink-3); }
+
+  .pn { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); margin-top: var(--s-9); padding-top: var(--s-5); border-top: 1px solid var(--ink); }
+  .pn a { display: grid; gap: var(--s-1); padding: var(--s-2) 0; color: var(--ink); text-decoration: none; }
+  .pn a span { font-size: var(--text-xs); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .pn__next { text-align: right; grid-column: 2; }
+
+  .chips a:focus-visible, .used a:focus-visible, .pn a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) {
+    .chips a:hover { border-color: var(--ink); }
+    .used a:hover { background: var(--surface-2); }
+    .pn a:hover code { text-decoration: underline; text-underline-offset: 3px; }
+  }
+</style>

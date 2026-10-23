@@ -1,0 +1,198 @@
+{
+  "slug": "component-library",
+  "order": 3,
+  "title": "Component library",
+  "product": "Grain UI",
+  "blurb": "An open-source component kit whose showcase went from a stock docs page of identical happy-path preview boxes to a live deploy run built from its own parts, an eight-state status mark, and an index where every preview is the real component in a real state.",
+  "mode": "Operate",
+  "persona": {
+    "name": "Leo Marchetti",
+    "role": "Frontend lead",
+    "goal": "Choose a component kit his team will live with for years, judging it on states, keyboard support and consistency rather than on the hero."
+  },
+  "command": "/pristine design src/components/",
+  "hasDark": true,
+  "before": {
+    "score": 4.5,
+    "level": 6,
+    "verdict": "Clean and consistent, and interchangeable with every shadcn starter. Each component sits in the same empty preview box showing only its happy path, focus is removed everywhere, and the dialog and tabs are divs. Leo can't judge states or keyboard support from it, which is exactly what he came for."
+  },
+  "after": {
+    "score": 9.5,
+    "level": 10,
+    "verdict": "The hero is a working deploy run assembled from the kit's own Status, Badge, Button, Checkbox, Toast and Dialog, and you can approve it, fail it or cancel it. Below it, 18 live previews show each component under production data. Leo can judge states and keyboard paths by using them, not by reading claims."
+  },
+  "dimensions": [
+    {
+      "name": "Persona fit",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Hierarchy & clarity",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Layout & spacing",
+      "before": 6,
+      "after": 9
+    },
+    {
+      "name": "Typography",
+      "before": 6,
+      "after": 9
+    },
+    {
+      "name": "Color & theming",
+      "before": 5,
+      "after": 10
+    },
+    {
+      "name": "Consistency",
+      "before": 7,
+      "after": 10
+    },
+    {
+      "name": "Responsiveness",
+      "before": 5,
+      "after": 9
+    },
+    {
+      "name": "Motion & interaction",
+      "before": 2,
+      "after": 10
+    },
+    {
+      "name": "Accessibility",
+      "before": 1,
+      "after": 9
+    },
+    {
+      "name": "Copy",
+      "before": 3,
+      "after": 10
+    },
+    {
+      "name": "Robustness & performance",
+      "before": 3,
+      "after": 9
+    }
+  ],
+  "critique": [
+    {
+      "priority": "P0",
+      "title": "Focus is removed everywhere",
+      "detail": "`*:focus { outline: none }` plus per-component `outline: none` means a keyboard user can't see where they are on any control. For a kit, that ships the bug to every app built on it.",
+      "lens": "harden"
+    },
+    {
+      "priority": "P0",
+      "title": "Dialog, tabs and toggles are divs",
+      "detail": "The modal is a div with z-index 9999 and no focus trap or Esc. Tabs and switches use onclick on divs, so they're unreachable by keyboard and silent to screen readers.",
+      "lens": "harden"
+    },
+    {
+      "priority": "P1",
+      "title": "Only the happy path, in identical boxes",
+      "detail": "Every component gets the same 350px bordered preview with a Preview / Code tab and one default instance. No loading, error message, overflow or keyboard state is shown, so the page can't prove the kit handles them.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P1",
+      "title": "Placeholder used as the label",
+      "detail": "Inputs show 'Project name' only as a placeholder, which disappears on typing. The error state turns the border red with no message explaining what's wrong.",
+      "lens": "clarify"
+    },
+    {
+      "priority": "P1",
+      "title": "Motion fights the user",
+      "detail": "`transition: all 0.3s ease-in` on everything, with tooltips and the modal growing from scale(0). Feedback starts slowly and animates properties that shouldn't move.",
+      "lens": "animate"
+    },
+    {
+      "priority": "P2",
+      "title": "Generic, interchangeable with every shadcn starter",
+      "detail": "Slate neutrals, black primary buttons, boilerplate one-line descriptions and 'Supercharge your UI' copy. Nothing says why Grain UI over the dozen kits that look the same, and black is used for primary actions, the Deployed badge and the on switch alike.",
+      "lens": "bolder"
+    }
+  ],
+  "changes": [
+    {
+      "lens": "delight",
+      "before": "Docs intro: 'Supercharge your UI' headline, Get Started / Read the Docs buttons, an install snippet",
+      "after": "A live atlas-web deploy run: steps advance (install 12s, build 31s, checks 212 tests), pause on 'Needs you' with Hold / Approve and promote, and end Deployed, Failed or Canceled with a toast",
+      "why": "The first thing a frontend lead sees is the kit doing a real job, with every state reachable in one click."
+    },
+    {
+      "lens": "colorize",
+      "before": "Badges: default / secondary / destructive variants; Building and Draft look identical, Degraded is just an outline",
+      "after": "Status: one mark for 8 states (queued dashed, running 8-arc fill, passed check, warning, failed cross, needs-you pulse, canceled, skipped), each differing by shape as well as color",
+      "why": "State reads in grayscale, at 12px, and for people who can't tell red from green."
+    },
+    {
+      "lens": "clarify",
+      "before": "Every component in an identical 350px preview box, one happy-path instance each",
+      "after": "Index of 18 live previews in 5 groups, each in a production state: a 52-character project name, a failed deploy, 'ines@' with an inline error, a 3-checks-failed toast",
+      "why": "Like Sprout, the index proves edge cases are handled instead of promising it."
+    },
+    {
+      "lens": "consistency",
+      "before": "One --radius: 0.5rem on everything, from a 12px badge to a 512px dialog",
+      "after": "--r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-full: 999px, all in theme.css",
+      "why": "Four radii chosen by component size make every part look like the same kit."
+    },
+    {
+      "lens": "consistency",
+      "before": "The same 1px border plus shadow-sm on cards, toast and dialog, so nothing reads as floating",
+      "after": "--shadow-sm for raised controls; --shadow-lg only for dialog, toast and the run card",
+      "why": "Elevation means something: only surfaces that float cast a real shadow."
+    },
+    {
+      "lens": "harden",
+      "before": "*:focus { outline: none; } and div-based modal at z-index: 9999",
+      "after": ":focus-visible { outline: 2px solid var(--focus); outline-offset: 2px } and a native <dialog> with focus on Cancel, type-to-confirm and focus return",
+      "why": "Keyboard users always see where they are, and the browser handles trapping, Esc and the inert background."
+    },
+    {
+      "lens": "animate",
+      "before": "transition: all 0.3s ease-in; transform: scale(0)",
+      "after": "transform 140ms cubic-bezier(0.23,1,0.32,1); :active scale(0.97); dialog from scale(0.96) over 240ms; toasts stack (max 3) and pause on hover",
+      "why": "Presses respond immediately, popups grow from near their final size, and only transform and opacity animate."
+    },
+    {
+      "lens": "harden",
+      "before": "JavaScript-only demo; nothing renders without it",
+      "after": "The run renders a real mid-build state (0:52, checks 140/212) in HTML; JS only advances it, and the index filter and lab hide themselves without JS",
+      "why": "The page tells the truth even before or without the script."
+    },
+    {
+      "lens": "quieter",
+      "before": "Slate-900 black for primary buttons, the Deployed badge and the on switch alike",
+      "after": "Solid --accent #5640d6 (dark #9a8cf8) for primary actions only; stroke SVG icons",
+      "why": "One accent, reserved for primary actions, lets the states carry the color."
+    },
+    {
+      "lens": "clarify",
+      "before": "Buttons labelled 'OK' and 'Submit'",
+      "after": "'Approve and promote', 'Hold', 'Delete project', 'Undo'",
+      "why": "Buttons name the action, so people who skim them still know what happens."
+    }
+  ],
+  "tells": [
+    "Stock shadcn-style slate docs layout: sidebar, breadcrumb, Preview / Code tabs",
+    "Every component in an identical bordered preview box",
+    "Only the happy path shown; no loading, error or overflow states",
+    "Centered-in-the-box demos on boilerplate one-line descriptions",
+    "Hype headline ('Supercharge your UI')",
+    "Black used for primary actions, status badges and switches alike",
+    "outline: none on every focusable element",
+    "transition: all with ease-in",
+    "Popups animating from scale(0)",
+    "Placeholder used as the only label",
+    "Div-based tabs, toggles and modal with z-index: 9999",
+    "Generic 'OK' / 'Submit' button labels",
+    "Slate-400 hint text below contrast minimums",
+    "No dark mode"
+  ]
+}

@@ -1,0 +1,280 @@
+---
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Building an accessible dialog | Grain UI</title>
+  <style is:global>
+    :root {
+      --primary: #2e8555; --primary-dark: #29784c; --primary-darkest: #205d3b;
+      --content: #1c1e21; --secondary: #606770; --border: #dadde1; --emphasis-100: #f5f6f7; --emphasis-200: #ebedf0;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      --mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; }
+    body { margin: 0; font-family: var(--font); font-size: 16px; line-height: 1.65; color: var(--content); background: #fff; }
+    a { color: var(--primary); text-decoration: none; transition: color 0.2s cubic-bezier(0.08, 0.52, 0.52, 1); }
+    a:hover { color: var(--primary-darkest); text-decoration: underline; }
+    button { font: inherit; }
+
+    .navbar { position: sticky; top: 0; z-index: 10; height: 60px; display: flex; align-items: center; padding: 0.5rem 1rem; background: #fff; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1); }
+    .navbar a { color: var(--content); }
+    .navbar a:hover { color: var(--primary); text-decoration: none; }
+    .brand { display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem; font-weight: 700; }
+    .brand svg { width: 32px; height: 32px; }
+    .navbar-items { display: flex; align-items: center; }
+    .navbar-items a { padding: 0.25rem 0.75rem; font-weight: 500; font-size: 15px; }
+    .navbar-items a.active { color: var(--primary); }
+    .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 0.25rem; }
+    .search-btn { display: flex; align-items: center; gap: 0.5rem; height: 36px; padding: 0 8px 0 10px; margin-left: 0.5rem; border: 0; border-radius: 40px; background: var(--emphasis-200); color: #969faf; font-size: 14px; cursor: pointer; }
+    .search-btn kbd { font-family: var(--font); font-size: 11px; background: #f3f4f6; border-radius: 3px; box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgba(30,35,90,0.4); color: #969faf; padding: 0 4px; }
+    .toggle-menu { display: none; background: none; border: 0; padding: 0; margin-right: 0.5rem; color: var(--content); cursor: pointer; }
+
+    .layout { display: flex; }
+    .sidebar { width: 300px; flex-shrink: 0; border-right: 1px solid var(--border); }
+    .sidebar nav { position: sticky; top: 60px; max-height: calc(100vh - 60px); overflow-y: auto; padding: 0.5rem; font-size: 15px; font-weight: 500; }
+    .menu-list { list-style: none; margin: 0; padding: 0; }
+    .menu-list .menu-list { padding-left: 1rem; margin-top: 0.25rem; }
+    .menu-item { margin-top: 0.25rem; }
+    .menu-link, .menu-cat { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0.375rem 1rem; border-radius: 0.25rem; color: var(--secondary); line-height: 1.25; text-align: left; background: none; border: 0; cursor: pointer; font-weight: 500; font-size: 15px; }
+    .menu-cat { color: var(--content); }
+    .menu-link:hover, .menu-cat:hover { background: rgba(0,0,0,0.05); color: var(--secondary); text-decoration: none; }
+    .menu-link.active { color: var(--primary); background: rgba(0,0,0,0.05); }
+    .menu-cat::after { content: ""; width: 1.25rem; height: 1.25rem; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="rgba(0,0,0,0.5)" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>') 50% / 2rem 2rem; transform: rotate(180deg); transition: transform 0.2s linear; }
+    .menu-item.collapsed > .menu-cat::after { transform: rotate(90deg); }
+    .menu-item.collapsed > .menu-list { display: none; }
+
+    .main { flex: 1; min-width: 0; padding: 2rem 1rem; }
+    .row { display: flex; max-width: 1320px; margin: 0 auto; }
+    .doc { flex: 0 0 75%; max-width: 75%; padding: 0 1rem; }
+    .toc-col { flex: 0 0 25%; max-width: 25%; padding: 0 1rem; }
+
+    .breadcrumbs { display: flex; align-items: center; gap: 0.5rem; list-style: none; padding: 0; margin: 0 0 0.8rem; font-size: 0.8rem; font-weight: 500; }
+    .breadcrumbs li { display: flex; align-items: center; gap: 0.5rem; }
+    .breadcrumbs li + li::before { content: "›"; color: var(--secondary); opacity: 0.6; font-size: 1rem; }
+    .breadcrumbs a, .breadcrumbs span { padding: 0.2rem 0.8rem; border-radius: 1.5rem; color: var(--content); }
+    .breadcrumbs a:hover { background: rgba(0,0,0,0.05); text-decoration: none; }
+    .breadcrumbs .home { padding: 0.2rem 0.4rem; display: flex; }
+    .breadcrumbs .current { background: rgba(0,0,0,0.05); color: var(--primary); }
+
+    .markdown { --space: 1.25rem; }
+    .markdown h1, .markdown h2, .markdown h3 { font-weight: 700; line-height: 1.25; margin: 0 0 var(--space); }
+    .markdown h1 { font-size: 3rem; }
+    .markdown h2 { font-size: 2rem; margin-top: calc(var(--space) * 2.5); }
+    .markdown h3 { font-size: 1.5rem; margin-top: calc(var(--space) * 1.5); }
+    .hash-link { opacity: 0; padding-left: 0.5rem; }
+    .hash-link::before { content: "#"; }
+    h2:hover .hash-link { opacity: 1; }
+    .markdown p { margin: 0 0 var(--space); }
+    code { font-family: var(--mono); font-size: 90%; background: rgba(0,0,0,0.04); border: 0.1rem solid rgba(0,0,0,0.1); border-radius: 0.4rem; padding: 0.1rem; vertical-align: middle; }
+
+    .codeblock { position: relative; margin-bottom: var(--space); border-radius: 0.4rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1); background: #f6f8fa; }
+    pre { margin: 0; padding: 1rem; overflow: auto; font-size: 90%; line-height: 1.45; color: #393a34; background: #f6f8fa; border-radius: 0.4rem; }
+    pre code { border: 0; background: none; padding: 0; font-size: 100%; vertical-align: baseline; }
+    .k { color: #00009f; } .s { color: #a31515; } .c { color: #999988; font-style: italic; } .f { color: #d73a49; } .t { color: #00009f; } .a { color: #00a4db; }
+    .copybtn { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; padding: 0.4rem; border: 1px solid var(--border); border-radius: 0.4rem; background: #f6f8fa; color: #393a34; opacity: 0; cursor: pointer; transition: opacity 0.2s ease-in-out; }
+    .codeblock:hover .copybtn, .copybtn:focus-visible { opacity: 0.4; }
+    .copybtn:hover { opacity: 1 !important; }
+
+    .admonition { margin-bottom: 1em; padding: 1rem; border: 1px solid; border-left-width: 5px; border-radius: 0.4rem; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1); }
+    .admonition-heading { display: flex; align-items: center; gap: 0.4em; margin-bottom: 0.3rem; font: 700 14px/1.25 var(--font); text-transform: uppercase; }
+    .admonition-heading svg { fill: currentColor; }
+    .admonition-content p:last-child { margin: 0; }
+    .admonition-content code { background: rgba(0,0,0,0.05); }
+    .admonition-note { background: #fdfdfe; border-color: #d4d5d8; color: #474748; }
+    .admonition-tip { background: #e6f6e6; border-color: #009400; color: #003100; }
+    .admonition-info { background: #eef9fd; border-color: #4cb3d4; color: #193c47; }
+    .admonition-warning { background: #fff8e6; border-color: #e6a700; color: #4d3800; }
+    .admonition-danger { background: #ffebec; border-color: #e13238; color: #4b1113; }
+
+    table { display: block; overflow: auto; border-collapse: collapse; margin-bottom: var(--space); }
+    th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+    th { font-weight: 700; }
+    tbody tr:nth-child(2n) { background: rgba(0,0,0,0.03); }
+
+    .doc-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; }
+    .doc-footer a { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .last-updated { font-size: smaller; font-style: italic; color: var(--secondary); }
+    .pagination-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+    .pagination-link { display: block; padding: 1rem; border: 1px solid var(--border); border-radius: 0.4rem; line-height: 1.25; transition: border-color 0.2s cubic-bezier(0.08, 0.52, 0.52, 1); }
+    .pagination-link:hover { border-color: var(--primary); text-decoration: none; }
+    .pagination-link.next { grid-column: 2; text-align: right; }
+    .sublabel { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500; color: var(--secondary); }
+    .label { display: block; font-weight: 700; word-break: break-word; }
+
+    .toc { position: sticky; top: calc(60px + 1rem); max-height: calc(100vh - 76px); overflow-y: auto; border-left: 1px solid var(--border); }
+    .toc ul { list-style: none; margin: 0; padding: 0 0 0 0.5rem; font-size: 0.8rem; }
+    .toc li { margin: 0.5rem 0.5rem; }
+    .toc a { color: var(--content); }
+    .toc a:hover, .toc a.active { color: var(--primary); text-decoration: none; }
+    .toc-mobile { display: none; }
+
+    .footer { padding: 2rem 1rem; background: #303846; color: #ebedf0; text-align: center; font-size: 15px; }
+
+    @media (max-width: 996px) {
+      .sidebar, .toc-col, .navbar-items, .search-btn .label-text, .search-btn kbd { display: none; }
+      .toggle-menu { display: flex; }
+      .doc { flex-basis: 100%; max-width: 100%; padding: 0; }
+      .main { padding: 1rem; }
+      .markdown h1 { font-size: 2rem; }
+      .toc-mobile { display: block; margin: 0 0 1rem; background: var(--emphasis-100); border-radius: 0.4rem; font-size: 15px; }
+      .toc-mobile summary { padding: 0.4rem 0.8rem; font-weight: 500; cursor: pointer; }
+      .toc-mobile ul { list-style: none; margin: 0; padding: 0 0.8rem 0.8rem 1rem; border-top: 1px solid var(--border); }
+      .toc-mobile li { margin-top: 0.5rem; }
+      .toc-mobile a { color: var(--content); }
+      .search-btn { padding: 0 10px; }
+      .layout.menu-open .sidebar { display: block; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 20; width: 83vw; background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.3); overflow-y: auto; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" aria-label="Main">
+    <button class="toggle-menu" type="button" aria-label="Toggle navigation bar"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/></svg></button>
+    <a class="brand" href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#2e8555"/><circle cx="11" cy="12" r="2.5" fill="#fff"/><circle cx="21" cy="12" r="2.5" fill="#fff"/><circle cx="16" cy="21" r="2.5" fill="#fff"/></svg>Grain UI</a>
+    <div class="navbar-items"><a href="#" class="active">Docs</a><a href="#">Components</a><a href="#">Themes</a><a href="#">Changelog</a></div>
+    <div class="navbar-right">
+      <div class="navbar-items"><a href="#">2.4</a><a href="#">GitHub ↗</a></div>
+      <button class="search-btn" type="button" aria-label="Search"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="label-text">Search</span> <kbd>⌘</kbd><kbd>K</kbd></button>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav aria-label="Docs sidebar">
+        <ul class="menu-list">
+          <li class="menu-item"><button class="menu-cat" type="button" aria-expanded="true">Getting Started</button>
+            <ul class="menu-list"><li class="menu-item"><a class="menu-link" href="#">Installation</a></li><li class="menu-item"><a class="menu-link" href="#">Theming</a></li><li class="menu-item"><a class="menu-link" href="#">Dark Mode</a></li></ul></li>
+          <li class="menu-item"><button class="menu-cat" type="button" aria-expanded="true">Guides</button>
+            <ul class="menu-list"><li class="menu-item"><a class="menu-link" href="#">Building a Form</a></li><li class="menu-item"><a class="menu-link" href="#">Popover</a></li><li class="menu-item"><a class="menu-link active" href="#" aria-current="page">Accessible Dialog</a></li><li class="menu-item"><a class="menu-link" href="#">Toast Notifications</a></li><li class="menu-item"><a class="menu-link" href="#">Data Tables</a></li></ul></li>
+          <li class="menu-item collapsed"><button class="menu-cat" type="button" aria-expanded="false">Reference</button>
+            <ul class="menu-list"><li class="menu-item"><a class="menu-link" href="#">Tokens</a></li><li class="menu-item"><a class="menu-link" href="#">Motion</a></li><li class="menu-item"><a class="menu-link" href="#">Accessibility</a></li></ul></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="row">
+        <div class="doc">
+          <ul class="breadcrumbs" aria-label="Breadcrumbs">
+            <li><a class="home" href="#" aria-label="Home page"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z"/></svg></a></li>
+            <li><span>Guides</span></li>
+            <li><span class="current">Accessible Dialog</span></li>
+          </ul>
+          <details class="toc-mobile"><summary>On this page</summary>
+            <ul><li><a href="#when">When to use a dialog</a></li><li><a href="#usage">Basic usage</a></li><li><a href="#focus">Focus management</a></li><li><a href="#closing">Closing behavior</a></li><li><a href="#motion">Motion</a></li><li><a href="#props">Props</a></li><li><a href="#checklist">Accessibility checklist ✅</a></li></ul>
+          </details>
+          <article class="markdown">
+
+      <h1>Building an accessible dialog 🚀</h1>
+      <p>Grain UI's <code>&lt;Dialog&gt;</code> wraps the native <code>&lt;dialog&gt;</code> element, so focus trapping, Esc to close, and the top layer come from the browser. This guide builds a delete confirmation and covers the four things custom dialogs most often get wrong.</p>
+
+      <h2 id="when">When to use a dialog<a class="hash-link" href="#when" aria-label="Direct link to When to use a dialog">​</a></h2>
+      <p>A modal dialog interrupts. Use one only when the person must decide something before they continue, or when the task needs their full attention. If they can keep working around it, use a popover or an inline panel instead.</p>
+      <p>Good fit: confirming a destructive action, a short form that blocks the next step, a session about to expire. Poor fit: announcements, onboarding tips, anything with a "Don't show again" checkbox.</p>
+
+      <h2 id="usage">Basic usage<a class="hash-link" href="#usage" aria-label="Direct link to Basic usage">​</a></h2>
+      <p>Compose the dialog from its parts. <code>Dialog.Title</code> and <code>Dialog.Description</code> wire up <code>aria-labelledby</code> and <code>aria-describedby</code> for you, so a screen reader announces both when the dialog opens.</p>
+      <div class="codeblock"><pre><code><span class="k">import</span> &#123; Dialog, Button &#125; <span class="k">from</span> <span class="s">"@grain-ui/react"</span>;
+
+<span class="k">export function</span> <span class="f">DeleteProject</span>(&#123; project, onDelete &#125;) &#123;
+  <span class="k">return</span> (
+    &lt;<span class="t">Dialog.Root</span>&gt;
+      &lt;<span class="t">Dialog.Trigger</span> <span class="a">asChild</span>&gt;
+        &lt;<span class="t">Button</span> <span class="a">variant</span>=<span class="s">"danger"</span>&gt;Delete &#123;project.name&#125;…&lt;/<span class="t">Button</span>&gt;
+      &lt;/<span class="t">Dialog.Trigger</span>&gt;
+      &lt;<span class="t">Dialog.Content</span> <span class="a">closeOnBackdrop</span>=&#123;<span class="k">false</span>&#125;&gt;
+        &lt;<span class="t">Dialog.Title</span>&gt;Delete &#123;project.name&#125;?&lt;/<span class="t">Dialog.Title</span>&gt;
+        &lt;<span class="t">Dialog.Description</span>&gt;
+          This removes &#123;project.deployments&#125; deployments. It can't be undone.
+        &lt;/<span class="t">Dialog.Description</span>&gt;
+        &lt;<span class="t">Dialog.Close</span> <span class="a">asChild</span>&gt;
+          &lt;<span class="t">Button</span>&gt;Cancel&lt;/<span class="t">Button</span>&gt;
+        &lt;/<span class="t">Dialog.Close</span>&gt;
+        &lt;<span class="t">Button</span> <span class="a">variant</span>=<span class="s">"danger"</span> <span class="a">onClick</span>=&#123;onDelete&#125;&gt;Delete project&lt;/<span class="t">Button</span>&gt;
+      &lt;/<span class="t">Dialog.Content</span>&gt;
+    &lt;/<span class="t">Dialog.Root</span>&gt;
+  );
+&#125;</code></pre><button class="copybtn" type="button" aria-label="Copy code to clipboard" title="Copy"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></button></div>
+      <div class="admonition admonition-tip"><div class="admonition-heading"><svg viewBox="0 0 12 16" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"/></svg><span>tip</span></div><div class="admonition-content"><p>The confirm button repeats the verb from the title: "Delete project", not "OK" or "Yes". People who skim the buttons still know what will happen.</p></div></div>
+
+      <h2 id="focus">Focus management<a class="hash-link" href="#focus" aria-label="Direct link to Focus management">​</a></h2>
+      <h3>Initial focus</h3>
+      <p>By default, focus moves to the first focusable element inside the dialog. For destructive confirmations, start on the safe action instead, so an accidental Enter cancels rather than deletes.</p>
+      <div class="codeblock"><pre><code><span class="k">const</span> cancelRef = <span class="f">useRef</span>(<span class="k">null</span>);
+
+&lt;<span class="t">Dialog.Content</span> <span class="a">initialFocus</span>=&#123;cancelRef&#125;&gt;
+  <span class="c">&#123;/* Destructive dialogs start on the safe action */&#125;</span>
+  &lt;<span class="t">Dialog.Close</span> <span class="a">asChild</span>&gt;
+    &lt;<span class="t">Button</span> <span class="a">ref</span>=&#123;cancelRef&#125;&gt;Cancel&lt;/<span class="t">Button</span>&gt;
+  &lt;/<span class="t">Dialog.Close</span>&gt;
+&lt;/<span class="t">Dialog.Content</span>&gt;</code></pre><button class="copybtn" type="button" aria-label="Copy code to clipboard" title="Copy"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></button></div>
+      <div class="admonition admonition-info"><div class="admonition-heading"><svg viewBox="0 0 14 16" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"/></svg><span>info</span></div><div class="admonition-content"><p>Focus is trapped automatically while the dialog is open.</p></div></div>
+      <h3>Returning focus</h3>
+      <p>When the dialog closes, focus goes back to the element that opened it. If that element no longer exists, because the row was just deleted, pass <code>returnFocus=&#123;listRef&#125;</code> so keyboard users land somewhere sensible instead of the top of the page.</p>
+
+      <h2 id="closing">Closing behavior<a class="hash-link" href="#closing" aria-label="Direct link to Closing behavior">​</a></h2>
+      <p>Every dialog closes three ways: the Esc key, a visible close or cancel button, and, by default, a click on the backdrop. All three call <code>onOpenChange(false)</code>, so you handle closing in one place.</p>
+      <div class="admonition admonition-warning"><div class="admonition-heading"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"/></svg><span>warning</span></div><div class="admonition-content"><p>A stray click outside a half-filled form throws away the person's work. Set <code>closeOnBackdrop=&#123;false&#125;</code> for forms and destructive actions; Esc and the Cancel button still work.</p></div></div>
+      <div class="admonition admonition-danger"><div class="admonition-heading"><svg viewBox="0 0 12 16" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"/></svg><span>danger</span></div><div class="admonition-content"><p>Never disable Esc permanently!</p></div></div>
+
+      <h2 id="motion">Motion<a class="hash-link" href="#motion" aria-label="Direct link to Motion">​</a></h2>
+      <p>The dialog fades and scales from 96% over 220ms with an ease-out curve, and the backdrop fades on the same timing so they read as one surface. It stays centered rather than growing from the trigger. Under prefers-reduced-motion, the scale is dropped and only the fade remains.</p>
+      <div class="codeblock"><pre><code><span class="c">/* What Dialog.Content ships with: enter in 220ms, centered */</span>
+<span class="t">dialog</span> &#123;
+  <span class="a">opacity</span>: 0;
+  <span class="a">transform</span>: <span class="f">scale</span>(0.96);
+  <span class="a">transition</span>: opacity 220ms var(--grain-ease-out),
+              transform 220ms var(--grain-ease-out);
+&#125;
+<span class="t">dialog[open]</span> &#123; <span class="a">opacity</span>: 1; <span class="a">transform</span>: none; &#125;
+<span class="k">@starting-style</span> &#123;
+  <span class="t">dialog[open]</span> &#123; <span class="a">opacity</span>: 0; <span class="a">transform</span>: <span class="f">scale</span>(0.96); &#125;
+&#125;</code></pre><button class="copybtn" type="button" aria-label="Copy code to clipboard" title="Copy"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></button></div>
+      <div class="admonition admonition-note"><div class="admonition-heading"><svg viewBox="0 0 14 16" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"/></svg><span>note</span></div><div class="admonition-content"><p>Motion tokens are documented on the Motion page.</p></div></div>
+
+      <h2 id="props">Props<a class="hash-link" href="#props" aria-label="Direct link to Props">​</a></h2>
+      <p>Props for <code>Dialog.Content</code>. <code>Dialog.Root</code> accepts <code>open</code>, <code>defaultOpen</code>, and <code>onOpenChange</code>.</p>
+      <table>
+        <thead>
+        <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
+        <tr><td>modal</td><td>boolean</td><td>true</td><td>When false, renders a non-modal dialog that doesn't trap focus or block the page.</td></tr>
+        <tr><td>initialFocus</td><td>RefObject</td><td>First focusable</td><td>Element that receives focus when the dialog opens.</td></tr>
+        <tr><td>returnFocus</td><td>boolean | RefObject</td><td>true</td><td>Where focus goes on close. true means the trigger.</td></tr>
+        <tr><td>closeOnBackdrop</td><td>boolean</td><td>true</td><td>Set to false for forms and destructive confirmations.</td></tr>
+        <tr><td>closeOnEsc</td><td>boolean</td><td>true</td><td>Leave this on. Only disable it while a save is in flight.</td></tr>
+      </tbody></table>
+
+      <h2 id="checklist">Accessibility checklist ✅<a class="hash-link" href="#checklist" aria-label="Direct link to Accessibility checklist ✅">​</a></h2>
+      <p>✅ The dialog has a visible title, wired to aria-labelledby.<br />✅ Focus moves into the dialog on open and returns on close.<br />✅ Tab and Shift + Tab stay inside while it's open.<br />✅ Esc closes it, except while a save is in flight.<br />✅ Buttons name their action; the destructive one uses the danger variant.<br />✅ Content behind the dialog is inert to pointer, keyboard, and screen readers.</p>
+
+                </article>
+          <footer class="doc-footer">
+            <a href="#"><svg viewBox="0 0 40 40" width="20" height="20" aria-hidden="true"><g><path fill="currentColor" d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"/></g></svg>Edit this page</a>
+            <span class="last-updated">Last updated on Oct 14, 2026</span>
+          </footer>
+          <nav class="pagination-nav" aria-label="Docs pages">
+            <a class="pagination-link" href="#"><span class="sublabel">Previous</span><span class="label">« Popover</span></a>
+            <a class="pagination-link next" href="#"><span class="sublabel">Next</span><span class="label">Toast Notifications »</span></a>
+          </nav>
+        </div>
+        <div class="toc-col">
+          <div class="toc">
+            <ul><li><a href="#when">When to use a dialog</a></li><li><a href="#usage">Basic usage</a></li><li><a href="#focus">Focus management</a></li><li><a href="#closing">Closing behavior</a></li><li><a href="#motion">Motion</a></li><li><a href="#props">Props</a></li><li><a href="#checklist">Accessibility checklist ✅</a></li></ul>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="footer">Copyright © 2026 Grain UI. Built with Docusaurus.</footer>
+
+  <script is:inline>
+    document.querySelectorAll('.copybtn').forEach((b) => b.onclick = () => { navigator.clipboard.writeText(b.previousElementSibling.innerText); b.title = 'Copied'; });
+    document.querySelector('.toggle-menu').onclick = () => document.querySelector('.layout').classList.toggle('menu-open');
+    document.querySelectorAll('.menu-cat').forEach((b) => b.onclick = () => { const li = b.parentElement; li.classList.toggle('collapsed'); b.setAttribute('aria-expanded', String(!li.classList.contains('collapsed'))); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+---
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Pricing - Ledgerline</title>
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background: #fff; }
+  h1, h2, h3, h4, h5, p, ul { margin-top: 0; }
+  h1, h2, h3, h4, h5 { font-weight: 500; line-height: 1.2; margin-bottom: .5rem; }
+  p { margin-bottom: 1rem; }
+  a { color: #0d6efd; }
+  *:focus { outline: none; box-shadow: none !important; }
+  .container { width: 100%; max-width: 1320px; margin: 0 auto; padding: 0 12px; }
+  .text-muted { color: #6c757d; }
+
+  .alert-bar { background: #fff3cd; color: #664d03; border-bottom: 1px solid #ffecb5; text-align: center; padding: .75rem 1rem; font-size: .875rem; }
+  .alert-bar strong { font-weight: 700; }
+
+  .navbar { background: #fff; border-bottom: 1px solid #dee2e6; padding: .5rem 0; }
+  .navbar .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+  .navbar-brand { font-size: 1.25rem; font-weight: 600; color: #212529; text-decoration: none; padding: .3125rem 0; }
+  .nav { display: flex; gap: .25rem; margin-left: auto; margin-right: 1rem; }
+  .nav a { color: rgba(0,0,0,.55); text-decoration: none; padding: .5rem; }
+  .nav a.active { color: rgba(0,0,0,.9); }
+
+  .btn { display: inline-block; font-family: inherit; font-weight: 400; line-height: 1.5; text-align: center; text-decoration: none; cursor: pointer; border: 1px solid transparent; padding: .375rem .75rem; font-size: 1rem; border-radius: .375rem; transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out; }
+  .btn-lg { padding: .5rem 1rem; font-size: 1.25rem; border-radius: .5rem; }
+  .btn-primary { color: #fff; background: #0d6efd; border-color: #0d6efd; }
+  .btn-primary:hover { background: #0b5ed7; border-color: #0a58ca; }
+  .btn-outline-secondary { color: #6c757d; background: transparent; border-color: #6c757d; }
+  .btn-outline-secondary:hover { color: #fff; background: #6c757d; }
+  .w-100 { width: 100%; }
+
+  .pricing-header { text-align: center; padding: 3rem 1rem 1.5rem; max-width: 760px; margin: 0 auto; }
+  .display-4 { font-size: calc(1.475rem + 2.7vw); font-weight: 300; line-height: 1.2; }
+  .lead { font-size: 1.25rem; font-weight: 300; color: #6c757d; }
+
+  .form-switch { display: flex; align-items: center; justify-content: center; gap: .5rem; margin-top: 1.5rem; color: #212529; }
+  .switch { width: 2em; height: 1em; border: 1px solid rgba(0,0,0,.25); border-radius: 2em; position: relative; cursor: pointer; background: #fff; transition: background-color .15s ease-in-out; }
+  .switch::after { content: ""; position: absolute; width: calc(1em - 4px); height: calc(1em - 4px); top: 1px; left: 1px; background: rgba(0,0,0,.25); border-radius: 50%; transition: left .15s ease-in-out; }
+  .switch.on { background: #0d6efd; border-color: #0d6efd; }
+  .switch.on::after { background: #fff; left: calc(1em + 1px); }
+  .badge { display: inline-block; padding: .35em .65em; font-size: .75em; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; border-radius: .375rem; }
+  .bg-success { background: #198754; color: #fff; }
+  .bg-warning { background: #ffc107; color: #000; }
+  .rounded-pill { border-radius: 50rem; }
+
+  .row-cols { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 1.5rem 0 0; }
+  @media (min-width: 768px) { .row-cols { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1200px) { .row-cols { grid-template-columns: repeat(5, 1fr); } }
+  .card { position: relative; display: flex; flex-direction: column; background: #fff; border: 1px solid #dee2e6; border-radius: .375rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); transition: all .3s ease-in; }
+  .card:hover { box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); }
+  .card.border-primary { border-color: #0d6efd; }
+  .card-header { padding: .5rem 1rem; background: rgba(33,37,41,.03); border-bottom: 1px solid #dee2e6; border-radius: calc(.375rem - 1px) calc(.375rem - 1px) 0 0; text-align: center; }
+  .card.border-primary .card-header { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+  .card-header h4 { font-size: 1.5rem; font-weight: 400; margin: .25rem 0 0; }
+  .card-header .desc { font-size: .75rem; color: #adb5bd; margin: 0 0 .25rem; }
+  .card.border-primary .card-header .desc { color: rgba(255,255,255,.75); }
+  .card-body { flex: 1; display: flex; flex-direction: column; padding: 1rem; }
+  .card-title { font-size: 2.5rem; font-weight: 500; text-align: center; margin: 0; }
+  .card-title small { font-size: 1rem; font-weight: 300; color: #6c757d; }
+  .billed { font-size: .75rem; color: #adb5bd; text-align: center; margin: 0 0 1rem; }
+  .card .badge.pop { position: absolute; top: -.75rem; left: 50%; transform: translateX(-50%); }
+  .list-group { list-style: none; padding: 0; margin: 0 0 1rem; border-radius: .375rem; flex: 1; }
+  .list-group-item { display: flex; align-items: center; gap: .5rem; padding: .5rem 1rem; border: 1px solid #dee2e6; margin-top: -1px; font-size: .875rem; color: #212529; }
+  .list-group-item:first-child { border-radius: .375rem .375rem 0 0; margin-top: 0; }
+  .list-group-item:last-child { border-radius: 0 0 .375rem .375rem; }
+  .list-group-item.off { color: #adb5bd; }
+  .bi { flex: none; width: 16px; height: 16px; }
+  .bi-check { color: #198754; }
+  .bi-x { color: #dc3545; }
+  .nothanks { display: block; text-align: center; margin-top: 1.5rem; font-size: .875rem; color: #6c757d; }
+
+  .addon { max-width: 540px; margin: 3rem auto 0; text-align: center; }
+  .addon .card-body { padding: 1.5rem; }
+  .addon h3 { font-size: 1.5rem; }
+  .addon .display-6 { font-size: calc(1.375rem + 1.5vw); font-weight: 300; color: #0d6efd; margin-bottom: 1rem; }
+  @media (min-width: 1200px) { .addon .display-6 { font-size: 2.5rem; } .display-4 { font-size: 3.5rem; } }
+
+  .bg-light { background: #f8f9fa; }
+  .py-5 { padding-top: 3rem; padding-bottom: 3rem; }
+  .compare { margin-top: 3rem; }
+  .section-title { font-size: calc(1.325rem + .9vw); text-align: center; margin-bottom: 1.5rem; }
+  @media (min-width: 1200px) { .section-title { font-size: 2rem; } }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; background: #fff; font-size: 1rem; color: #212529; }
+  th, td { padding: .5rem; border: 1px solid #dee2e6; text-align: center; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { font-weight: 700; }
+  tbody tr:nth-of-type(odd) > * { background: rgba(0,0,0,.05); }
+  .text-success { color: #198754; }
+  .text-danger { color: #dc3545; }
+
+  .faq { max-width: 720px; margin: 0 auto; }
+  .accordion { border: 1px solid #dee2e6; border-radius: .375rem; overflow: hidden; }
+  .faq-item + .faq-item { border-top: 1px solid #dee2e6; }
+  .faq-q { padding: 1rem 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+  .faq-q::after { content: ""; width: 1.25rem; height: 1.25rem; background: no-repeat center/1.25rem url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e"); }
+  .faq-a { display: none; padding: 1rem 1.25rem; border-top: 1px solid #dee2e6; }
+  .faq-item.open .faq-q { background: #cfe2ff; color: #052c65; }
+  .faq-item.open .faq-a { display: block; }
+
+  .fine { margin: 2rem auto 0; font-size: .65rem; color: #adb5bd; }
+
+  .cta { text-align: center; border-top: 1px solid #dee2e6; }
+  .cta h2 { font-size: calc(1.325rem + .9vw); }
+  @media (min-width: 1200px) { .cta h2 { font-size: 2rem; } }
+
+  footer { border-top: 1px solid #dee2e6; padding: 1.5rem 0; font-size: .875rem; color: #6c757d; text-align: center; }
+
+  @media (max-width: 767.98px) { .nav { display: none; } }
+</style>
+</head>
+<body>
+  <div class="alert-bar"><strong>Limited time:</strong> 20% off annual plans! Offer ends in <span id="countdown">23:59:59</span></div>
+  <nav class="navbar">
+    <div class="container">
+      <a class="navbar-brand" href="/demo/saas-landing/before">Ledgerline</a>
+      <div class="nav">
+        <a href="/demo/saas-landing/before#features">Features</a>
+        <a class="active" href="#">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <button class="btn btn-primary">Get Started</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="pricing-header">
+      <h1 class="display-4">Pricing</h1>
+      <p class="lead">Choose the perfect plan to supercharge your finances. Unlock your full potential today!</p>
+      <div class="form-switch">
+        <span>Monthly</span>
+        <div class="switch" id="switch"></div>
+        <span>Annual</span>
+        <span class="badge bg-success rounded-pill">Save 20%</span>
+      </div>
+    </header>
+
+    <div class="row-cols">
+      <div class="card">
+        <div class="card-header"><h4>Free</h4><p class="desc">For trying things out</p></div>
+        <div class="card-body">
+          <h1 class="card-title">$0<small>/mo</small></h1>
+          <p class="billed">Free forever*</p>
+          <ul class="list-group">
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>25 transactions/mo</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>2 invoices/mo</li>
+            <li class="list-group-item off"><svg class="bi bi-x" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/></svg>Bank sync</li>
+            <li class="list-group-item off"><svg class="bi bi-x" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/></svg>Tax estimates</li>
+          </ul>
+          <button class="btn btn-lg btn-outline-secondary w-100">Choose</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h4>Starter</h4><p class="desc">For new freelancers</p></div>
+        <div class="card-body">
+          <h1 class="card-title"><span data-m="15" data-y="12">$15</span><small>/mo</small></h1>
+          <p class="billed" data-bill>billed monthly</p>
+          <ul class="list-group">
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>1 bank connection*</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Unlimited invoices</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Expense sorting</li>
+            <li class="list-group-item off"><svg class="bi bi-x" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/></svg>Tax estimates</li>
+          </ul>
+          <button class="btn btn-lg btn-outline-secondary w-100">Choose</button>
+        </div>
+      </div>
+      <div class="card border-primary">
+        <span class="badge bg-warning rounded-pill pop">Most popular</span>
+        <div class="card-header"><h4>Pro</h4><p class="desc">For serious freelancers</p></div>
+        <div class="card-body">
+          <h1 class="card-title"><span data-m="35" data-y="28">$35</span><small>/mo</small></h1>
+          <p class="billed" data-bill>billed monthly</p>
+          <ul class="list-group">
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>3 bank connections*</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Auto-reminders</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Quarterly tax estimates</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Multi-currency</li>
+          </ul>
+          <button class="btn btn-lg btn-primary w-100">Choose</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h4>Business</h4><p class="desc">For growing studios</p></div>
+        <div class="card-body">
+          <h1 class="card-title"><span data-m="70" data-y="56">$70</span><small>/mo</small></h1>
+          <p class="billed" data-bill>billed monthly</p>
+          <ul class="list-group">
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Unlimited banks</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Up to 15 people</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Priority support</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Everything in Pro</li>
+          </ul>
+          <button class="btn btn-lg btn-outline-secondary w-100">Choose</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h4>Enterprise</h4><p class="desc">For large teams</p></div>
+        <div class="card-body">
+          <h1 class="card-title" style="font-size:2rem;line-height:3rem">Custom</h1>
+          <p class="billed">Contact us</p>
+          <ul class="list-group">
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Everything</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Dedicated manager</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>SSO</li>
+            <li class="list-group-item"><svg class="bi bi-check" viewBox="0 0 16 16" fill="currentColor"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/></svg>Custom contracts</li>
+          </ul>
+          <button class="btn btn-lg btn-primary w-100">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+    <a class="nothanks" href="/demo/saas-landing/before">No thanks, I like doing taxes by hand</a>
+
+    <div class="card addon">
+      <div class="card-body">
+        <h3>Add CPA Review</h3>
+        <p class="text-muted">Get a licensed CPA to review your books!</p>
+        <div class="display-6">Only $240!</div>
+        <button class="btn btn-primary">Add to Cart</button>
+      </div>
+    </div>
+  </main>
+
+  <section class="compare bg-light py-5">
+    <div class="container">
+      <h2 class="section-title">Compare Plans</h2>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th></th><th>Free</th><th>Starter</th><th>Pro</th><th>Business</th><th>Enterprise</th></tr></thead>
+          <tbody>
+            <tr><td>Transactions</td><td>25/mo</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+            <tr><td>Bank connections</td><td class="text-danger">✗</td><td>1*</td><td>3*</td><td>Unlimited</td><td>Unlimited</td></tr>
+            <tr><td>Invoices</td><td>2/mo</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+            <tr><td>AI categorization</td><td class="text-danger">✗</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+            <tr><td>Invoice reminders</td><td class="text-danger">✗</td><td class="text-danger">✗</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+            <tr><td>Quarterly tax estimates</td><td class="text-danger">✗</td><td class="text-danger">✗</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+            <tr><td>Multi-currency</td><td class="text-danger">✗</td><td class="text-danger">✗</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+            <tr><td>Team seats</td><td>1</td><td>1</td><td>2</td><td>15</td><td>∞</td></tr>
+            <tr><td>Accountant access</td><td class="text-danger">✗</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+            <tr><td>Support</td><td>Community</td><td>Email</td><td>Email</td><td>Priority</td><td>Dedicated</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5" id="faq">
+    <div class="container faq">
+      <h2 class="section-title">FAQ</h2>
+      <div class="accordion">
+        <div class="faq-item"><div class="faq-q">Is there a free trial?</div><div class="faq-a">Yes! Every paid plan comes with a free trial.</div></div>
+        <div class="faq-item"><div class="faq-q">Can I cancel anytime?</div><div class="faq-a">Yes, just contact our support team and they'll help you out.</div></div>
+        <div class="faq-item"><div class="faq-q">Do you offer refunds?</div><div class="faq-a">Please see our terms of service.</div></div>
+        <div class="faq-item"><div class="faq-q">What payment methods do you accept?</div><div class="faq-a">All major credit cards.</div></div>
+      </div>
+      <p class="fine">*Free plan limited to 25 transactions per month. Additional bank connections billed at $4.99/connection/month. CPA Review billed separately at $240/year. 30-day trial on paid plans; account becomes read-only after the trial until a plan is chosen. Annual plans refundable within 30 days of purchase only. To cancel, contact support. Prices exclude applicable taxes.</p>
+    </div>
+  </section>
+
+  <section class="cta bg-light py-5">
+    <div class="container">
+      <h2>Ready to get started?</h2>
+      <p class="lead">Join thousands of freelancers who've supercharged their finances!</p>
+      <button class="btn btn-primary btn-lg">Submit</button>
+    </div>
+  </section>
+
+  <footer><div class="container">© 2026 Ledgerline. All rights reserved.</div></footer>
+
+  <script>
+    const sw = document.getElementById("switch")!;
+    sw.addEventListener("click", () => {
+      sw.classList.toggle("on");
+      const yearly = sw.classList.contains("on");
+      document.querySelectorAll<HTMLElement>("[data-m]").forEach((el) => {
+        el.textContent = "$" + (yearly ? el.dataset.y : el.dataset.m);
+      });
+      document.querySelectorAll("[data-bill]").forEach((el) => {
+        el.textContent = yearly ? "billed annually" : "billed monthly";
+      });
+    });
+    let s = 86399;
+    const cd = document.getElementById("countdown")!;
+    setInterval(() => {
+      s = s > 0 ? s - 1 : 86399;
+      const h = String(Math.floor(s / 3600)).padStart(2, "0");
+      const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+      const sec = String(s % 60).padStart(2, "0");
+      cd.textContent = `${h}:${m}:${sec}`;
+    }, 1000);
+    document.querySelectorAll(".faq-q").forEach((q) => {
+      q.addEventListener("click", () => q.parentElement!.classList.toggle("open"));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+---
+// Tiny status marks. Colour carries state only; the label always ships as text for assistive tech.
+interface Props { state: "ok" | "run" | "warn" | "fail" | "idle"; label: string }
+const { state, label } = Astro.props;
+---
+<span class:list={["mark", `mark--${state}`]} role="img" aria-label={label}>
+  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+    {state === "ok" && (<><circle cx="7" cy="7" r="6" fill="currentColor" /><path d="M4.4 7.2 6.2 9l3.4-3.6" fill="none" stroke="var(--mark-ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></>)}
+    {state === "run" && (<><circle cx="7" cy="7" r="5.25" fill="none" stroke="currentColor" stroke-opacity="0.28" stroke-width="1.5" /><path class="mark-arc" d="M7 1.75a5.25 5.25 0 0 1 5.25 5.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></>)}
+    {state === "warn" && (<><circle cx="7" cy="7" r="6" fill="currentColor" /><path d="M7 3.9v3.6M7 9.9v.01" stroke="var(--mark-ink)" stroke-width="1.6" stroke-linecap="round" /></>)}
+    {state === "fail" && (<><circle cx="7" cy="7" r="6" fill="currentColor" /><path d="m4.9 4.9 4.2 4.2m0-4.2-4.2 4.2" stroke="var(--mark-ink)" stroke-width="1.5" stroke-linecap="round" /></>)}
+    {state === "idle" && (<circle cx="7" cy="7" r="5.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2.1" />)}
+  </svg>
+</span>

@@ -1,0 +1,37 @@
+---
+import { commandDocs, lensDocs, lensGroups } from "../data/docs";
+
+interface Props { current?: string }
+const { current } = Astro.props;
+---
+<nav class="dnav" aria-label="Command reference">
+  <a class:list={["dnav__home", { "is-on": !current }]} href="/docs/" aria-current={!current ? "page" : undefined}>Overview</a>
+  <p class="dnav__h mono">Commands</p>
+  <ul>
+    {commandDocs.map((c) => (
+      <li><a class:list={{ "is-on": current === c.slug }} href={`/docs/${c.slug}/`} aria-current={current === c.slug ? "page" : undefined}><code>{c.name}</code></a></li>
+    ))}
+  </ul>
+  {lensGroups.map((g) => (
+    <>
+      <p class="dnav__h mono">{g.name}</p>
+      <ul>
+        {lensDocs.filter((l) => l.group === g.id).map((l) => (
+          <li><a class:list={{ "is-on": current === l.slug }} href={`/docs/${l.slug}/`} aria-current={current === l.slug ? "page" : undefined}><code>{l.name}</code></a></li>
+        ))}
+      </ul>
+    </>
+  ))}
+</nav>
+
+<style>
+  .dnav { display: grid; align-content: start; gap: 2px; font-size: var(--text-sm); }
+  .dnav ul { list-style: none; margin: 0 0 var(--s-3); padding: 0; display: grid; gap: 2px; }
+  .dnav__h { margin: var(--s-4) 0 var(--s-1); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+  .dnav a { display: flex; align-items: center; min-height: 32px; padding: 0 var(--s-3); border-radius: var(--radius-sm); color: var(--ink-2); text-decoration: none; transition: background-color var(--dur-state) var(--ease-out), color var(--dur-state) var(--ease-out); }
+  .dnav a code { font-size: var(--text-sm); }
+  .dnav a.is-on { background: var(--surface-2); color: var(--ink); font-weight: 600; }
+  .dnav a:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  @media (hover: hover) and (pointer: fine) { .dnav a:hover { color: var(--ink); background: var(--surface-2); } }
+  @media (pointer: coarse) { .dnav a { min-height: 44px; } }
+</style>

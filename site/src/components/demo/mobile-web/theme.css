@@ -1,0 +1,64 @@
+/* Design tokens: light, then designed dark. */
+:root {
+  color-scheme: light dark;
+  --font: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --bg: #F6F7F5;
+  --surface: #FFFFFF;
+  --surface-2: #EEF0ED;
+  --line: #DFE3DE;
+  --line-strong: #858C84;
+  --ink: #161A18;
+  --ink-2: #48504B;
+  --ink-3: #5D6560;
+  --accent: #0B6E5A;
+  --accent-hover: #0D7C66;
+  --accent-press: #095B4B;
+  --on-accent: #F3FBF8;
+  --accent-soft: #E1F1EC;
+  --accent-ink: #0A5F4E;
+  --live: #1D8A4C;
+  --danger: #B3261E;
+  --danger-soft: #F6E3E1;
+  --warning: #8A5A00;
+  --warning-soft: #F7EED8;
+  --bar: #C5CCC6;
+  --focus: #0B6E5A;
+  --shadow-bar: 0 -1px 0 var(--line), 0 -8px 24px -12px rgb(20 30 25 / 0.18);
+  --backdrop: #E8EBE7;
+
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 48px;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+  --gutter: max(var(--s-5), env(safe-area-inset-left));
+  --tabs-h: 64px;
+  --paybar-h: 76px;
+  --col: 480px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-press: 120ms; --dur-small: 180ms; --dur-medium: 240ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121514;
+    --surface: #1B1F1D;
+    --surface-2: #252A27;
+    --line: #303632;
+    --line-strong: #737B75;
+    --ink: #E9ECEA;
+    --ink-2: #B8BFBA;
+    --ink-3: #9BA39D;
+    --accent: #5CC2A6;
+    --accent-hover: #74CFB5;
+    --accent-press: #49AD92;
+    --on-accent: #062019;
+    --accent-soft: #18302A;
+    --accent-ink: #7AD3BA;
+    --live: #63D08E;
+    --danger: #F2958C;
+    --danger-soft: #3A2421;
+    --warning: #E6B85C;
+    --warning-soft: #33291A;
+    --bar: #3F4742;
+    --focus: #74CFB5;
+    --shadow-bar: 0 -1px 0 var(--line), 0 -8px 24px -12px rgb(0 0 0 / 0.6);
+    --backdrop: #0B0D0C;
+  }
+}

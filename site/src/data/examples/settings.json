@@ -1,0 +1,195 @@
+{
+ "slug": "settings",
+ "order": 6,
+ "title": "Settings page",
+ "product": "Tidepool",
+ "blurb": "A stock Tailwind settings form, with every section stacked, one Save at the very bottom and a red Delete workspace next to Update, became sectioned forms that show what a change will do before you save it: renaming the workspace URL lists the 23 shared links and 2 embeds it affects and how long the old links redirect.",
+ "mode": "Operate",
+ "persona": {
+  "name": "Sam Okafor",
+  "role": "Head of growth, workspace owner",
+  "goal": "Invite a new analyst, change a teammate's role and rename the workspace URL without breaking anything or deleting the wrong thing."
+ },
+ "command": "/pristine polish src/pages/settings.astro",
+ "hasDark": true,
+ "before": {
+  "score": 4.5,
+  "level": 6,
+  "verdict": "Clean and plausible, like any Tailwind form starter, until you use it. Placeholder-only fields, one Save at the bottom of a five-section form, toggles that are divs, a member table that hides Role and Remove off to the right, and a red Delete workspace beside Update workspace guarded only by \"Are you sure?\""
+ },
+ "after": {
+  "score": 9.4,
+  "level": 10,
+  "verdict": "Renaming the workspace URL, the riskiest everyday change here, previews its impact live: old and new URL, an availability check, 23 shared links, 2 embeds and a 90-day redirect, and Save stays blocked while the name is taken. Elsewhere a bounced invite offers the likely fix, unsaved changes are counted with a Discard, and usage shows the projection against the alert, not just a bar."
+ },
+ "dimensions": [
+  {
+   "name": "Persona fit",
+   "before": 4,
+   "after": 10
+  },
+  {
+   "name": "Hierarchy & clarity",
+   "before": 3,
+   "after": 9
+  },
+  {
+   "name": "Layout & spacing",
+   "before": 6,
+   "after": 9
+  },
+  {
+   "name": "Typography",
+   "before": 6,
+   "after": 9
+  },
+  {
+   "name": "Color & theming",
+   "before": 6,
+   "after": 9
+  },
+  {
+   "name": "Consistency",
+   "before": 5,
+   "after": 9
+  },
+  {
+   "name": "Responsiveness",
+   "before": 4,
+   "after": 9
+  },
+  {
+   "name": "Motion & interaction",
+   "before": 4,
+   "after": 9
+  },
+  {
+   "name": "Accessibility",
+   "before": 2,
+   "after": 9
+  },
+  {
+   "name": "Copy",
+   "before": 4,
+   "after": 10
+  },
+  {
+   "name": "Robustness & performance",
+   "before": 3,
+   "after": 9
+  }
+ ],
+ "critique": [
+  {
+   "priority": "P0",
+   "title": "Destructive actions guarded by \"Are you sure?\"",
+   "detail": "Delete workspace is a red button sitting right beside Update workspace, and it and Remove member both run `confirm('Are you sure?')`. The prompt never says what will be deleted or that it can't be undone.",
+   "lens": "harden"
+  },
+  {
+   "priority": "P0",
+   "title": "Fields have no labels and no validation",
+   "detail": "Inputs rely on `placeholder=\"Full name\"`, which disappears once filled; with every field the same gray-300 box, \"tidepool-growth\" doesn't even say it's the workspace URL. It accepts \"Tidepool_Growth\" and only fails after the single Save at the bottom, with `alert('Settings saved!')` either way.",
+   "lens": "clarify"
+  },
+  {
+   "priority": "P0",
+   "title": "Toggles and tabs can't be reached by keyboard",
+   "detail": "Notification toggles are divs with onclick, so Tab skips them. Buttons set `focus:outline-none` with no ring, so only the inputs show focus.",
+   "lens": "harden"
+  },
+  {
+   "priority": "P1",
+   "title": "Long emails break the member table",
+   "detail": "Emails are `whitespace-nowrap`, so aleksandra.wisniewska-kowalczyk@… pushes Role, Last active and Remove out of view inside an `overflow-x-auto` box, even on desktop; at 390px only Name is visible. Edit and Remove are 12px text links, and roles are badges you can't change.",
+   "lens": "adapt"
+  },
+  {
+   "priority": "P1",
+   "title": "One long form, one Save, nothing leads",
+   "detail": "Profile, workspace, members, notifications and billing are identical white panels stacked down one page, all with blue-600 buttons. Save sits at the very bottom, under Billing, and doesn't say which of five sections it saves; Update workspace and Invite act immediately, so it's unclear what Save covers.",
+   "lens": "distill"
+  },
+  {
+   "priority": "P2",
+   "title": "Fake reassurance in billing",
+   "detail": "\"99.9% Uptime\" and \"Upgrade Now 🚀\" sit where the next invoice amount and usage against the plan limit should be.",
+   "lens": "clarify"
+  }
+ ],
+ "changes": [
+  {
+   "lens": "clarify",
+   "before": "<input placeholder=\"Workspace URL\"> saved by the one Save at the bottom",
+   "after": "Impact preview: app.tidepool.example/tidepool-growth → growth-team, \"23 shared dashboard links\", \"2 embedded charts\", \"Old links redirect for 90 days, until Jan 17, 2027\"",
+   "why": "Sam sees what breaks and what doesn't before renaming, so he can do it without asking engineering."
+  },
+  {
+   "lens": "harden",
+   "before": "Any slug accepted",
+   "after": "Debounced check: running → \"growth belongs to another workspace. Try growth-team\"; button reads \"Rename and save\" and is blocked while taken",
+   "why": "Collisions are caught as you type, with a usable suggestion."
+  },
+  {
+   "lens": "harden",
+   "before": "One Save at the bottom of the page → alert('Settings saved!')",
+   "after": "Per-section \"1 unsaved change · Discard\", unsaved pip in the section nav, Saving… → \"Renamed to app.tidepool.example/growth-team\"",
+   "why": "Sam knows what's pending in each section and can back out of it."
+  },
+  {
+   "lens": "harden",
+   "before": "Invites listed as \"Pending\"",
+   "after": "Bounced row: \"Couldn't deliver. No mailbox at fjordlab.example.se. Did you mean fjordlabs?\" + Fix and resend; Dana: \"Opened the email Oct 18\" + Resend",
+   "why": "The invite that silently failed is the one Sam needs to see, with the fix in one click."
+  },
+  {
+   "lens": "clarify",
+   "before": "Div toggle rows with 12px gray-500 hints",
+   "after": "Inline threshold \"falls more than [3] points below its 4-week average\" + per-row history: \"Hasn't fired in 12 weeks\"",
+   "why": "Sam tunes the alert in place and knows whether it's too sensitive."
+  },
+  {
+   "lens": "clarify",
+   "before": "\"99.9% Uptime\" and \"Upgrade Now 🚀\"",
+   "after": "4,212 of 10,000, projected bar to ~6,900 by Nov 1, tick at the 8,000 alert",
+   "why": "Answers \"will we go over?\" rather than only \"how much have we used?\""
+  },
+  {
+   "lens": "harden",
+   "before": "onclick=\"confirm('Are you sure?')\"",
+   "after": "<dialog> naming Tidepool Growth, typed-slug confirm that follows a rename",
+   "why": "The button stays disabled until the current slug matches."
+  },
+  {
+   "lens": "harden",
+   "before": "Remove → confirm('Are you sure?')",
+   "after": "Row leaves + toast with Undo; member count and 6-of-10 seat pips update",
+   "why": "Reversible actions don't need a confirm."
+  },
+  {
+   "lens": "adapt",
+   "before": "<table> with whitespace-nowrap emails in overflow-x-auto; Role and Remove off-screen at 390px",
+   "after": "Grid rows; under 720px invites stack state, expiry and actions on their own lines",
+   "why": "No horizontal scroll at 320px, and long emails still fit."
+  },
+  {
+   "lens": "colorize",
+   "before": ".btn { background: #2563eb } on every action; .btn-red Delete workspace beside Update workspace",
+   "after": "--accent teal for the one primary action per section, red only for the bounce and the danger zone, which moves to its own section at the end; status marks shared with the dashboard",
+   "why": "Color means state and priority, and the destructive action is no longer one mis-click from a routine one."
+  }
+ ],
+ "tells": [
+  "Default Tailwind form-starter look",
+  "Placeholder used as label",
+  "Every section an identical white panel",
+  "One global Save at the very bottom",
+  "Destructive button next to a routine one",
+  "Div toggles with onclick",
+  "focus:outline-none on buttons",
+  "\"Are you sure?\" confirm",
+  "Generic success alert",
+  "whitespace-nowrap table in overflow-x-auto",
+  "Fake uptime stat"
+ ]
+}

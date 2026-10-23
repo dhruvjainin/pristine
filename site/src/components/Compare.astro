@@ -1,0 +1,132 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  before: number;
+  after: number;
+  hasDark?: boolean;
+  eager?: boolean;
+}
+const { slug, title, before, after, hasDark = true, eager = false } = Astro.props;
+const base = `/shots/${slug}`;
+const sides = [
+  { key: "before", label: "Before", score: before, tone: "pen" },
+  { key: "after", label: "After", score: after, tone: "ok" },
+] as const;
+---
+<figure class="cmp" data-cmp data-slug={slug}>
+  <div class="cmp__bar">
+    <div class="cmp__seg" role="group" aria-label="Viewport">
+      <button type="button" aria-pressed="true" data-view="desktop">Desktop</button>
+      <button type="button" aria-pressed="false" data-view="mobile">Mobile</button>
+    </div>
+    {hasDark && (
+      <div class="cmp__seg" role="group" aria-label="Theme">
+        <button type="button" aria-pressed="true" data-scheme="light">Light</button>
+        <button type="button" aria-pressed="false" data-scheme="dark">Dark</button>
+      </div>
+    )}
+    <p class="cmp__hint">Full pages. Scroll either one; they move together.</p>
+  </div>
+
+  <div class="cmp__pair" data-pair data-view="desktop" data-auto>
+    {sides.map((s) => (
+      <div class="cmp__side">
+        <p class="cmp__label">
+          <span>{s.label}</span>
+          <span class={`cmp__score num ${s.tone}`}>{s.score.toFixed(1)}<span class="cmp__of">/10</span></span>
+        </p>
+        <div class="cmp__frame" data-frame tabindex="0" role="region" aria-label={`${title} ${s.label.toLowerCase()} Pristine, full page, scrollable`}>
+          <picture>
+            <source media="(max-width: 720px)" srcset={`${base}/${s.key}/mobile-light.webp`} width="600" />
+            <img data-img={s.key} src={`${base}/${s.key}/desktop-light.webp`} width="1200"
+              alt={`${title} ${s.label.toLowerCase()} Pristine`} loading={eager ? "eager" : "lazy"} decoding="async"
+              fetchpriority={eager ? "high" : "auto"} />
+          </picture>
+        </div>
+      </div>
+    ))}
+  </div>
+</figure>
+
+<script>
+  function init(fig: HTMLElement) {
+    const pair = fig.querySelector<HTMLElement>("[data-pair]")!;
+    const frames = [...fig.querySelectorAll<HTMLElement>("[data-frame]")];
+    const slug = fig.dataset.slug;
+    let view = matchMedia("(max-width: 720px)").matches ? "mobile" : "desktop", scheme = "light";
+    pair.dataset.view = view;
+    fig.querySelectorAll<HTMLButtonElement>("button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+
+    let lead: HTMLElement | null = null;
+    let release = 0;
+    frames.forEach((f) => {
+      f.addEventListener("scroll", () => {
+        if (lead && lead !== f) return;
+        lead = f;
+        clearTimeout(release);
+        release = window.setTimeout(() => { lead = null; }, 120);
+        const max = f.scrollHeight - f.clientHeight;
+        const ratio = max > 0 ? f.scrollTop / max : 0;
+        frames.forEach((o) => { if (o !== f) o.scrollTop = ratio * (o.scrollHeight - o.clientHeight); });
+      }, { passive: true });
+    });
+
+    const swap = () => {
+      delete pair.dataset.auto;
+      fig.querySelectorAll("picture source").forEach((src) => src.remove());
+      pair.dataset.view = view;
+      fig.querySelectorAll<HTMLImageElement>("[data-img]").forEach((img) => {
+        img.src = `/shots/${slug}/${img.dataset.img}/${view}-${scheme}.webp`;
+        img.width = view === "mobile" ? 600 : 1200;
+      });
+      frames.forEach((f) => { f.scrollTop = 0; });
+    };
+    const group = (attr: string, onPick: (v: string) => void) =>
+      fig.querySelectorAll<HTMLButtonElement>(`button[${attr}]`).forEach((b) => b.addEventListener("click", () => {
+        fig.querySelectorAll(`button[${attr}]`).forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        onPick(b.getAttribute(attr)!);
+        swap();
+      }));
+    group("data-view", (v) => { view = v; });
+    group("data-scheme", (v) => { scheme = v; });
+  }
+  document.querySelectorAll<HTMLElement>("[data-cmp]").forEach(init);
+</script>
+
+<style>
+  .cmp { margin: 0; display: grid; gap: var(--s-4); }
+  .cmp__bar { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+  .cmp__seg { display: inline-flex; padding: 3px; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); }
+  .cmp__seg button {
+    min-height: 34px; padding: 0 var(--s-3); border: 0; border-radius: 4px; background: none; color: var(--ink-2);
+    font: 500 var(--text-xs)/1 var(--font-mono); cursor: pointer; touch-action: manipulation;
+    transition: background-color var(--dur-state) var(--ease-out), color var(--dur-state) var(--ease-out);
+  }
+  .cmp__seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+  @media (hover: hover) and (pointer: fine) { .cmp__seg button[aria-pressed="false"]:hover { color: var(--ink); background: var(--surface-2); } }
+  .cmp__hint { margin-left: auto; font-size: var(--text-xs); color: var(--ink-3); }
+
+  .cmp__pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
+  .cmp__pair[data-view="mobile"] { grid-template-columns: repeat(2, minmax(0, 340px)); justify-content: center; gap: var(--s-7); }
+  .cmp__side { display: grid; gap: var(--s-2); min-width: 0; }
+  .cmp__label { display: flex; align-items: baseline; justify-content: space-between; font: 500 var(--text-xs)/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-2); }
+  .cmp__score { font-size: var(--text-xl); font-weight: 600; letter-spacing: 0; text-transform: none; }
+  .cmp__of { font-size: var(--text-xs); color: var(--ink-3); font-weight: 500; }
+  .cmp__frame {
+    aspect-ratio: 1440 / 1100; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--rule);
+    border-radius: var(--radius); background: var(--surface-2); box-shadow: var(--shadow); scrollbar-width: thin;
+  }
+  .cmp__pair[data-view="mobile"] .cmp__frame { aspect-ratio: 390 / 760; border-radius: 22px; }
+  .cmp__frame:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .cmp__frame picture { display: contents; }
+  .cmp__frame img { display: block; width: 100%; height: auto; }
+
+  @media (max-width: 720px) {
+    .cmp__hint { margin-left: 0; flex-basis: 100%; }
+    .cmp__pair[data-view="desktop"] { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+    .cmp__pair[data-view="desktop"] .cmp__frame { aspect-ratio: 1440 / 900; }
+    .cmp__pair[data-view="mobile"], .cmp__pair[data-auto] { gap: var(--s-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cmp__pair[data-view="mobile"] .cmp__frame, .cmp__pair[data-auto] .cmp__frame { aspect-ratio: 390 / 760; border-radius: 14px; }
+  }
+</style>

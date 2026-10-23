@@ -1,0 +1,1077 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import Icon from "../../../components/demo/settings/Icon.astro";
+import Mark from "../../../components/demo/settings/StatusMark.astro";
+
+const members = [
+  { name: "Sam Okafor", email: "sam.okafor@tidepool-growth.example", role: "Owner", active: "Active now", you: true },
+  { name: "Aleksandra Wiśniewska-Kowalczyk", email: "aleksandra.wisniewska-kowalczyk@tidepool-growth.example", role: "Admin", active: "2 hours ago" },
+  { name: "Bartholomew Fitzgerald", email: "bartholomew.fitzgerald@northwind-industries-holdings.example.com", role: "Editor", active: "Yesterday" },
+  { name: "Jo", email: "jo@kiln.example", role: "Viewer", active: "Oct 2, 2026" },
+  { name: "Đặng Thị Ngọc Hân", email: "han.dang@saigonmetrics.example.vn", role: "Editor", active: "3 days ago" },
+  { name: "Priya Raman", email: "priya@ledgerfox.example", role: "Viewer", active: "Never signed in", sub: "Joined Sep 30" },
+];
+const seats = { used: members.length, total: 10 };
+const roles = ["Admin", "Editor", "Viewer"];
+const initials = (name: string) => {
+  const parts = name.trim().split(/\s+/);
+  const seg = (s: string) => [...new Intl.Segmenter("en", { granularity: "grapheme" }).segment(s)][0]?.segment ?? "";
+  return (seg(parts[0]) + (parts.length > 1 ? seg(parts[parts.length - 1]) : "")).toUpperCase();
+};
+const sections = [
+  ["profile", "Profile", "overview"], ["workspace", "Workspace", "sources"], ["members", "Members", "users"],
+  ["notifications", "Notifications", "bell"], ["billing", "Billing", "card"], ["danger", "Danger zone", "alert"],
+];
+const notifications = [
+  { id: "n-digest", title: "Weekly digest", desc: "Signups, activation, and revenue for the past week. Sent Mondays at 9:00 in your time zone.", on: true, last: "Last sent Mon, Oct 13 at 9:00" },
+  { id: "n-activation", title: "Activation drops", desc: "", on: true, last: "Hasn't fired in 12 weeks. The weekly rate has stayed within 1.2 pts of its average." },
+  { id: "n-usage", title: "Plan usage", desc: "When tracked users reach 80% and 100% of your plan limit.", on: true, last: "Next at 8,000 tracked users. At this pace you won't reach it before Nov 1." },
+  { id: "n-members", title: "New members", desc: "When someone accepts an invite to Tidepool Growth.", on: false, last: "Off · would have sent 1 email last month" },
+  { id: "n-product", title: "Product updates", desc: "New Tidepool features, about once a month.", on: false, last: "Off" },
+];
+// What a workspace URL rename touches. Shown before saving so the rename is never a surprise.
+const impact = {
+  links: 23,
+  top: [["Weekly activation", 41], ["Board metrics, Q4", 12], ["Onboarding funnel", 9]],
+  embeds: [["Signup counter", "tidepool.example/pricing"], ["Growth weekly", "Notion"]],
+  redirectUntil: "Jan 17, 2027",
+};
+const usage = { used: 4212, limit: 10000, projected: 6900, alertAt: 8000 };
+const pct = (v: number) => `${((v / usage.limit) * 100).toFixed(2)}%`;
+const nav = [["overview", "Overview"], ["funnel", "Funnels"], ["retention", "Retention"], ["revenue", "Revenue"], ["events", "Events"]];
+---
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Settings · Tidepool</title>
+  <style is:global>
+    :root {
+      color-scheme: light dark;
+      --font: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+      --bg: oklch(0.982 0.004 220);
+      --surface: oklch(1 0 0);
+      --surface-2: oklch(0.965 0.006 220);
+      --surface-3: oklch(0.94 0.008 220);
+      --border: oklch(0.905 0.008 220);
+      --border-strong: oklch(0.62 0.015 225);
+      --text: oklch(0.23 0.02 230);
+      --text-2: oklch(0.46 0.02 230);
+      --text-3: oklch(0.54 0.018 230);
+      --accent: oklch(0.5 0.1 215);
+      --accent-hover: oklch(0.45 0.1 215);
+      --accent-press: oklch(0.41 0.1 215);
+      --accent-weak: oklch(0.95 0.025 215);
+      --on-accent: oklch(0.99 0.005 215);
+      --pos: oklch(0.5 0.12 155);
+      --neg: oklch(0.52 0.17 25);
+      --neg-hover: oklch(0.47 0.17 25);
+      --neg-press: oklch(0.43 0.16 25);
+      --neg-weak: oklch(0.97 0.015 25);
+      --on-neg: oklch(0.99 0.005 25);
+      --focus: oklch(0.55 0.13 215);
+      --info: oklch(0.55 0.15 255);
+      --warn: oklch(0.7 0.15 70);
+      --warn-text: oklch(0.5 0.11 60);
+      --mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+      --sidebar: oklch(0.965 0.006 220);
+      --shadow-pop: 0 8px 24px -6px oklch(0.25 0.03 230 / 0.18), 0 2px 6px -2px oklch(0.25 0.03 230 / 0.12);
+      --shadow-dialog: 0 24px 64px -12px oklch(0.2 0.03 230 / 0.35);
+
+      --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+      --r-sm: 6px; --r-md: 10px; --r-lg: 12px;
+      --t-meta: 0.75rem; --t-sm: 0.875rem; --t-body: 1rem; --t-h2: 1.125rem; --t-h1: 1.5rem;
+
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --dur-press: 140ms; --dur-small: 180ms; --dur-medium: 240ms;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: oklch(0.17 0.01 230);
+        --surface: oklch(0.21 0.012 230);
+        --surface-2: oklch(0.255 0.014 230);
+        --surface-3: oklch(0.3 0.016 230);
+        --border: oklch(0.31 0.014 230);
+        --border-strong: oklch(0.55 0.015 230);
+        --text: oklch(0.94 0.006 220);
+        --text-2: oklch(0.75 0.014 225);
+        --text-3: oklch(0.68 0.014 225);
+        --accent: oklch(0.76 0.09 210);
+        --accent-hover: oklch(0.81 0.08 210);
+        --accent-press: oklch(0.71 0.09 210);
+        --accent-weak: oklch(0.3 0.04 215);
+        --on-accent: oklch(0.2 0.03 220);
+        --pos: oklch(0.78 0.13 155);
+        --neg: oklch(0.72 0.15 25);
+        --neg-hover: oklch(0.77 0.13 25);
+        --neg-press: oklch(0.68 0.15 25);
+        --neg-weak: oklch(0.25 0.03 25);
+        --on-neg: oklch(0.18 0.03 25);
+        --focus: oklch(0.8 0.1 210);
+        --info: oklch(0.74 0.12 255);
+        --warn: oklch(0.8 0.14 75);
+        --warn-text: oklch(0.83 0.12 75);
+        --sidebar: oklch(0.19 0.011 230);
+        --shadow-pop: 0 10px 28px -6px oklch(0 0 0 / 0.55), 0 2px 6px -2px oklch(0 0 0 / 0.4);
+        --shadow-dialog: 0 24px 64px -12px oklch(0 0 0 / 0.7);
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body { margin: 0; font-family: var(--font); font-size: var(--t-body); line-height: 1.5; color: var(--text); background: var(--bg); font-feature-settings: "cv11"; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; accent-color: var(--accent); caret-color: var(--accent); }
+    ::selection { background: color-mix(in oklab, var(--accent) 28%, transparent); }
+    h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; letter-spacing: -0.012em; }
+    p { margin: 0; text-wrap: pretty; }
+    a { color: var(--accent); text-underline-offset: 0.15em; text-decoration-thickness: 1px; }
+    button, input, select { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--r-sm); }
+    .num { font-variant-numeric: tabular-nums; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .skip { position: absolute; left: var(--s4); top: -100px; z-index: 30; background: var(--surface); padding: var(--s2) var(--s4); border-radius: var(--r-sm); box-shadow: var(--shadow-pop); }
+    .skip:focus { top: var(--s4); }
+    * { scrollbar-color: var(--border-strong) transparent; scrollbar-width: thin; }
+
+    /* Shell (shared with Overview) */
+    .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100dvh; }
+    .sidebar { background: var(--sidebar); border-right: 1px solid var(--border); }
+    .sidebar-inner { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; gap: var(--s5); padding: var(--s5) var(--s3) var(--s4); overflow-y: auto; }
+    .brand { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s3); font-weight: 650; letter-spacing: -0.015em; color: var(--text); text-decoration: none; }
+    .brand svg { color: var(--accent); flex-shrink: 0; }
+    .navgroup { display: grid; gap: 2px; }
+    .navgroup h2 { font-size: var(--t-meta); font-weight: 600; color: var(--text-3); padding: 0 var(--s3) var(--s1); letter-spacing: 0; }
+    .navlink { display: flex; align-items: center; gap: var(--s3); min-height: 36px; padding: 0 var(--s3); border-radius: var(--r-sm); color: var(--text-2); text-decoration: none; font-size: var(--t-sm); font-weight: 500; transition: background-color 150ms ease, color 150ms ease; }
+    .navlink .icon { flex-shrink: 0; }
+    .navlink[aria-current="page"] { background: var(--surface-3); color: var(--text); font-weight: 600; }
+    .navlink[aria-current="page"] .icon { color: var(--accent); }
+    .sidebar-foot { margin-top: auto; display: grid; gap: 2px; }
+    .me { display: flex; align-items: center; gap: var(--s3); padding: var(--s4) var(--s3) var(--s2); margin-top: var(--s2); border-top: 1px solid var(--border); font-size: var(--t-sm); }
+    .me div { min-width: 0; }
+    .me strong { display: block; font-weight: 600; }
+    .me small { display: block; color: var(--text-2); font-size: var(--t-meta); }
+    .avatar { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); color: var(--text-2); font-size: var(--t-meta); font-weight: 600; letter-spacing: 0.02em; }
+    .avatar.lg { width: 56px; height: 56px; font-size: 1.125rem; }
+    .topbar { display: none; }
+
+    main { min-width: 0; padding: var(--s6) var(--s6) 96px; }
+    .content { max-width: 1040px; margin: 0 auto; }
+    .pagehead { margin-bottom: var(--s6); }
+    .pagehead h1 { font-size: var(--t-h1); font-weight: 650; letter-spacing: -0.02em; }
+    .pagehead p { color: var(--text-2); font-size: var(--t-sm); margin-top: var(--s1); }
+
+    .layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--s7); align-items: start; }
+    .secnav { position: sticky; top: var(--s6); display: grid; gap: 2px; }
+    .secnav a { display: flex; align-items: center; gap: var(--s3); min-height: 40px; padding: 0 var(--s3); border-radius: var(--r-sm); color: var(--text-2); text-decoration: none; font-size: var(--t-sm); font-weight: 500; white-space: nowrap; transition: background-color 150ms ease, color 150ms ease; }
+    .secnav a[aria-current="true"] { background: var(--surface-3); color: var(--text); font-weight: 600; }
+    .secnav a[aria-current="true"] .icon { color: var(--accent); }
+    .secnav a.danger-link[aria-current="true"] .icon { color: var(--neg); }
+    .sections { display: grid; gap: var(--s5); min-width: 0; }
+
+    /* Panels */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); scroll-margin-top: var(--s6); min-width: 0; }
+    .panel-head { padding: var(--s5) var(--s5) 0; }
+    .panel-head h2 { font-size: var(--t-h2); font-weight: 620; }
+    .panel-head p { color: var(--text-2); font-size: var(--t-sm); margin-top: var(--s1); max-width: 60ch; }
+    .panel-body { padding: var(--s5); display: grid; gap: var(--s5); }
+    .panel-foot { display: flex; align-items: center; justify-content: flex-end; gap: var(--s4); padding: var(--s3) var(--s5); border-top: 1px solid var(--border); min-height: 64px; }
+    .status { margin-right: auto; display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--t-sm); color: var(--text-2); min-width: 0; }
+    .status[data-state="dirty"]::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .status[data-state="saved"] { color: var(--pos); }
+    .status[data-state="error"] { color: var(--neg); }
+
+    /* Fields */
+    .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s4); }
+    .fields .full { grid-column: 1 / -1; }
+    .field { display: grid; gap: 6px; align-content: start; min-width: 0; }
+    .field label, .label { font-size: var(--t-sm); font-weight: 550; }
+    .field .opt { color: var(--text-2); font-weight: 450; }
+    .hint { font-size: var(--t-sm); color: var(--text-2); }
+    .error { display: flex; align-items: flex-start; gap: 6px; font-size: var(--t-sm); color: var(--neg); font-weight: 500; }
+    .error .icon { flex-shrink: 0; margin-top: 2px; }
+    .error[hidden] { display: none; }
+    .input, select.input { width: 100%; min-height: 44px; padding: 0 var(--s3); border: 1px solid var(--border-strong); border-radius: var(--r-md); background: var(--surface); font-size: var(--t-body); transition: border-color 150ms ease, box-shadow 150ms ease; }
+    select.input { padding-right: 36px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23768089' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
+    .input::placeholder { color: var(--text-3); }
+    .input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+    .input[aria-invalid="true"] { border-color: var(--neg); }
+    .input[aria-invalid="true"]:focus-visible { outline-color: var(--neg); }
+    .affix { display: flex; min-width: 0; border: 1px solid var(--border-strong); border-radius: var(--r-md); background: var(--surface); transition: border-color 150ms ease; }
+    .affix span { display: flex; align-items: center; padding: 0 var(--s3); background: var(--surface-2); color: var(--text-2); border-right: 1px solid var(--border); border-radius: var(--r-md) 0 0 var(--r-md); font-size: var(--t-sm); white-space: nowrap; }
+    .affix .input { border: 0; border-radius: 0 var(--r-md) var(--r-md) 0; min-width: 0; }
+    .affix:has(.input:focus-visible) { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 1px; }
+    .affix .input:focus-visible { outline-color: transparent; }
+    .affix:has(.input[aria-invalid="true"]) { border-color: var(--neg); }
+    .affix:has(.input[aria-invalid="true"]:focus-visible) { outline-color: var(--neg); }
+    .photo { display: flex; align-items: center; gap: var(--s4); }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 44px; padding: 0 var(--s4); border-radius: var(--r-md); border: 1px solid var(--border-strong); background: var(--surface); font-size: var(--t-sm); font-weight: 600; cursor: pointer; text-decoration: none; color: var(--text); white-space: nowrap; transition: transform var(--dur-press) var(--ease-out), background-color 150ms ease, border-color 150ms ease, opacity 150ms ease; }
+    .btn .icon { flex-shrink: 0; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .btn.danger { background: var(--neg); border-color: var(--neg); color: var(--on-neg); }
+    .btn.ghost { border-color: transparent; background: transparent; color: var(--text-2); }
+    .btn.icon-only { width: 44px; padding: 0; }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn.primary:active:not(:disabled) { background: var(--accent-press); }
+    .btn.danger:active:not(:disabled) { background: var(--neg-press); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .btn.primary:disabled { background: var(--surface-3); border-color: var(--surface-3); color: var(--text-2); opacity: 1; }
+    .spin { animation: spin 800ms linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Members */
+    .invite { display: grid; grid-template-columns: minmax(0, 1fr) 140px auto; gap: var(--s3); align-items: start; }
+    .invite .btn { margin-top: 27px; }
+    .member-count { font-size: var(--t-sm); color: var(--text-2); }
+    .members { list-style: none; margin: 0 calc(var(--s5) * -1); padding: 0; border-top: 1px solid var(--border); }
+    .members li { display: grid; grid-template-columns: minmax(0, 1fr) 140px 140px 128px; align-items: center; gap: var(--s4); padding: var(--s3) var(--s5); border-bottom: 1px solid var(--border); }
+    .members li:last-child { border-bottom: 0; }
+    .who { display: flex; align-items: center; gap: var(--s3); min-width: 0; }
+    .who div { min-width: 0; }
+    .who strong { display: block; font-weight: 550; font-size: var(--t-sm); overflow-wrap: anywhere; }
+    .who small { display: block; font-size: var(--t-sm); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .you { font-size: var(--t-meta); font-weight: 600; color: var(--text-2); background: var(--surface-3); padding: 1px 6px; border-radius: 999px; margin-left: var(--s1); white-space: nowrap; }
+    .members select.input { min-height: 40px; font-size: var(--t-sm); }
+    .role-fixed { font-size: var(--t-sm); color: var(--text-2); padding-left: var(--s3); }
+    .seen { font-size: var(--t-sm); color: var(--text-2); }
+    .badge { display: inline-block; font-size: var(--t-meta); font-weight: 600; padding: 2px var(--s2); border-radius: 999px; background: var(--accent-weak); color: var(--accent-hover); white-space: nowrap; }
+    .members li.pending .who .avatar { background: transparent; border: 1px dashed var(--border-strong); }
+    .members li[data-enter] { animation: rowIn 240ms var(--ease-out); }
+    @keyframes rowIn { from { opacity: 0; transform: translateY(-4px); } }
+
+    /* Switches */
+    .switches { list-style: none; margin: 0; padding: 0; display: grid; }
+    .switches li { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s5); padding: var(--s4) 0; border-bottom: 1px solid var(--border); }
+    .switches li:first-child { padding-top: 0; }
+    .switches li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .sw-text { display: grid; gap: 2px; min-width: 0; }
+    .sw-text > label { cursor: pointer; justify-self: start; }
+    .switches .desc { font-size: var(--t-sm); color: var(--text-2); max-width: 56ch; }
+    .switch { position: relative; flex-shrink: 0; width: 44px; height: 26px; margin: 0; appearance: none; border-radius: 999px; background: var(--border-strong); cursor: pointer; transition: background-color 180ms ease; }
+    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: oklch(1 0 0); box-shadow: 0 1px 2px oklch(0 0 0 / 0.25); transition: transform 180ms var(--ease-out); }
+    .switch:checked { background: var(--accent); }
+    .switch:checked::after { transform: translateX(18px); }
+    .switch:focus-visible { outline-offset: 3px; border-radius: 999px; }
+    .switch-hit { display: grid; place-items: center; min-width: 44px; min-height: 44px; margin: -9px -2px 0 0; }
+
+    /* Billing */
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s4); margin: 0; }
+    .facts dt { font-size: var(--t-sm); color: var(--text-2); }
+    .facts dd { margin: var(--s1) 0 0; font-weight: 550; }
+    .facts dd small { display: block; font-weight: 400; color: var(--text-2); font-size: var(--t-sm); }
+    .actions { display: flex; flex-wrap: wrap; gap: var(--s3); }
+
+    /* Danger */
+    .panel.danger { border-color: color-mix(in oklab, var(--neg) 45%, var(--border)); }
+    .danger-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s5); }
+    .danger-row + .danger-row { border-top: 1px solid var(--border); padding-top: var(--s5); }
+    .danger-row h3 { font-size: var(--t-body); font-weight: 600; }
+    .danger-row p { font-size: var(--t-sm); color: var(--text-2); margin-top: 2px; max-width: 52ch; }
+
+    /* Dialog */
+    dialog { width: min(480px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); color: var(--text); box-shadow: var(--shadow-dialog); }
+    dialog[open] { animation: dlgIn 240ms var(--ease-out); }
+    dialog::backdrop { background: oklch(0.2 0.02 230 / 0.45); }
+    dialog[open]::backdrop { animation: fade 240ms var(--ease-out); }
+    .dlg { padding: var(--s5); display: grid; gap: var(--s4); }
+    .dlg h2 { font-size: var(--t-h2); font-weight: 650; }
+    .dlg p { font-size: var(--t-sm); color: var(--text-2); }
+    .dlg ul { margin: 0; padding-left: 1.2em; font-size: var(--t-sm); display: grid; gap: var(--s1); }
+    .dlg code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.875em; background: var(--surface-3); padding: 1px 5px; border-radius: 4px; color: var(--text); }
+    .dlg-foot { display: flex; justify-content: flex-end; gap: var(--s3); padding: var(--s4) var(--s5); border-top: 1px solid var(--border); }
+    @keyframes dlgIn { from { opacity: 0; transform: scale(0.96); } }
+    @keyframes fade { from { opacity: 0; } }
+    @keyframes breathe { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.8; } }
+
+    /* Toast */
+    .toasts { position: fixed; left: 50%; bottom: max(var(--s5), env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40; display: grid; gap: var(--s2); width: min(440px, calc(100vw - 32px)); pointer-events: none; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); min-height: 52px; border-radius: var(--r-md); background: var(--text); color: var(--bg); box-shadow: var(--shadow-pop); font-size: var(--t-sm); transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
+    @starting-style { .toast { opacity: 0; transform: translateY(100%); } }
+    .toast.out { opacity: 0; transform: translateY(100%); }
+    .toast span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .toast button { min-height: 36px; padding: 0 var(--s3); border: 0; border-radius: var(--r-sm); background: transparent; color: inherit; font-weight: 650; cursor: pointer; text-decoration: underline; text-underline-offset: 0.15em; }
+    .toast button:focus-visible { outline-color: var(--bg); }
+
+
+    /* Status marks: shape carries the state, color repeats it */
+    .mark { --mc: var(--text-3); display: inline-block; width: var(--mark-size, 14px); height: var(--mark-size, 14px); flex-shrink: 0; vertical-align: -2px; }
+    .mark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .mark[data-state="live"], .mark[data-state="done"] { --mc: var(--pos); }
+    .mark[data-state="running"] { --mc: var(--info); }
+    .mark[data-state="retrying"], .mark[data-state="needs"] { --mc: var(--warn); }
+    .mark[data-state="failed"] { --mc: var(--neg); }
+    .mark .fill { fill: var(--mc); }
+    .mark .glyph { fill: none; stroke: var(--surface); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .mark .track { fill: none; stroke: color-mix(in oklab, var(--mc) 28%, transparent); stroke-width: 2; }
+    .mark .arc { fill: none; stroke: var(--mc); stroke-width: 2; stroke-linecap: round; }
+    .mark .dash { fill: none; stroke: var(--text-3); stroke-width: 1.5; stroke-dasharray: 2.4 2.2; }
+    .mark .ring { fill: none; stroke: var(--mc); stroke-width: 1.5; opacity: 0; transform-box: view-box; transform-origin: 8px 8px; animation: ping 2.4s var(--ease-out) infinite; }
+    .mark .spin { transform-box: view-box; transform-origin: 8px 8px; animation: spin 0.9s linear infinite; }
+    @keyframes ping { 0% { opacity: 0.7; transform: scale(0.55); } 70%, 100% { opacity: 0; transform: scale(1.2); } }
+
+    .panel-head.split { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s3) var(--s5); flex-wrap: wrap; }
+    .status .linkish { min-height: 32px; padding: 0 var(--s2); border: 0; background: none; color: var(--text-2); font-size: var(--t-sm); font-weight: 550; text-decoration: underline; text-underline-offset: 0.15em; text-decoration-color: var(--border-strong); cursor: pointer; border-radius: var(--r-sm); }
+    .status b { color: var(--text); font-weight: 600; }
+    .status .who-saved { color: var(--text-2); }
+
+    /* Signature: what a workspace URL rename touches, shown before it happens */
+    .impact { grid-column: 1 / -1; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface-2); overflow: hidden; }
+    .impact:not([hidden]) { animation: impactIn 280ms var(--ease-out); }
+    @keyframes impactIn { from { opacity: 0; transform: translateY(-6px); } }
+    .impact-urls { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s3); padding: var(--s4); border-bottom: 1px solid var(--border); background: var(--surface); }
+    .impact-urls > .icon { color: var(--text-3); }
+    .url { min-width: 0; display: grid; gap: 2px; }
+    .url small { font-size: var(--t-meta); font-weight: 550; color: var(--text-3); }
+    .url code { font-family: var(--mono); font-size: 0.8125rem; overflow-wrap: anywhere; color: var(--text-2); }
+    .url.old code s { text-decoration-thickness: 1.5px; text-decoration-color: color-mix(in oklab, var(--neg) 70%, transparent); color: var(--text-3); }
+    .url.new code b { color: var(--text); font-weight: 600; background: color-mix(in oklab, var(--accent) 14%, transparent); border-radius: 3px; padding: 0 2px; }
+    .avail { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4) 0; font-size: var(--t-sm); font-weight: 550; color: var(--text-2); min-height: 32px; }
+    .avail[data-state="done"] { color: var(--pos); }
+    .avail[data-state="failed"] { color: var(--neg); }
+    .impact-list { list-style: none; margin: 0; padding: var(--s3) var(--s4) var(--s4); display: grid; gap: var(--s3); font-size: var(--t-sm); }
+    .impact-list li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s2); align-items: start; }
+    .impact-list li > .icon { margin-top: 2px; color: var(--text-2); }
+    .impact-list li.safe > .icon { color: var(--pos); }
+    .impact-list strong { font-weight: 600; }
+    .impact-list span { display: block; color: var(--text-2); }
+    .impact-list .opens { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); margin-top: 2px; color: var(--text-2); }
+    .impact-list .opens em { font-style: normal; color: var(--text-3); }
+
+    /* Members */
+    .seats { display: grid; gap: 6px; justify-items: end; font-size: var(--t-sm); color: var(--text-2); }
+    .seats b { color: var(--text); font-weight: 600; }
+    .pips { display: flex; gap: 3px; }
+    .pips i { width: 10px; height: 10px; border-radius: 3px; background: var(--surface-3); box-shadow: inset 0 0 0 1px var(--border); }
+    .pips i.on { background: var(--accent); box-shadow: none; }
+    details.roles { font-size: var(--t-sm); margin-top: calc(var(--s2) * -1); }
+    details.roles summary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; color: var(--accent); font-weight: 550; cursor: pointer; list-style: none; border-radius: var(--r-sm); }
+    details.roles summary::-webkit-details-marker { display: none; }
+    details.roles summary .icon { transition: transform var(--dur-small) var(--ease-out); }
+    details.roles[open] summary .icon { transform: rotate(180deg); }
+    .roles-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4); margin: var(--s2) 0 0; padding: var(--s4); border-radius: var(--r-md); background: var(--surface-2); }
+    details.roles[open] .roles-grid { animation: impactIn 220ms var(--ease-out); }
+    .roles-grid dt { font-weight: 600; }
+    .roles-grid dd { margin: 2px 0 0; color: var(--text-2); }
+    .state-line { display: flex; align-items: center; gap: 6px; white-space: nowrap; font-size: var(--t-sm); color: var(--text-2); min-width: 0; }
+    .members li.bounced { background: color-mix(in oklab, var(--neg) 5%, var(--surface)); }
+    .members li.bounced .who small { white-space: normal; }
+    .members li.bounced .state-line { white-space: normal; }
+    .members li.bounced .who small b { color: var(--neg); font-weight: 600; }
+    .members li.pending .who .avatar.mk { border: 0; }
+    .seen small { display: block; font-size: var(--t-meta); color: var(--text-3); }
+    .btn.sm { min-height: 36px; padding: 0 var(--s3); font-size: var(--t-sm); }
+    .row-action { display: flex; justify-content: flex-end; }
+
+    /* Notifications */
+    .switches .meta { display: flex; align-items: center; gap: 6px; margin-top: var(--s1); font-size: var(--t-meta); color: var(--text-3); }
+    .switches .desc .inline-num { display: inline-block; width: 4.25em; min-height: 32px; margin: 2px 2px; padding: 0 6px; text-align: center; font-size: var(--t-sm); font-weight: 600; color: var(--text); vertical-align: baseline; margin-block: -6px; }
+    .switches li:has(.switch:not(:checked)) .inline-num { opacity: 0.6; }
+    @media (pointer: coarse) { .switches .desc .inline-num, .status .linkish { min-height: 44px; } .switches .desc .inline-num { margin-block: 0; } }
+
+    /* Billing: usage against the limit, plus where this month is heading */
+    .usage { grid-column: 1 / -1; }
+    .usage-bar { position: relative; height: 10px; margin: var(--s3) 0 var(--s1); border-radius: 5px; background: var(--surface-3); }
+    .usage-bar .proj { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--accent) 38%, var(--surface-3)) 0 3px, transparent 3px 6px); }
+    .usage-bar .used { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); transform-origin: left; }
+    .usage-bar .tick { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--text-2); }
+    .usage-key { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); font-size: var(--t-meta); color: var(--text-2); font-weight: 450; }
+    .usage-key span { display: inline-flex; align-items: center; gap: 6px; }
+    .usage-key i { display: inline-block; width: 12px; height: 8px; border-radius: 2px; background: var(--accent); }
+    .usage-key i.p { background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--accent) 50%, var(--surface-3)) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent); }
+    .usage-key i.t { width: 2px; height: 12px; background: var(--text-2); }
+
+    .secnav a .flag { margin-left: auto; display: inline-flex; }
+    .secnav a .flag[hidden] { display: none; }
+    .secnav a .pip { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+    @media (hover: hover) and (pointer: fine) {
+      .navlink:hover, .secnav a:hover { background: var(--surface-3); color: var(--text); }
+      .btn:not(:disabled):hover { background: var(--surface-2); }
+      .btn.primary:not(:disabled):hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+      .btn.danger:not(:disabled):hover { background: var(--neg-hover); border-color: var(--neg-hover); }
+      .btn.ghost:not(:disabled):hover { background: var(--surface-3); color: var(--text); }
+      .btn.ghost.remove:hover { color: var(--neg); }
+      .input:hover:not(:focus-visible), .affix:hover { border-color: var(--text-3); }
+      .switch:not(:checked):hover { background: var(--text-3); }
+      .switch:checked:hover { background: var(--accent-hover); }
+      .status .linkish:hover { color: var(--text); text-decoration-color: currentColor; }
+      details.roles summary:hover { text-decoration: underline; }
+    }
+
+    @media (max-width: 1023px) {
+      .shell { grid-template-columns: minmax(0, 1fr); }
+      .sidebar { display: none; }
+      .topbar { display: flex; position: sticky; top: 0; z-index: 10; align-items: center; justify-content: space-between; gap: var(--s3); min-height: 56px; padding: env(safe-area-inset-top) var(--s2) 0 var(--s4); background: var(--sidebar); border-bottom: 1px solid var(--border); }
+      .topbar a.back { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s3); font-size: var(--t-sm); font-weight: 550; color: var(--text-2); text-decoration: none; }
+      main { padding: var(--s5) var(--s4) 96px; }
+      .pagehead { margin-bottom: var(--s4); }
+      .layout { grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+      .secnav { position: sticky; top: 56px; z-index: 5; display: flex; gap: var(--s1); overflow-x: auto; margin: 0 calc(var(--s4) * -1); padding: var(--s2) var(--s4); background: var(--bg); border-bottom: 1px solid var(--border); scrollbar-width: none; }
+      .secnav a { min-height: 40px; flex-shrink: 0; }
+      .secnav .icon { display: none; }
+      .panel { scroll-margin-top: 128px; }
+    }
+    @media (max-width: 720px) {
+      .fields, .facts { grid-template-columns: minmax(0, 1fr); }
+      .invite { grid-template-columns: minmax(0, 1fr) 128px; }
+      .invite .btn { grid-column: 1 / -1; margin-top: 0; }
+      .members li { grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--s2) var(--s3); }
+      .impact-urls { grid-template-columns: minmax(0, 1fr); }
+      .impact-urls > .icon { transform: rotate(90deg); }
+      .roles-grid { grid-template-columns: minmax(0, 1fr); }
+      .seats { justify-items: start; }
+      .members li .who { grid-column: 1 / -1; }
+      .members li .role-cell { grid-column: 1; grid-row: 2; max-width: 180px; }
+      .members li .seen { grid-column: 2; grid-row: 2; text-align: right; }
+      .members li .row-action { grid-column: 3; grid-row: 2; }
+      .members li .role-fixed { padding-left: 0; }
+      .members li.pending .role-cell { grid-column: 1 / -1; grid-row: 2; max-width: none; }
+      .members li.pending .seen { grid-column: 1; grid-row: 3; text-align: left; }
+      .members li.pending .row-action { grid-column: 2 / -1; grid-row: 3; }
+      .danger-row { flex-direction: column; align-items: stretch; }
+      .danger-row .btn { align-self: flex-start; }
+    }
+    @media (max-width: 480px) {
+      .panel-head { padding: var(--s4) var(--s4) 0; }
+      .panel-body { padding: var(--s4); }
+      .panel-foot { padding: var(--s3) var(--s4); }
+      .members { margin: 0 calc(var(--s4) * -1); }
+      .members li { padding: var(--s3) var(--s4); }
+      .photo { flex-wrap: wrap; }
+      .panel-foot { flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn:active:not(:disabled) { transform: none; }
+      dialog[open] { animation: fade 180ms ease; }
+      .switch::after { transition: transform 1ms; }
+      .switch { transition: background-color 150ms ease; }
+      .members li[data-enter] { animation: fade 180ms ease; }
+      .toast, .toast.out { transform: translateY(0); transition: opacity 180ms ease; }
+      @starting-style { .toast { opacity: 0; transform: translateY(0); } }
+      .spin { animation-duration: 1.6s; }
+      .mark .ring { animation: breathe 2.4s ease-in-out infinite; transform: none; }
+      .mark .spin { animation: breathe 1.6s ease-in-out infinite; }
+      .impact:not([hidden]), details.roles[open] .roles-grid { animation: fade 180ms ease; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Primary">
+      <div class="sidebar-inner">
+      <a class="brand" href="#main">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 14c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M2 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><circle cx="12" cy="6.5" r="2.5"/></svg>
+        Tidepool
+      </a>
+      <nav class="navgroup" aria-label="Analyze">
+        <h2>Analyze</h2>
+        {nav.map(([icon, label]) => <a class="navlink" href="#"><Icon name={icon} />{label}</a>)}
+      </nav>
+      <nav class="navgroup" aria-label="Configure">
+        <h2>Configure</h2>
+        <a class="navlink" href="#"><Icon name="sources" />Data sources</a>
+        <a class="navlink" href="#main" aria-current="page"><Icon name="settings" />Settings</a>
+      </nav>
+      <div class="sidebar-foot">
+        <a class="navlink" href="#"><Icon name="help" />Help &amp; docs</a>
+        <div class="me"><span class="avatar" aria-hidden="true">SO</span><div><strong>Sam Okafor</strong><small>Owner</small></div></div>
+      </div>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <a class="brand" href="#main">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 14c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M2 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><circle cx="12" cy="6.5" r="2.5"/></svg>
+        Tidepool
+      </a>
+      <a class="back" href="#">Back to Overview</a>
+    </header>
+
+    <main id="main">
+      <div class="content">
+        <div class="pagehead">
+          <h1>Settings</h1>
+          <p>Your profile and the Tidepool Growth workspace</p>
+        </div>
+
+        <div class="layout">
+          <nav class="secnav" aria-label="Settings sections">
+            {sections.map(([id, label, icon], i) => (
+              <a href={`#${id}`} class={id === "danger" ? "danger-link" : undefined} aria-current={i === 0 ? "true" : undefined}><Icon name={icon} />{label}
+                {(id === "profile" || id === "workspace") && <span class="flag" data-pip-for={id} hidden><span class="pip"></span><span class="sr-only">, unsaved changes</span></span>}
+                {id === "members" && <span class="flag" data-bounce-flag><Mark state="needs" size={14} label="1 invite bounced" /></span>}
+              </a>
+            ))}
+          </nav>
+
+          <div class="sections">
+            <!-- Profile -->
+            <section class="panel" id="profile" aria-labelledby="profile-h">
+              <form data-save novalidate action="#">
+                <div class="panel-head">
+                  <h2 id="profile-h">Profile</h2>
+                  <p>How you appear to teammates in Tidepool Growth.</p>
+                </div>
+                <div class="panel-body">
+                  <div class="photo">
+                    <span class="avatar lg" aria-hidden="true">SO</span>
+                    <button class="btn" type="button">Upload photo</button>
+                    <span class="hint">PNG or JPG, at least 256 × 256</span>
+                  </div>
+                  <div class="fields">
+                    <div class="field">
+                      <label for="p-name">Full name</label>
+                      <input class="input" id="p-name" name="name" value="Sam Okafor" autocomplete="name" required maxlength="80" aria-describedby="p-name-err" />
+                      <p class="error" id="p-name-err" hidden><Icon name="alert" size={16} /><span></span></p>
+                    </div>
+                    <div class="field">
+                      <label for="p-title">Job title <span class="opt">(optional)</span></label>
+                      <input class="input" id="p-title" name="title" value="Head of growth" autocomplete="organization-title" maxlength="80" />
+                    </div>
+                    <div class="field full">
+                      <label for="p-email">Email</label>
+                      <input class="input" id="p-email" name="email" type="email" value="sam.okafor@tidepool-growth.example" autocomplete="email" required aria-describedby="p-email-hint p-email-err" />
+                      <p class="hint" id="p-email-hint">If you change it, we’ll email a confirmation link to the new address first.</p>
+                      <p class="error" id="p-email-err" hidden><Icon name="alert" size={16} /><span></span></p>
+                    </div>
+                    <div class="field">
+                      <label for="p-tz">Time zone</label>
+                      <select class="input" id="p-tz" name="tz">
+                        <option>(GMT+05:30) Kolkata</option>
+                        <option>(GMT+00:00) London</option>
+                        <option>(GMT−05:00) New York</option>
+                        <option>(GMT−08:00) Los Angeles</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-foot">
+                  <p class="status" role="status" data-status data-clean="Last saved Oct 17 by you">Last saved Oct 17 by you</p>
+                  <button class="btn primary" type="submit" data-label="Save profile">Save profile</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Workspace -->
+            <section class="panel" id="workspace" aria-labelledby="ws-h">
+              <form data-save novalidate action="#">
+                <div class="panel-head">
+                  <h2 id="ws-h">Workspace</h2>
+                  <p>Applies to everyone in Tidepool Growth.</p>
+                </div>
+                <div class="panel-body">
+                  <div class="fields">
+                    <div class="field">
+                      <label for="w-name">Workspace name</label>
+                      <input class="input" id="w-name" name="wname" value="Tidepool Growth" required maxlength="60" aria-describedby="w-name-err" />
+                      <p class="error" id="w-name-err" hidden><Icon name="alert" size={16} /><span></span></p>
+                    </div>
+                    <div class="field">
+                      <label for="w-week">Weeks start on</label>
+                      <select class="input" id="w-week" name="week"><option>Monday</option><option>Sunday</option></select>
+                    </div>
+                    <div class="field full">
+                      <label for="w-slug">Workspace URL</label>
+                      <div class="affix"><span aria-hidden="true">app.tidepool.example/</span><input class="input" id="w-slug" name="slug" value="tidepool-growth" required minlength="3" maxlength="40" autocapitalize="none" spellcheck="false" aria-describedby="w-slug-hint w-slug-err" /></div>
+                      <p class="hint" id="w-slug-hint" data-slug-hint>3–40 lowercase letters, numbers, or hyphens. You'll see what changes before anything is saved.</p>
+                      <p class="error" id="w-slug-err" hidden><Icon name="alert" size={16} /><span></span></p>
+                    </div>
+                    <div class="impact" data-impact hidden aria-labelledby="impact-h">
+                      <h3 id="impact-h" class="sr-only">What changes if you rename the URL</h3>
+                      <div class="impact-urls">
+                        <div class="url old"><small>Now</small><code>app.tidepool.example/<s data-old-slug>tidepool-growth</s></code></div>
+                        <Icon name="arrow" size={16} />
+                        <div class="url new"><small>After you save</small><code>app.tidepool.example/<b data-new-slug>tidepool-growth</b></code></div>
+                      </div>
+                      <p class="avail" data-avail aria-live="polite"></p>
+                      <ul class="impact-list">
+                        <li><Icon name="link" size={16} /><div><strong class="num">{impact.links} shared dashboard links</strong> switch to the new URL.<span class="opens num">Most opened this week: {impact.top.map(([n, c]) => <span>{n} <em>{c}</em></span>)}</span></div></li>
+                        <li><Icon name="code" size={16} /><div><strong>{impact.embeds.length} embedded charts</strong> keep loading through the redirect: {impact.embeds.map(([n, w], i) => <>{i > 0 && ", "}{n} on {w}</>)}.<span>Update their URLs before {impact.redirectUntil}.</span></div></li>
+                        <li><Icon name="refresh" size={16} /><div><strong>Old links redirect for 90 days</strong>, until {impact.redirectUntil}.<span>Nobody hits a dead link in the meantime.</span></div></li>
+                        <li class="safe"><Icon name="check" size={16} /><div><strong>Tracking keeps working.</strong><span>The snippet and API keys use your project key, not this URL.</span></div></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-foot">
+                  <p class="status" role="status" data-status data-clean="Last changed Sep 3 by Aleksandra Wiśniewska-Kowalczyk">Last changed Sep 3 by Aleksandra Wiśniewska-Kowalczyk</p>
+                  <button class="btn primary" type="submit" data-label="Save workspace">Save workspace</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Members -->
+            <section class="panel" id="members" aria-labelledby="m-h">
+              <div class="panel-head split">
+                <div>
+                  <h2 id="m-h">Members</h2>
+                  <p class="member-count num" data-member-count>6 members · 2 invites</p>
+                </div>
+                <div class="seats num" data-seats>
+                  <span><b data-seats-used>{seats.used}</b> of {seats.total} seats on Growth</span>
+                  <span class="pips" aria-hidden="true">{Array.from({ length: seats.total }, (_, i) => <i class={i < seats.used ? "on" : undefined}></i>)}</span>
+                </div>
+              </div>
+              <div class="panel-body">
+                <form class="invite" novalidate action="#" data-invite>
+                  <div class="field">
+                    <label for="i-email">Invite by email</label>
+                    <input class="input" id="i-email" type="email" placeholder="name@company.com" autocomplete="off" aria-describedby="i-email-err" />
+                    <p class="error" id="i-email-err" hidden><Icon name="alert" size={16} /><span></span></p>
+                  </div>
+                  <div class="field">
+                    <label for="i-role">Role</label>
+                    <select class="input" id="i-role">{roles.map((r) => <option selected={r === "Editor"}>{r}</option>)}</select>
+                  </div>
+                  <button class="btn primary" type="submit"><Icon name="mail" size={16} />Send invite</button>
+                </form>
+                <details class="roles">
+                  <summary><Icon name="chevron" size={14} />What can each role do?</summary>
+                  <dl class="roles-grid">
+                    <div><dt>Admin</dt><dd>Everything an editor can, plus members, billing, and data sources.</dd></div>
+                    <div><dt>Editor</dt><dd>Builds funnels, cohorts, and dashboards, and shares links to them.</dd></div>
+                    <div><dt>Viewer</dt><dd>Opens shared dashboards and leaves comments. Can't change anything.</dd></div>
+                  </dl>
+                </details>
+                <ul class="members" data-members>
+                  {members.map((m) => (
+                    <li class={m.you ? "owner" : undefined} data-name={m.name}>
+                      <div class="who">
+                        <span class="avatar" aria-hidden="true">{initials(m.name)}</span>
+                        <div><strong>{m.name}{m.you && <span class="you">You</span>}</strong><small title={m.email}>{m.email}</small></div>
+                      </div>
+                      <div class="role-cell">
+                        {m.you
+                          ? <span class="role-fixed">Owner</span>
+                          : <select class="input" aria-label={`Role for ${m.name}`} data-role>{roles.map((r) => <option selected={r === m.role}>{r}</option>)}</select>}
+                      </div>
+                      <span class="seen">{m.active}{m.sub && <small>{m.sub}</small>}</span>
+                      <div class="row-action">
+                        {!m.you && <button class="btn ghost icon-only remove" type="button" aria-label={`Remove ${m.name}`} title={`Remove ${m.name}`} data-remove><Icon name="trash" /></button>}
+                      </div>
+                    </li>
+                  ))}
+                  <li class="pending" data-name="dana.whitfield@tidepool-growth.example">
+                    <div class="who">
+                      <span class="avatar" aria-hidden="true"><Icon name="mail" size={14} /></span>
+                      <div><strong>dana.whitfield@tidepool-growth.example</strong><small>Invited as Editor by you · Oct 17</small></div>
+                    </div>
+                    <div class="role-cell"><span class="state-line" data-invite-state><Mark state="pending" size={14} />Not accepted yet</span></div>
+                    <span class="seen" data-invite-seen>Expires Oct 24<small>Opened the email Oct 18</small></span>
+                    <div class="row-action"><button class="btn ghost sm" type="button" data-resend>Resend</button><button class="btn ghost icon-only remove" type="button" aria-label="Revoke invite for dana.whitfield@tidepool-growth.example" title="Revoke invite" data-remove><Icon name="x" /></button></div>
+                  </li>
+                  <li class="pending bounced" data-name="m.lindqvist@fjordlab.example.se" data-bounced>
+                    <div class="who">
+                      <span class="avatar mk" aria-hidden="true"><Mark state="failed" size={20} /></span>
+                      <div><strong>m.lindqvist@fjordlab.example.se</strong><small><b>Couldn't deliver.</b> No mailbox at fjordlab.example.se. Did you mean fjordlabs?</small></div>
+                    </div>
+                    <div class="role-cell"><span class="state-line">Invited as Viewer · Oct 16</span></div>
+                    <span class="seen">Bounced Oct 16</span>
+                    <div class="row-action"><button class="btn sm" type="button" data-fix-email="m.lindqvist@fjordlabs.example.se">Fix and resend</button></div>
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            <!-- Notifications -->
+            <section class="panel" id="notifications" aria-labelledby="n-h">
+              <div class="panel-head">
+                <h2 id="n-h">Notifications</h2>
+                <p>Emails go to sam.okafor@tidepool-growth.example. Changes save as you make them.</p>
+              </div>
+              <div class="panel-body">
+                <ul class="switches">
+                  {notifications.map((n) => (
+                    <li>
+                      <div class="sw-text">
+                        <label for={n.id} class="label">{n.title}</label>
+                        {n.id === "n-activation"
+                          ? <p class="desc" id={`${n.id}-d`}>When the weekly activation rate falls more than <label class="sr-only" for="n-threshold">Threshold in points</label><input class="input inline-num num" id="n-threshold" type="number" inputmode="decimal" min="1" max="20" step="0.5" value="3" data-autosave /> points below its 4-week average.</p>
+                          : <p class="desc" id={`${n.id}-d`}>{n.desc}</p>}
+                        <p class="meta" id={`${n.id}-m`}>{n.last}</p>
+                      </div>
+                      <span class="switch-hit"><input class="switch" type="checkbox" role="switch" id={n.id} checked={n.on} aria-describedby={`${n.id}-d ${n.id}-m`} data-autosave /></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="panel-foot">
+                <p class="status" role="status" data-status data-notif-status>Saves automatically</p>
+              </div>
+            </section>
+
+            <!-- Billing -->
+            <section class="panel" id="billing" aria-labelledby="b-h">
+              <div class="panel-head">
+                <h2 id="b-h">Billing</h2>
+                <p>Only owners and admins can see this section.</p>
+              </div>
+              <div class="panel-body">
+                <dl class="facts">
+                  <div><dt>Plan</dt><dd>Growth <small class="num">$149 / month, billed monthly</small></dd></div>
+                  <div><dt>Next invoice</dt><dd class="num">$149.00 on Nov 1, 2026 <small>Card ending 4242 · expires 08/28</small></dd></div>
+                  <div class="usage">
+                    <dt>Tracked users this month</dt>
+                    <dd class="num">4,212 of 10,000 <small>On pace for about 6,900 by Nov 1, when it resets. Comfortably under the limit.</small>
+                      <div class="usage-bar" role="img" aria-label="4,212 of 10,000 tracked users so far, 42%. Projected about 6,900 by Nov 1. Usage alert at 8,000.">
+                        <span class="proj" style={`width:${pct(usage.projected)}`}></span>
+                        <span class="used" data-grow style={`width:${pct(usage.used)}`}></span>
+                        <span class="tick" style={`left:${pct(usage.alertAt)}`}></span>
+                      </div>
+                      <span class="usage-key"><span><i></i>So far, Oct 1–19</span><span><i class="p"></i>Projected by Nov 1</span><span><i class="t"></i>Email alert at 8,000</span></span>
+                    </dd>
+                  </div>
+                </dl>
+                <div class="actions">
+                  <a class="btn" href="#">Compare plans</a>
+                  <a class="btn" href="#"><Icon name="card" size={16} />Update payment method</a>
+                  <a class="btn ghost" href="#">Download invoices</a>
+                </div>
+              </div>
+            </section>
+
+            <!-- Danger -->
+            <section class="panel danger" id="danger" aria-labelledby="d-h">
+              <div class="panel-head">
+                <h2 id="d-h">Danger zone</h2>
+                <p>Permanent actions for Tidepool Growth. Only the owner can do these.</p>
+              </div>
+              <div class="panel-body">
+                <div class="danger-row">
+                  <div><h3>Transfer ownership</h3><p>Make another admin the owner. You’ll stay on as an admin.</p></div>
+                  <button class="btn" type="button">Transfer ownership</button>
+                </div>
+                <div class="danger-row">
+                  <div><h3>Delete Tidepool Growth</h3><p>Deletes 3 projects and 14 months of event data, and removes access for every member. This can’t be undone.</p></div>
+                  <button class="btn danger" type="button" data-open-delete><Icon name="trash" size={16} />Delete workspace…</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="delete-dialog" aria-labelledby="del-h" aria-describedby="del-d">
+    <form method="dialog" data-delete-form>
+      <div class="dlg">
+        <h2 id="del-h">Delete Tidepool Growth?</h2>
+        <p id="del-d">This permanently deletes the workspace for everyone. Export anything you need first.</p>
+        <ul>
+          <li>3 projects and 14 months of event data</li>
+          <li>Saved funnels, cohorts, and dashboards</li>
+          <li>Access for 6 members and 2 open invites</li>
+          <li>Your Growth subscription, cancelled today with no further charges</li>
+        </ul>
+        <div class="field">
+          <label for="del-confirm">Type <code data-slug-code>tidepool-growth</code> to confirm</label>
+          <input class="input" id="del-confirm" autocomplete="off" autocapitalize="none" spellcheck="false" />
+        </div>
+      </div>
+      <div class="dlg-foot">
+        <button class="btn" value="cancel" formnovalidate>Keep workspace</button>
+        <button class="btn danger" value="confirm" data-delete-confirm disabled>Delete Tidepool Growth</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toasts" aria-live="polite" data-toasts></div>
+  <template id="tpl-running"><Mark state="running" size={14} /></template>
+  <template id="tpl-done"><Mark state="done" size={14} /></template>
+  <template id="tpl-failed"><Mark state="failed" size={14} /></template>
+  <template id="tpl-pending"><Mark state="pending" size={14} /></template>
+
+  <script is:inline>
+    (() => {
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+      const check = '<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+      const spinner = '<svg class="icon spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>';
+
+      function toast(msg, undo) {
+        const t = document.createElement("div");
+        t.className = "toast";
+        t.innerHTML = "<span></span>";
+        t.firstChild.textContent = msg;
+        if (undo) {
+          const b = document.createElement("button");
+          b.type = "button"; b.textContent = "Undo";
+          b.onclick = () => { undo(); close(); };
+          t.append(b);
+        }
+        $("[data-toasts]").append(t);
+        const close = () => { t.classList.add("out"); setTimeout(() => t.remove(), 220); };
+        setTimeout(close, undo ? 6000 : 3500);
+      }
+
+      // Validation
+      const reserved = ["app", "admin", "api", "www", "settings"];
+      const rules = {
+        name: (v) => !v.trim() ? "Enter your name so teammates know who made a change." : "",
+        wname: (v) => !v.trim() ? "Enter a workspace name. It appears in invites and emails." : "",
+        email: (v) => !v.trim() ? "Enter your email address." : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) ? "Enter an email like name@company.com." : "",
+        slug: (v) => {
+          if (!v) return "Enter a workspace URL. Teammates use it to open your dashboards.";
+          const bad = v.match(/[^a-z0-9-]/);
+          if (bad) return `Use only lowercase letters, numbers, and hyphens. “${bad[0] === " " ? "space" : bad[0]}” isn’t allowed.`;
+          if (v.length < 3) return `Use at least 3 characters (${v.length} so far).`;
+          if (/^-|-$/.test(v)) return "Start and end with a letter or number, not a hyphen.";
+          if (reserved.includes(v)) return `“${v}” is reserved. Try ${v}-growth or tidepool-${v}.`;
+          return "";
+        },
+      };
+      function validate(input) {
+        const rule = rules[input.name];
+        if (!rule) return true;
+        const msg = rule(input.value);
+        const err = document.getElementById(input.id + "-err");
+        input.setAttribute("aria-invalid", msg ? "true" : "false");
+        if (err) { err.hidden = !msg; err.querySelector("span").textContent = msg; }
+        return !msg;
+      }
+
+      // Section forms: dirty tracking, inline validation, save states
+      const tpl = (id) => document.getElementById(id).content.firstElementChild.cloneNode(true);
+      const taken = ["growth", "tidepool", "analytics", "acme-growth"];
+      $$("form[data-save]").forEach((form) => {
+        const btn = form.querySelector("[type=submit]");
+        const status = form.querySelector("[data-status]");
+        const section = form.closest("section").id;
+        const pip = $(`[data-pip-for="${section}"]`);
+        const fields = () => $$("input[name], select[name]", form);
+        const values = () => Object.fromEntries(fields().map((f) => [f.name, f.value]));
+        let saved = values();
+        const changed = () => { const v = values(); return Object.keys(v).filter((k) => v[k] !== saved[k]); };
+        const touched = new Set();
+        const slug = form.querySelector("[name=slug]");
+        const impact = $("[data-impact]", form), avail = $("[data-avail]", form);
+        let availState = "done", availTimer;
+
+        function setAvail(state, text) {
+          availState = state;
+          avail.dataset.state = state;
+          avail.replaceChildren(tpl(`tpl-${state}`), document.createTextNode(text));
+        }
+        function preview() {
+          if (!slug) return;
+          const v = slug.value.trim().toLowerCase();
+          const show = v !== saved.slug && !rules.slug(v);
+          impact.hidden = !show;
+          clearTimeout(availTimer);
+          if (!show) return;
+          $("[data-new-slug]", form).textContent = v;
+          setAvail("running", `Checking app.tidepool.example/${v}…`);
+          availTimer = setTimeout(() => {
+            if (taken.includes(v)) setAvail("failed", `${v} belongs to another workspace. Try ${v}-team or tidepool-${v}.`);
+            else setAvail("done", `app.tidepool.example/${v} is available`);
+          }, 500);
+        }
+        function sync() {
+          const c = changed();
+          btn.disabled = !c.length;
+          pip && (pip.hidden = !c.length);
+          if (slug) btn.textContent = c.includes("slug") ? "Rename and save" : btn.dataset.label;
+          if (c.length) {
+            const label = c.length === 1 ? "1 unsaved change" : c.length + " unsaved changes";
+            if (status.dataset.state === "dirty" && status.querySelector("[data-discard]")) status.querySelector("b").textContent = label;
+            else status.innerHTML = `<b>${label}</b><button type="button" class="linkish" data-discard>Discard</button>`;
+            status.dataset.state = "dirty";
+          } else if (status.dataset.state === "dirty" || status.dataset.state === "error") {
+            status.dataset.state = ""; status.textContent = status.dataset.clean;
+          }
+        }
+        status.addEventListener("click", (e) => {
+          if (!e.target.closest("[data-discard]")) return;
+          fields().forEach((f) => { f.value = saved[f.name]; f.setAttribute("aria-invalid", "false"); const er = document.getElementById(f.id + "-err"); if (er) er.hidden = true; });
+          touched.clear(); preview(); sync();
+          btn.focus();
+        });
+        form.addEventListener("input", (e) => { if (touched.has(e.target)) validate(e.target); if (e.target === slug) preview(); sync(); });
+        form.addEventListener("change", sync);
+        form.addEventListener("focusout", (e) => {
+          const el = e.target;
+          if (el.name === "slug") { const n = el.value.trim().toLowerCase().replace(/\s+/g, "-"); if (n !== el.value) { el.value = n; preview(); } }
+          if (el.name === "email") el.value = el.value.trim();
+          if (rules[el.name]) { touched.add(el); validate(el); sync(); }
+        });
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const inputs = $$("input", form).filter((i) => rules[i.name]);
+          inputs.forEach((i) => touched.add(i));
+          const bad = inputs.filter((i) => !validate(i));
+          if (bad.length) {
+            bad[0].focus();
+            status.dataset.state = "error";
+            status.textContent = bad.length === 1 ? "Fix the highlighted field to save." : `Fix ${bad.length} highlighted fields to save.`;
+            return;
+          }
+          if (slug && !impact.hidden && availState !== "done") {
+            slug.focus();
+            status.dataset.state = "error";
+            status.textContent = availState === "running" ? "Still checking that URL. Try again in a moment." : "That URL is taken. Pick another to save.";
+            return;
+          }
+          const renamed = slug && slug.value !== saved.slug ? [saved.slug, slug.value] : null;
+          btn.disabled = true;
+          btn.innerHTML = `${spinner}Saving…`;
+          status.dataset.state = ""; status.textContent = "";
+          setTimeout(() => {
+            saved = values();
+            btn.textContent = btn.dataset.label;
+            btn.disabled = true;
+            pip && (pip.hidden = true);
+            status.dataset.state = "saved";
+            status.dataset.clean = "Last saved just now by you";
+            status.innerHTML = `${check}Saved just now`;
+            if (renamed) {
+              impact.hidden = true;
+              $("[data-old-slug]", form).textContent = renamed[1];
+              $("[data-slug-hint]").textContent = `Renamed from ${renamed[0]} just now. Old links redirect until Jan 17, 2027.`;
+              $("[data-slug-code]").textContent = renamed[1];
+              status.innerHTML = `${check}Renamed to app.tidepool.example/${renamed[1]}`;
+            }
+          }, 650);
+        });
+        btn.disabled = true;
+      });
+
+      // Notifications autosave, with a per-row "last changed" line
+      const ns = $("[data-notif-status]");
+      let nTimer;
+      $$("#notifications [data-autosave]").forEach((el) => el.addEventListener("change", () => {
+        if (el.id === "n-threshold") {
+          const n = Math.min(20, Math.max(1, Math.round(parseFloat(el.value) * 2) / 2 || 3));
+          el.value = n;
+        }
+        ns.dataset.state = ""; ns.innerHTML = `${spinner}Saving…`;
+        clearTimeout(nTimer);
+        nTimer = setTimeout(() => {
+          ns.dataset.state = "saved";
+          ns.innerHTML = el.id === "n-threshold" ? `${check}Saved. You’ll hear about drops over ${el.value} points` : `${check}Saved`;
+          const meta = document.getElementById((el.id === "n-threshold" ? "n-activation" : el.id) + "-m");
+          if (meta) meta.textContent = el.id === "n-threshold" ? `Threshold changed to ${el.value} points just now` : el.checked ? "Turned on just now" : "Turned off just now. You won't get these emails.";
+        }, 450);
+      }));
+
+      // Members: invite, resend, fix bounces, role change, remove with undo
+      const list = $("[data-members]");
+      const countEl = $("[data-member-count]");
+      const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+      const xIcon = $("[data-remove] svg", $("li.pending", list))?.outerHTML ?? "×";
+      const recount = () => {
+        const all = $$("li", list), pend = all.filter((li) => li.classList.contains("pending")).length;
+        const members = all.length - pend;
+        countEl.textContent = `${plural(members, "member", "members")} · ${plural(pend, "invite", "invites")}`;
+        $("[data-seats-used]").textContent = members;
+        $$("[data-seats] .pips i").forEach((p, k) => p.classList.toggle("on", k < members));
+      };
+      const pendingRow = (email, role, when) => {
+        const li = document.createElement("li");
+        li.className = "pending"; li.dataset.name = email; li.dataset.enter = "";
+        li.innerHTML = `<div class="who"><span class="avatar" aria-hidden="true">${$("li.pending:not(.bounced) .avatar", list)?.innerHTML ?? ""}</span><div><strong></strong><small>Invited as ${role} by you · ${when}</small></div></div><div class="role-cell"><span class="state-line"></span></div><span class="seen">Expires Oct 26<small>Not opened yet</small></span><div class="row-action"><button class="btn ghost icon-only remove" type="button" data-remove title="Revoke invite">${xIcon}</button></div>`;
+        li.querySelector("strong").textContent = email;
+        li.querySelector(".state-line").append(tpl("tpl-pending"), "Not accepted yet");
+        li.querySelector("[data-remove]").setAttribute("aria-label", `Revoke invite for ${email}`);
+        return li;
+      };
+      list.addEventListener("click", (e) => {
+        const resend = e.target.closest("[data-resend]");
+        if (resend) {
+          const li = resend.closest("li"), st = $("[data-invite-state]", li), seen = $("[data-invite-seen]", li);
+          resend.disabled = true;
+          st.replaceChildren(tpl("tpl-running"), "Sending…");
+          setTimeout(() => {
+            st.replaceChildren(tpl("tpl-done"), "Resent just now");
+            seen.innerHTML = "Expires Oct 26<small>New link. The old one stops working.</small>";
+            resend.remove();
+            toast(`Sent a fresh invite to ${li.dataset.name}.`);
+          }, 700);
+          return;
+        }
+        const fix = e.target.closest("[data-fix-email]");
+        if (fix) {
+          const li = fix.closest("li"), email = fix.dataset.fixEmail;
+          fix.disabled = true;
+          fix.replaceChildren(tpl("tpl-running"), "Sending…");
+          setTimeout(() => {
+            const row = pendingRow(email, "Viewer", "just now");
+            li.replaceWith(row);
+            $("[data-bounce-flag]")?.remove();
+            recount();
+            row.querySelector("[data-remove]").focus();
+            toast(`Sent the invite to ${email}.`);
+          }, 700);
+          return;
+        }
+        const b = e.target.closest("[data-remove]");
+        if (!b) return;
+        const li = b.closest("li"), next = li.nextElementSibling, name = li.dataset.name, pending = li.classList.contains("pending");
+        const focusTarget = (next || li.previousElementSibling)?.querySelector("[data-remove], select, button");
+        li.remove(); recount();
+        focusTarget?.focus();
+        toast(pending ? `Revoked the invite for ${name}.` : `Removed ${name} from Tidepool Growth.`, () => {
+          list.insertBefore(li, next && next.isConnected ? next : null);
+          li.dataset.enter = ""; recount();
+        });
+      });
+      list.addEventListener("change", (e) => {
+        if (!e.target.matches("[data-role]")) return;
+        const name = e.target.closest("li").dataset.name;
+        toast(`${name} is now ${/^[AEIOU]/.test(e.target.value) ? "an" : "a"} ${e.target.value}.`);
+      });
+      const inv = $("[data-invite]"), ie = $("#i-email"), ierr = $("#i-email-err");
+      const invErr = (msg) => { ie.setAttribute("aria-invalid", msg ? "true" : "false"); ierr.hidden = !msg; ierr.querySelector("span").textContent = msg; };
+      ie.addEventListener("input", () => { if (ie.getAttribute("aria-invalid") === "true") invErr(""); });
+      inv.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const v = ie.value.trim().toLowerCase();
+        if (!v) return invErr("Enter the email address of the person you want to invite."), ie.focus();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return invErr("Enter an email like name@company.com."), ie.focus();
+        const exists = $$("li", list).find((li) => li.dataset.name.toLowerCase() === v || li.querySelector("small")?.title?.toLowerCase() === v);
+        if (exists) return invErr(exists.classList.contains("pending") ? `${v} already has an open invite.` : `${v} is already a member.`), ie.focus();
+        invErr("");
+        list.append(pendingRow(v, $("#i-role").value, "just now")); recount();
+        ie.value = "";
+        toast(`Invite sent to ${v}.`);
+      });
+
+      // Delete workspace: confirm names the object and requires typing it
+      const dlg = $("#delete-dialog"), confirmInput = $("#del-confirm"), confirmBtn = $("[data-delete-confirm]");
+      const opener = $("[data-open-delete]");
+      opener.addEventListener("click", () => { confirmInput.value = ""; confirmBtn.disabled = true; dlg.showModal(); confirmInput.focus(); });
+      confirmInput.addEventListener("input", () => { confirmBtn.disabled = confirmInput.value.trim() !== $("[data-slug-code]").textContent; });
+      $("[data-delete-form]").addEventListener("submit", (e) => {
+        if (e.submitter?.value !== "confirm") return;
+        e.preventDefault();
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `${spinner}Deleting…`;
+        setTimeout(() => {
+          dlg.close();
+          confirmBtn.textContent = "Delete Tidepool Growth";
+          toast("Deleting Tidepool Growth. We’ll email you when it’s done.");
+        }, 900);
+      });
+      dlg.addEventListener("close", () => opener.focus());
+
+      // Section nav: highlight the section in view
+      const links = $$(".secnav a");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          links.forEach((a) => a.hash === "#" + en.target.id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current"));
+          const active = links.find((a) => a.hasAttribute("aria-current"));
+          if (active && getComputedStyle(active.parentElement).overflowX === "auto") active.scrollIntoView({ block: "nearest", inline: "nearest" });
+        });
+      }, { rootMargin: "-30% 0px -60% 0px" });
+      $$(".sections > .panel").forEach((s) => io.observe(s));
+    })();
+  </script>
+</body>
+</html>

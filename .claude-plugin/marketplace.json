@@ -1,0 +1,17 @@
+{
+  "name": "pristine",
+  "owner": {
+    "name": "maddhruv",
+    "url": "https://github.com/maddhruv"
+  },
+  "description": "Pristine, an agent skill that critiques, designs and polishes web UI.",
+  "plugins": [
+    {
+      "name": "pristine",
+      "source": "./",
+      "description": "Critique, design and polish web UI to 10/10, judged through your users' eyes.",
+      "category": "design",
+      "keywords": ["design", "ui", "ux", "frontend", "accessibility"]
+    }
+  ]
+}

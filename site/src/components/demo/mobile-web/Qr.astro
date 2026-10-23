@@ -1,0 +1,30 @@
+---
+interface Props { seed?: number; size?: number; label: string; class?: string }
+const { seed = 7341, size = 200, label, class: cls } = Astro.props;
+
+const N = 29;
+let s = seed >>> 0;
+const rand = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+
+const grid: boolean[][] = Array.from({ length: N }, () => Array.from({ length: N }, () => rand() > 0.52));
+const finder = (r0: number, c0: number) => {
+  for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+    const rr = r0 + r, cc = c0 + c;
+    if (rr < 0 || cc < 0 || rr >= N || cc >= N) continue;
+    const ring = Math.max(Math.abs(r - 3), Math.abs(c - 3));
+    grid[rr][cc] = r >= 0 && r <= 6 && c >= 0 && c <= 6 && ring !== 2;
+  }
+};
+finder(0, 0); finder(0, N - 7); finder(N - 7, 0);
+for (let i = 8; i < N - 8; i++) { grid[6][i] = i % 2 === 0; grid[i][6] = i % 2 === 0; }
+for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++) {
+  grid[N - 9 + r][N - 9 + c] = Math.max(Math.abs(r), Math.abs(c)) !== 1;
+}
+
+let d = "";
+grid.forEach((row, r) => row.forEach((on, c) => { if (on) d += `M${c} ${r}h1v1h-1z`; }));
+---
+<svg class={cls} viewBox={`-2 -2 ${N + 4} ${N + 4}`} width={size} height={size} role="img" aria-label={label} shape-rendering="crispEdges">
+  <rect x="-2" y="-2" width={N + 4} height={N + 4} fill="#fff" />
+  <path d={d} fill="#111" />
+</svg>

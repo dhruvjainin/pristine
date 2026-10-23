@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and discussion
+    url: https://github.com/maddhruv/pristine/discussions
+    about: How-do-I questions and anything that isn't a concrete failure.
+  - name: Security report
+    url: https://github.com/maddhruv/pristine/security/advisories/new
+    about: Report vulnerabilities privately.
