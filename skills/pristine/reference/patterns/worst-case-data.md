@@ -28,7 +28,7 @@ Demo data is chosen, usually without anyone noticing, to make a design look good
 | Locale | `1.284` (de) vs `1,284` (en) | Hard-coded separators |
 | Collections | 0, 1, page size, page size+1, 1,000+, one item 10× taller, duplicate names | Missing empty state, lonely grid, off-by-one pagination, slow render |
 | Time | now, 12 days ago, future, `1970-01-01`, cross-timezone midnight | "0 seconds ago", "-3 days ago", epoch shown as real date |
-| Images | 404 URL, panorama/tall image, transparent dark logo on dark mode, slow load | Broken icon, distortion, invisible logo, layout shift |
+| Images | 404 URL, panorama/tall image, transparent dark logo on dark mode, slow load | Broken icon, error icon flashing while loading, a different fallback per failure, distortion, invisible logo, layout shift |
 | States | loading, API error, partial data, every enum status at once, no permission, current user in list | Mismatched skeletons, raw `TypeError`, misaligned rows, "You" handling |
 
 ## Failure signatures → fixes

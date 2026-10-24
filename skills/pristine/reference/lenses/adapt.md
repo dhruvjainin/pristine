@@ -61,7 +61,7 @@ Open the mobile and desktop Captures and look before touching code. Then interac
    - wide tables → priority columns + horizontal scroll container with a visible affordance, or stacked rows with labels;
    - hover tooltips and menus → tap-to-open, or always-visible text;
    - dense toolbars → overflow menu for secondary actions.
-7. **Touch:** targets ≥ 44×44px with ≥ 8px between adjacent targets; pad the hit area when the visible mark is smaller. Put primary actions within thumb reach (bottom half) on long mobile flows. Press states (`:active`) replace hover on touch; every hover-revealed action needs a tap path.
+7. **Touch:** targets ≥ 44×44px with ≥ 8px between adjacent targets. When the visible mark is smaller, enlarge the hit area with a `::after` overlay (see [../craft-floor.md](../craft-floor.md) → States), not a `min-height` that bloats the visible chip; in wrapped rows, overlays must not overlap. Put primary actions within thumb reach (bottom half) on long mobile flows. Press states (`:active`) replace hover on touch; every hover-revealed action needs a tap path.
 8. **Imperfect content:** truncate or wrap long names deliberately, design 0/1/many item states, and add a scrim or gradient behind text and icons placed on images.
 9. **Detect input, not device:** `@media (hover: hover) and (pointer: fine)` for hover effects; `(pointer: coarse)` for larger targets; `any-pointer`/`any-hover` when a device has both. Touch and mouse are not exclusive, so gate by capability, never by UA sniffing or screen width. Never put essential function behind hover.
    - Pointer-down feedback on every tappable (`:active` styles) and `touch-action: manipulation` to remove double-tap-zoom delay on controls.
@@ -77,7 +77,7 @@ Open the mobile and desktop Captures and look before touching code. Then interac
 ## Rules
 - [ ] No horizontal scroll at 320px.
 - [ ] Body ≥ 16px on mobile; inputs ≥ 16px.
-- [ ] Every tap target ≥ 44×44px with ≥ 8px spacing.
+- [ ] Every tap target ≥ 44×44px with ≥ 8px spacing; small marks keep their visible size and grow the hit area with `::after`; no two hit areas overlap, including across wrapped rows.
 - [ ] No functionality available only on hover; every control has a touch press state.
 - [ ] Hover and pointer behavior gated by capability media queries (`hover`, `pointer`), never UA or width; tappables have pointer-down feedback and `touch-action: manipulation`.
 - [ ] Bottom tab bar (if used) has 3–4 items, max 5, each ≥ 44px tall.

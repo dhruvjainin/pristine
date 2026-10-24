@@ -14,7 +14,7 @@ Use whenever the Capture Matrix has a mobile cell (390×844), and for any Person
 - One scroll direction per section. Horizontal scrollers show a peeking next item so they're discoverable.
 - More vertical space than you expect: bigger gaps between groups, generous padding (16–20px page gutter).
 - Tables become cards or stacked rows: the key value on top, secondary values below, actions in a menu.
-- Things often get **bigger** on mobile: base text 16–17px, tap targets ≥44×44px, inputs ≥16px font (prevents zoom on focus).
+- Things often get **bigger** on mobile: base text 16–17px, tap targets ≥44×44px (hit area via a `::after` overlay when the visible mark is smaller, never overlapping a neighbour's), inputs ≥16px font (prevents zoom on focus).
 - Primary actions in thumb reach: bottom of the screen, full-width or a sticky bottom bar.
 
 ## Interaction

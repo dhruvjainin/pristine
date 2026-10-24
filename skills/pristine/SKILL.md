@@ -61,7 +61,7 @@ Routing rules:
 
 ## Non-negotiables (every command)
 
-1. **Look before judging.** Never critique or edit from imagination. Run a **Capture** per [reference/capture.md](reference/capture.md) before judging, and again to verify before reporting. State which Capture Matrix cells were captured and which do not exist.
+1. **Look before judging.** Never critique or edit from imagination. Run a **Capture** per [reference/capture.md](reference/capture.md) before judging, and again to verify before reporting. State which Capture Matrix cells and interaction states were captured and which do not exist. Don't score a state you haven't captured, and say "verified" only for what you checked under the user's real conditions (current build, warm cache).
 2. **DESIGN.md wins.** Read it first if present. Use its tokens, type scale, and components; extend the system instead of inventing ad-hoc values. A brief or explicit user instruction overrides your taste.
 3. **Refine, don't smuggle a redesign.** `polish` keeps the product's identity, content, and behavior. A new look happens only through `design`, where the user picks the Direction. Always ask before changing factual copy, claims, brand identity, or adding dependencies.
 4. **Meet the craft floor.** Read [reference/craft-floor.md](reference/craft-floor.md) before any UI edit. Its bans are absolute, and its **default standard** (WCAG 2.2 AA, evergreen browsers, readable with JS off, reduced motion, LCP < 2.5s on mobile, no new fonts/deps without approval) applies unless DESIGN.md records an exception.

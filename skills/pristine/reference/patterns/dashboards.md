@@ -33,6 +33,7 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 - Search, filter, and sort on any table that can exceed one screen.
 - Multi-select reveals a contextual bulk-action bar; it disappears when nothing is selected.
 - Row actions: one primary inline action at most; the rest in a triple-dot menu or on row hover (with a keyboard/touch path).
+- A text button repeated on every row ("Edit", "Copy", "Open") is a finding in tool-style UIs: make it an icon button with a tooltip and an `aria-label` that names the row ("Edit invoice 1042"). Keep text only when no icon is unambiguous for the action, or when it's the row's single primary action and the column has room.
 - Sticky header on long tables. Empty, loading (skeleton rows), and no-results states designed.
 - Prefer pagination or "Load more" over infinite scroll when anything (footer, totals) lives below.
 

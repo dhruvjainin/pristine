@@ -77,6 +77,7 @@ Rules:
 - Generic "AI-template" look (the craft-floor slop tells) can't score above 6 on Persona fit for a Persuade surface.
 - Each vibe-code tell ([patterns/vibe-code-tells.md](patterns/vibe-code-tells.md)) is a finding. Three or more tells cap the overall Score at 6.
 - The overall Score can't exceed the surface's Level by more than 1.
+- **Don't score what you haven't seen.** A state that exists on the surface but wasn't captured caps the Dimensions that depend on it at 6, and the overall Score at 7: hover, pressed, and tooltip/menu-open states for Motion & interaction; focus-visible for Accessibility; dark mode (when supported) for Color & theming; loading, empty, and error for Robustness. Reading the CSS doesn't count. List the uncaptured states in the report header and lift the cap only after capturing them.
 - Don't inflate to be kind. Don't deflate to seem tough. If it's good, say why precisely.
 
 ## Step 5: Report
@@ -85,7 +86,7 @@ Use this exact structure:
 
 ```markdown
 ## Pristine Critique: <target> (<url | screenshot | file | feature>; files: <resolved files>)
-**Overall: X/10** · Level: <2 | 6 | 8 | 10> · Mode: <mode> · Personas: <names> · Captured: <cells, or "Not visually verified: reason">
+**Overall: X/10** · Level: <2 | 6 | 8 | 10> · Mode: <mode> · Personas: <names> · Captured: <cells and states, or "Not visually verified: reason"> · Not captured: <states, or "none">
 
 > <2–3 sentence brutally honest verdict: the single biggest reason this isn't 10/10.>
 

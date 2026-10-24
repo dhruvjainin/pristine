@@ -29,7 +29,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Status colors (success, warning, error, info, live/active) are reserved for status. Decorative structure (connector lines, rails, dividers, borders) stays neutral; color only the part that carries meaning, e.g. the live path through a tree or timeline.
 - [ ] Destructive actions use semantic red; success, warning, and error colors are semantic, not brand choices.
 - [ ] Brand colors that fail contrast are darkened (or swapped to an analogous role) for text and buttons.
-- [ ] Interactive states: hover slightly lighter, pressed slightly darker, disabled desaturated.
+- [ ] Interactive states: hover lighter, pressed darker, disabled desaturated, and each one visibly different from rest. Hover and pressed fills differ from the resting fill by ≥ 0.04 OKLCH lightness (about 1.1:1 contrast between the two fills), or the state adds a visible border, underline, or shadow change. Check it in both themes from zoomed captures of rest, hover, and pressed placed side by side; a change you can't see in the shot doesn't count.
 - [ ] Dark mode is designed, not inverted: surfaces get lighter as they elevate, with larger steps between layers than in light mode (≈4–6% vs ≈2%); text is off-white, not pure white; brand colors are desaturated and use a lighter ramp step.
 
 ### Typography
@@ -48,6 +48,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] More space above a heading than below it.
 - [ ] Nothing causes horizontal scroll at 320px wide.
 - [ ] Controls that sit in one row (button next to input, copy box, select, tab) share one height token and one radius. Measure the rendered heights; padding plus an inner button easily adds 10px.
+- [ ] Chips, badges, and tags inline with text sit on the text baseline: the row uses `align-items: baseline`, and the icon inside a chip uses `align-self: center`. Check in a zoomed capture that the chip label and the neighbouring text share one baseline.
 
 ### Theming variables
 - [ ] A CSS variable that callers are told to set ("set `--card-padding`") is never re-declared on the component's own root element; a value set there beats anything a parent sets. Read it with a fallback (`padding: var(--card-padding, 16px)`), or put the default on `:root` or a zero-specificity `:where()` wrapper.
@@ -65,7 +66,8 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Every data view has loading, empty, error, and success states.
 - [ ] Focus ring is visible on every background: ≥ 2px, ≥ 3:1 contrast, offset 2px.
 - [ ] Meaning shown on hover (tooltips, hover cards) is also in the control's accessible name or visible text; hover is never the only way to learn it.
-- [ ] Touch targets ≥ 44×44px (visible mark may be smaller; pad the hit area; Fitts' law).
+- [ ] Touch targets ≥ 44×44px (Fitts' law). When the visible mark is smaller, keep its size and enlarge only the hit area with an overlay: `position: relative` on the control and `::after { content: ""; position: absolute; inset: -8px; }` (pick the inset that reaches 44px). Don't use `min-height`/padding that bloats a visible chip or icon button. In wrapped rows and stacked lists, hit areas must not overlap: each side's overlay extends at most half the gap to the next target; if that can't reach 44px, widen the gap, not the mark.
+- [ ] Images have one fallback look: a missing URL, a failed load, and the loading state show the same placeholder at the final size. Loading never shows the error or broken-image icon, not even for a frame; start in the placeholder and swap only on `load`.
 - [ ] Data-driven components survive worst-case data ([patterns/worst-case-data.md](patterns/worst-case-data.md)): long and one-letter names, unbreakable emails, 0/1/1,000 items, missing images, locale-formatted numbers.
 
 ### Mobile platform

@@ -37,16 +37,19 @@ Start from the resolved target (URL, screenshot, file path, or feature name; see
    ```bash
    node <skill dir>/scripts/capture.mjs <url> --out .pristine/captures/<label>
    ```
-   Options: `--selector "<css>"` to scope to a section, `--full` for full-page, `--wait <ms>` for late content, `--zoom 4` to render at 4× pixel density (use with `--selector`), `--dark-class dark` when dark mode is toggled by a class on `<html>` rather than `prefers-color-scheme`, and `--label before|after`. The script finds Playwright in the project or installs it into a user cache. It writes four PNGs and a `capture.json` saying whether dark mode actually differs from light.
+   Options: `--selector "<css>"` to scope to a section, `--full` for full-page, `--wait <ms>` for late content, `--zoom 4` to render at 4× pixel density (use with `--selector`), `--dark-class dark` (or `--dark-attr data-theme=dark`) when dark mode is toggled on `<html>` rather than by `prefers-color-scheme`, `--state hover|focus|active` with `--selector` to capture an interaction state, `--pad <px>` to widen a scoped shot so a tooltip or menu outside the element is included, and `--label before|after`. The script finds Playwright in the project or installs it into a user cache. It writes four PNGs and a `capture.json` with each cell's visible background colour and luminance, whether dark differs from light, and whether dark actually applied (`dark.applied`).
 3. **Ask the user** for screenshots of the missing cells. Name exactly which ones.
 
 Never silently skip. If every route fails, say so in the report: **"Not visually verified: <reason>"**, and lower your confidence accordingly.
+
+**Say "verified" only for what you checked under the user's real conditions:** the current build (not a stale bundle or an old dev server), a warm cache like a returning visitor's, and the theme and device mechanism the user actually uses. Anything else gets named for what it was: "checked in the dev server with a cold cache", "checked from the code, not rendered".
 
 ## Step 3: Drive each cell
 
 With a harness browser tool:
 - **Viewport**: set it to 1440×900, then 390×844. If the tool can't resize, use device emulation, or a narrow window.
 - **Theme**: emulate `prefers-color-scheme: dark` (DevTools emulation), or flip the site's own theme toggle, or the class from DESIGN.md / code (`html.dark`, `[data-theme="dark"]`).
+- **Confirm dark actually applied** before judging a dark cell. Read the computed background colour of the visible page (`getComputedStyle(document.body).backgroundColor`, or the topmost opaque element at the viewport centre): its relative luminance must be ≤ 0.4 and differ from the light cell. If it's still light, the toggle didn't take (a theme script may have overwritten it, or the site uses another mechanism); fix the toggle and re-capture, never judge a light screenshot as dark. The bundled script does this check and warns.
 - Scroll top to bottom once so lazy content and scroll-triggered animations settle, then capture. Capture full page when the target is a page; capture the element when the target is a section. Scroll with `behavior: "instant"` and confirm `scrollY` is back at 0 before a full-page shot: on pages with `scroll-behavior: smooth`, a plain `scrollTo(0, 0)` animates, and the shot shows the sticky header covering the content, which is not a real bug.
 - **Wait out deliberate delays.** Tooltips, hover cards, and menus often open after a delay (some libraries default to 600ms or more). Before calling a hover state missing, read the component library's default delay or the props in the code, wait longer than that, and check the DOM for the opened element.
 - **Wait for hydration before interacting.** Components that hydrate when scrolled into view ignore early clicks. Scroll the element into view, then wait for a hydration signal (an attached handler, a removed `data-pending` or skeleton, or `networkidle` plus a short settle) before clicking or recording.
@@ -58,7 +61,7 @@ With a harness browser tool:
   Take 2–3 frames (start, middle, end) to judge an animation's path. CSS transitions and animations both show up in `getAnimations()`.
 - **Zoom in on small things.** The Capture Matrix sizes are whole-page layouts; a 12px status dot, icon, badge, or focus ring can't be judged from them. Take a zoomed pass of each small element that matters to the verdict, scoped to it, at 3–4×: `--selector "<css>" --zoom 4` with the bundled script, or the browser tool's device-scale/zoom setting plus an element screenshot. Judge shape, alignment, anti-aliasing, and contrast from the zoomed shot, and size and weight from the normal one.
 - **Capture the cramped places too.** Small containers (preview cards, sidebars, popovers, embedded widgets, a 208px-tall card) need their own scoped pass at their real size; a full-page shot hides their clipping.
-- For interaction states that matter to the verdict (hover, focus, open menu, error), capture those too.
+- **Capture interaction states.** For each kind of interactive element on the surface (button, link, chip, row, input), capture rest, hover, pressed, and focus-visible, plus any tooltip, menu, or error state it has. With the bundled script: `--selector "<css>" --state hover --pad 48 --zoom 3`. A state you didn't capture can't be scored ([critique.md](critique.md) → Calibration).
 
 ## Step 4: Decide which cells exist
 

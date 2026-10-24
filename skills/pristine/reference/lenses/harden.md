@@ -78,7 +78,7 @@ Before editing, read the Personas' locales, devices, connection quality, and rol
    - **empty:** explain why (first use, no results, filters, no permission) and offer the next action;
    - **error:** inline near the cause, preserve user input, offer retry; do not blank the whole page when one widget fails;
    - **partial:** show what loaded and mark what failed;
-   - **missing media:** fallback avatars (initials or neutral) and image placeholders with fixed dimensions; `object-fit: cover` plus `aspect-ratio` for odd-shaped images; fall back on load error, not only on a missing URL;
+   - **missing media:** fallback avatars (initials or neutral) and image placeholders with fixed dimensions; `object-fit: cover` plus `aspect-ratio` for odd-shaped images; one fallback look for missing URL, load error, and loading (same placeholder, same size), and loading never flashes the error icon;
    - **feedback channel:** field and section errors inline; transient errors, warnings, and background results as toasts (announced).
 4. **Map API errors:** 400 → field errors; 401 → re-auth preserving work; 403 → explain permission and who can grant it; 404 → not-found state with a way back; 409 → conflict resolution; 429 → wait time; 5xx → retry + support path.
 5. **Concurrency:** disable and show progress on submit buttons during requests; debounce search (~300ms); abort stale requests; optimistic updates roll back visibly on failure.
@@ -99,7 +99,7 @@ Before editing, read the Personas' locales, devices, connection quality, and rol
 - [ ] User input survives validation and network errors.
 - [ ] Submit cannot fire twice.
 - [ ] Inputs accept spaces, separators, casing, and paste the system can normalize; stored and displayed values are normalized.
-- [ ] Missing avatars and images fall back cleanly; 0 items and huge numbers hold.
+- [ ] Missing, failed, and loading images share one fallback, with no error icon while loading; 0 items and huge numbers hold.
 - [ ] Destructive actions are red and confirmed or undoable.
 - [ ] Every API error status maps to a specific, recoverable state.
 - [ ] RTL layout mirrors correctly using logical properties.

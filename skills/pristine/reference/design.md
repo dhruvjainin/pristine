@@ -20,7 +20,7 @@ If the user only wants the existing UI to be better without changing its look, t
 
 1. Read `DESIGN.md`. If it's missing, gather the minimum from the conversation and the code: what the product does, who the primary Persona is, and what this surface must achieve. Ask only for what you can't infer, one question at a time. For a fresh target with no product context at all, suggest `/pristine init` first, but don't block on it.
 2. Identify the mode (Persuade / Operate / Read / Experience, see [critique.md](critique.md)) and read the matching pattern files the same way critique Step 1.3 does. Always read [patterns/vibe-code-tells.md](patterns/vibe-code-tells.md): a fresh design must start without them.
-3. Read the code around the target: framework, styling approach, tokens, shared components, and similar screens. Build with what the project already uses. Ask before adding a dependency (library, font, icon set).
+3. Read the code around the target: framework, styling approach, tokens, shared components, and similar screens. Build with what the project already uses: before drawing any component, search the system for one with the same job (component folders, Storybook, the UI library; search by role such as `Tooltip`, `Chip`, `Avatar`, `IconButton`) and reuse or extend it. Ask before adding a dependency (library, font, icon set).
 4. Resolve where the work lives. For a fresh target named by feature ("pricing page", "onboarding"), choose the route and file location from the project's conventions and state them.
 5. **Redesign case only**: write an inventory of what must survive: every feature, piece of factual copy, link, form field, state, route, analytics or test hook, and keyboard behavior. This is the regression checklist for Step 5.
 
@@ -67,7 +67,7 @@ Rules:
 
 1. Run the project's type-check/lint/build if they exist and are fast. Fix what you broke.
 2. Run the detector on the new or edited files. Fix real findings.
-3. Run an **after** Capture across the Capture Matrix (`--label after`), including the key interaction states. For a redesign, compare it with the before-Capture.
+3. Run an **after** Capture across the Capture Matrix (`--label after`), including rest, hover, pressed, focus-visible, and tooltip/menu states of each kind of control; confirm the dark cells really rendered dark. For a redesign, compare it with the before-Capture.
 4. **Redesign case only**: walk the Step 1 inventory. Every item must still be present and still work.
 5. Score it honestly with the critique Dimensions. If it falls short of Level 8 for its mode, fix the biggest gaps, then re-capture **once**.
 6. Apply polish's verify rules ([polish.md](polish.md) Step 5): run the affected tests with specific selectors, justify any accepted detector finding in the report, open any regenerated visual baselines, and update the docs, tokens prose, and references that describe what changed.
@@ -76,7 +76,7 @@ Rules:
 
 ```markdown
 ## Pristine Design (<fresh | redesign>): <target> (<route>; files: <created/edited files>)
-**Direction: <name>** · **Score: <before → >Y/10** · Level: <n> · Captured: <cells> (paths)
+**Direction: <name>** · **Score: <before → >Y/10** · Level: <n> · Captured: <cells and states> (paths) · Not captured: <states, or "none">
 
 ### What was built
 - <structure, signature moment, and the system changes (tokens and DESIGN.md)>
