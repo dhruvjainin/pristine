@@ -55,3 +55,13 @@ Captivating = **structure first, then purposeful motion, then one well-built sur
 ## Mobile
 
 Re-compose for 390px; don't just stack. The hero visual still shows the product, crop it tighter. Nav collapses to a menu with the CTA still visible.
+
+## Interactive product demos
+
+- Inventory the visible demo navigation from the rendered sidebar, tabs and menus, not from the screens already implemented. Visit 100% of those destinations at 390px and 1440px in both themes before scoring the whole demo.
+- Every destination has a non-empty page title and meaningful content or an intentional empty state with a next action. A blank panel fails even if its composer and navigation still work.
+- From every secondary page, switch the top-level example. The selected example, title and body must all change together. One owner controls the selected page; a stale local selection must not override it.
+- Suggested tasks and typed requests use the same entry path. Click a suggestion and verify the destination, exact draft, focus and send state. A prefilled but permanently disabled composer is a broken action.
+- Navigation starts new pages at the top without resetting user edits. Keep manual scroll position only when returning to the same view by an explicit back action.
+- On narrow screens, page-specific actions move to a second header row before either the title or action label clips. Verify each action's full label and focus ring at 390px.
+- Separate blocked live services from editable presentation work. Report a live-service blocker, but finish the independent demo screens. Do not award a requested score to an uncaptured state or use the blocker to excuse unrelated gaps.

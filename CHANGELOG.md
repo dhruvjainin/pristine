@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6
+
+- Interactive demos require a rendered navigation inventory with 100% destination coverage across both themes and screen sizes.
+- Verify example switching from secondary pages, suggestion-to-chat handoff, page scroll reset and unclipped narrow-screen header actions.
+- Keep live-service blockers separate from independent presentation work. These checks require browser state and are not inferred from a static scan.
+
 ## 0.2.5
 
 - Craft floor: finished preflight tool steps fold to one header row once live agents, results or an approval appear; running steps and failures stay open, and the folded row reopens by click and keyboard.
