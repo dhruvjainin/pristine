@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5
+
+- Craft floor: finished preflight tool steps fold to one header row once live agents, results or an approval appear; running steps and failures stay open, and the folded row reopens by click and keyboard.
+- `detect.mjs`: new `open-finished-tools` warning for `ToolActivity variant="stepper"` in a file that also renders `AgentFanout` (advisory; it can't tell whether the stepper sits above the fanout).
+
 ## 0.2.4
 
 - Craft floor: a background refresh, poll or revalidation never inserts or removes content that moves the page; only a first load with no data may show a loading block.

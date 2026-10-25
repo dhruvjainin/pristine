@@ -119,6 +119,14 @@ for (const file of files) {
     }
   }
 
+  if (/\.(jsx|tsx|vue|svelte|astro)$/.test(file) && /<AgentFanout\b/.test(text)) {
+    const stepperRe = /<ToolActivity\b(?:[^<>]|=>)*?\bvariant\s*=\s*["']stepper["']/g;
+    let s;
+    while ((s = stepperRe.exec(text))) {
+      add(file, text.slice(0, s.index).split("\n").length, "warn", "open-finished-tools", "ToolActivity variant=\"stepper\" in a file that also renders AgentFanout: finished tool steps stay open and push the agents below the fold. Use the collapsible variant so settled tools fold to one row. Possible false positive if this ToolActivity never sits above the fanout.");
+    }
+  }
+
   if (!isTokenFile && hexCount >= 8) add(file, 0, "warn", "hardcoded-colors", `${hexCount} hard-coded hex colors outside token files: route through Design System tokens.`);
 
   // same-rule contrast for CSS-ish blocks
