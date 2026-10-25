@@ -61,6 +61,7 @@ With a harness browser tool:
   Take 2–3 frames (start, middle, end) to judge an animation's path. CSS transitions and animations both show up in `getAnimations()`.
 - **Zoom in on small things.** The Capture Matrix sizes are whole-page layouts; a 12px status dot, icon, badge, or focus ring can't be judged from them. Take a zoomed pass of each small element that matters to the verdict, scoped to it, at 3–4×: `--selector "<css>" --zoom 4` with the bundled script, or the browser tool's device-scale/zoom setting plus an element screenshot. Judge shape, alignment, anti-aliasing, and contrast from the zoomed shot, and size and weight from the normal one.
 - **Capture the cramped places too.** Small containers (preview cards, sidebars, popovers, embedded widgets, a 208px-tall card) need their own scoped pass at their real size; a full-page shot hides their clipping.
+- **Watch live surfaces for movement.** If the surface polls or refreshes in the background (progress, sync status, live counts), keep it open for 10–15 seconds with no input and sample the top offset of the main list or table every frame (`getBoundingClientRect().top` in a `setInterval` of 16ms). Confirm at least one background request actually happened: count calls by wrapping `window.fetch` *after* load, because in-page mocks replace `fetch` and the network tab never sees them. Any change in offset, or any status text that flashes in and out, fails **Background work never moves the page** ([craft-floor.md](craft-floor.md)). Still screenshots can't catch this.
 - **Capture interaction states.** For each kind of interactive element on the surface (button, link, chip, row, input), capture rest, hover, pressed, and focus-visible, plus any tooltip, menu, or error state it has. With the bundled script: `--selector "<css>" --state hover --pad 48 --zoom 3`. A state you didn't capture can't be scored ([critique.md](critique.md) → Calibration).
 
 ## Step 4: Decide which cells exist
@@ -71,5 +72,7 @@ With a harness browser tool:
 ## Step 5: Look properly
 
 For each image, check before writing anything: first-glance focal point, hierarchy, alignment, spacing rhythm, text overflow/wrapping, contrast, cut-off or overlapping elements, horizontal scroll on mobile, theme-specific bugs (invisible borders, unreadable text, images with white boxes in dark).
+
+**Unasked-for error states are bugs, not states.** If a capture shows an error, "could not load", or empty state that the scenario didn't ask for, stop: find the failing request (console, network, mock handler) and fix the data or route before scoring. Then capture the success state with realistic data. Never score a section that you have only seen failing or empty.
 
 Keep screenshots under `.pristine/captures/` (suggest adding `.pristine/` to `.gitignore`). Reference them by path in reports.

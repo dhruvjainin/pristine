@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.4
+
+- Craft floor: a background refresh, poll or revalidation never inserts or removes content that moves the page; only a first load with no data may show a loading block.
+- Capture: watch polling surfaces for 10–15 seconds, sample the list's position every frame, and confirm a background request happened by wrapping `fetch` after load (in-page mocks hide it from the network tab).
+- `detect.mjs`: new `background-refresh-shift` warning for `isFetching`/`refreshing`/`isValidating && <p|div|…>`.
+
+## 0.2.3
+
+- Capture: an error, "could not load" or empty state the scenario didn't ask for is a bug to fix (failing request, mock or route) before scoring, then the success state is captured with realistic data.
+- Critique: a section seen only failing or empty counts as uncaptured and caps the overall Score at 7.
+
+## 0.2.2
+
+- Craft floor: when the UI acts on or counts a set of items, the user can see that list and each item's state on the same page; sibling providers list their items alike.
+- Critique: a parity check compares sibling surfaces (one per provider, plan or record type) and makes anything missing from one of them a finding.
+
+## 0.2.1
+
+- Craft floor: every action must look clickable at rest in a still capture; a lone text-only ghost button that reads as body text fails.
+- Critique: a cold read of each still capture asks "can I click this?" for every line of text; an action that reads as text caps the overall Score at 7.
+- `detect.mjs`: new `ghost-text-action` warning for text-only ghost/link buttons of three or more words, across multi-line JSX.
+
 ## 0.2.0
 
 - Scoring: a state that exists but wasn't captured (hover, pressed, tooltip, focus-visible, dark, loading/empty/error) caps its Dimension at 6 and the overall Score at 7. Reports list what wasn't captured.
