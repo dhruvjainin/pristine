@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+- Craft floor: a background refresh, poll or revalidation never inserts or removes content that moves the page; only a first load with no data may show a loading block.
+- Capture: watch polling surfaces for 10–15 seconds, sample the list's position every frame, and confirm a background request happened by wrapping `fetch` after load (in-page mocks hide it from the network tab).
+- `detect.mjs`: new `background-refresh-shift` warning for `isFetching`/`refreshing`/`isValidating && <p|div|…>`.
+
 ## 0.2.3
 
 - Capture: an error, "could not load" or empty state the scenario didn't ask for is a bug to fix (failing request, mock or route) before scoring, then the success state is captured with realistic data.
