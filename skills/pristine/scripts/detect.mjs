@@ -102,6 +102,15 @@ for (const file of files) {
     if (!isTokenFile) hexCount += (line.match(/#[0-9a-fA-F]{3,8}\b(?![\w-])/g) || []).filter((h) => /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(h)).length;
   });
 
+  if (/\.(jsx|tsx|vue|svelte|astro)$/.test(file)) {
+    const ghostRe = /<(\w+)\b((?:[^<>]|=>)*?\bvariant\s*=\s*["'](?:ghost|link)["'](?:[^<>]|=>)*?)>\s*([^<{}]+?)\s*<\/\1>/g;
+    let g;
+    while ((g = ghostRe.exec(text))) {
+      if (g[3].split(/\s+/).length < 3) continue;
+      add(file, text.slice(0, g.index).split("\n").length, "warn", "ghost-text-action", `Text-only ghost/link action "${g[3].slice(0, 40)}": at rest it can read as body text. Check the still capture; use outline or add an icon unless it sits in a group of actions.`);
+    }
+  }
+
   if (!isTokenFile && hexCount >= 8) add(file, 0, "warn", "hardcoded-colors", `${hexCount} hard-coded hex colors outside token files: route through Design System tokens.`);
 
   // same-rule contrast for CSS-ish blocks

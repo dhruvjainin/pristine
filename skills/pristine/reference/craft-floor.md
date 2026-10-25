@@ -63,6 +63,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 
 ### States
 - [ ] Every interactive element has default, hover, focus-visible, active, and disabled states.
+- [ ] **Clickable at rest.** In a still capture with no hover, every action is recognisable as an action: a fill, a border, an icon, or link styling (underline or accent colour) distinct from nearby body text. A borderless ghost button is allowed only in a group of actions or a toolbar, or as an icon button; never as the only action in a row, and never in the same colour and weight as the text around it. Its text must align with the content edge it sits under (no ghost padding indent).
 - [ ] Every data view has loading, empty, error, and success states.
 - [ ] Focus ring is visible on every background: ≥ 2px, ≥ 3:1 contrast, offset 2px.
 - [ ] Meaning shown on hover (tooltips, hover cards) is also in the control's accessible name or visible text; hover is never the only way to learn it.

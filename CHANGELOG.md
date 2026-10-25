@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Craft floor: every action must look clickable at rest in a still capture; a lone text-only ghost button that reads as body text fails.
+- Critique: a cold read of each still capture asks "can I click this?" for every line of text; an action that reads as text caps the overall Score at 7.
+- `detect.mjs`: new `ghost-text-action` warning for text-only ghost/link buttons of three or more words, across multi-line JSX.
+
 ## 0.2.0
 
 - Scoring: a state that exists but wasn't captured (hover, pressed, tooltip, focus-visible, dark, loading/empty/error) caps its Dimension at 6 and the overall Score at 7. Reports list what wasn't captured.

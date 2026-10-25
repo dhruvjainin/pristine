@@ -26,7 +26,7 @@ Verify every detector finding in context; drop false positives.
 ## Step 3: Walk through as each Persona
 
 For each Persona in DESIGN.md (max 3), and on the device they actually use:
-1. **First 5 seconds**: what do they see first? Do they know what this is, and what to do? Then the **skeleton test**: blur or squint at the capture; grouping and the one focal point must still read.
+1. **First 5 seconds**: what do they see first? Do they know what this is, and what to do? Then the **skeleton test**: blur or squint at the capture; grouping and the one focal point must still read. Then the **cold read**: in each still capture, for every line of text, answer "can I click this?" without the code. An action that reads as text, or text that reads as an action, is a P1 finding.
 2. **Primary task**: walk it step by step. Where do they hesitate, misread, or get stuck?
 3. **Deal-breakers**: does anything trigger the Persona's listed deal-breakers?
 4. **Delight**: anything they'd remember or share?
@@ -76,6 +76,7 @@ Rules:
 - The **overall Score is a judgment, not an average.** It's capped by the worst blocker: any Dimension ≤3 caps overall at 6; any craft-floor ban ([craft-floor.md](craft-floor.md)) present caps overall at 7.
 - Generic "AI-template" look (the craft-floor slop tells) can't score above 6 on Persona fit for a Persuade surface.
 - Each vibe-code tell ([patterns/vibe-code-tells.md](patterns/vibe-code-tells.md)) is a finding. Three or more tells cap the overall Score at 6.
+- An action that fails the cold read (looks like plain text at rest) caps Hierarchy & clarity at 6 and the overall Score at 7. Knowing from the code that it is a button doesn't count.
 - The overall Score can't exceed the surface's Level by more than 1.
 - **Don't score what you haven't seen.** A state that exists on the surface but wasn't captured caps the Dimensions that depend on it at 6, and the overall Score at 7: hover, pressed, and tooltip/menu-open states for Motion & interaction; focus-visible for Accessibility; dark mode (when supported) for Color & theming; loading, empty, and error for Robustness. Reading the CSS doesn't count. List the uncaptured states in the report header and lift the cap only after capturing them.
 - Don't inflate to be kind. Don't deflate to seem tough. If it's good, say why precisely.
