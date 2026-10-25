@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- Capture: an error, "could not load" or empty state the scenario didn't ask for is a bug to fix (failing request, mock or route) before scoring, then the success state is captured with realistic data.
+- Critique: a section seen only failing or empty counts as uncaptured and caps the overall Score at 7.
+
 ## 0.2.2
 
 - Craft floor: when the UI acts on or counts a set of items, the user can see that list and each item's state on the same page; sibling providers list their items alike.

@@ -72,4 +72,6 @@ With a harness browser tool:
 
 For each image, check before writing anything: first-glance focal point, hierarchy, alignment, spacing rhythm, text overflow/wrapping, contrast, cut-off or overlapping elements, horizontal scroll on mobile, theme-specific bugs (invisible borders, unreadable text, images with white boxes in dark).
 
+**Unasked-for error states are bugs, not states.** If a capture shows an error, "could not load", or empty state that the scenario didn't ask for, stop: find the failing request (console, network, mock handler) and fix the data or route before scoring. Then capture the success state with realistic data. Never score a section that you have only seen failing or empty.
+
 Keep screenshots under `.pristine/captures/` (suggest adding `.pristine/` to `.gitignore`). Reference them by path in reports.

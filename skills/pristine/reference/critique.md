@@ -77,6 +77,7 @@ Rules:
 - Generic "AI-template" look (the craft-floor slop tells) can't score above 6 on Persona fit for a Persuade surface.
 - Each vibe-code tell ([patterns/vibe-code-tells.md](patterns/vibe-code-tells.md)) is a finding. Three or more tells cap the overall Score at 6.
 - An action that fails the cold read (looks like plain text at rest) caps Hierarchy & clarity at 6 and the overall Score at 7. Knowing from the code that it is a button doesn't count.
+- A section seen only in an error or empty state it wasn't meant to be in is uncaptured: it caps the overall Score at 7 until its success state is captured.
 - The overall Score can't exceed the surface's Level by more than 1.
 - **Don't score what you haven't seen.** A state that exists on the surface but wasn't captured caps the Dimensions that depend on it at 6, and the overall Score at 7: hover, pressed, and tooltip/menu-open states for Motion & interaction; focus-visible for Accessibility; dark mode (when supported) for Color & theming; loading, empty, and error for Robustness. Reading the CSS doesn't count. List the uncaptured states in the report header and lift the cap only after capturing them.
 - Don't inflate to be kind. Don't deflate to seem tough. If it's good, say why precisely.
