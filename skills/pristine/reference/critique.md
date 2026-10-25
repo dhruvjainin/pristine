@@ -26,7 +26,7 @@ Verify every detector finding in context; drop false positives.
 ## Step 3: Walk through as each Persona
 
 For each Persona in DESIGN.md (max 3), and on the device they actually use:
-1. **First 5 seconds**: what do they see first? Do they know what this is, and what to do? Then the **skeleton test**: blur or squint at the capture; grouping and the one focal point must still read. Then the **cold read**: in each still capture, for every line of text, answer "can I click this?" without the code. An action that reads as text, or text that reads as an action, is a P1 finding.
+1. **First 5 seconds**: what do they see first? Do they know what this is, and what to do? Then the **skeleton test**: blur or squint at the capture; grouping and the one focal point must still read. Then the **cold read**: in each still capture, for every line of text, answer "can I click this?" without the code. An action that reads as text, or text that reads as an action, is a P1 finding. Then the **parity check**: for each set of sibling surfaces (one per provider, plan, or record type), list what each shows; anything one sibling shows and another lacks is a finding.
 2. **Primary task**: walk it step by step. Where do they hesitate, misread, or get stuck?
 3. **Deal-breakers**: does anything trigger the Persona's listed deal-breakers?
 4. **Delight**: anything they'd remember or share?

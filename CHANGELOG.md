@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+
+- Craft floor: when the UI acts on or counts a set of items, the user can see that list and each item's state on the same page; sibling providers list their items alike.
+- Critique: a parity check compares sibling surfaces (one per provider, plan or record type) and makes anything missing from one of them a finding.
+
 ## 0.2.1
 
 - Craft floor: every action must look clickable at rest in a still capture; a lone text-only ghost button that reads as body text fails.
