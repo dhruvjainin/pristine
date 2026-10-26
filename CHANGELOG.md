@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.8
+
+- Capture the full chat lifecycle, including pending sends, incremental replies, interruptions and restored sends, rather than treating route coverage as chat coverage.
+- Require one native progress indicator per pending reply and no first-run welcome during active or recovering conversations.
+- Prove streaming before completion with delayed transport chunks; verify replay deduplication, retained text and zero resend requests on reconnect.
+- These are runtime checks. Static placeholder matches cannot prove which indicators render together or whether text arrived incrementally.
+
 ## 0.2.7
 
 - Capture embedded, expanded and standalone entry points separately, including mobile title and action bounds after handoff.

@@ -74,6 +74,12 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Images have one fallback look: a missing URL, a failed load, and the loading state show the same placeholder at the final size. Loading never shows the error or broken-image icon, not even for a frame; start in the placeholder and swap only on `load`.
 - [ ] Data-driven components survive worst-case data ([patterns/worst-case-data.md](patterns/worst-case-data.md)): long and one-letter names, unbreakable emails, 0/1/1,000 items, missing images, locale-formatted numbers.
 
+### Conversation lifecycle
+- [ ] **One reply, one progress indicator.** Reuse the design system's thinking or activity component. Before the first response text, each pending reply has exactly one visible progress indicator with an accessible name, not separate "Thinking" and "Working" placeholders. On confirmed completion, cancellation or failure, it has zero.
+- [ ] **Empty history is not a new conversation.** The first-run welcome is absent while sending, loading an existing conversation, restoring an interrupted send, streaming or recovering from an error. An empty existing conversation has its own empty state. A loading failure never replaces retained messages with the welcome screen.
+- [ ] **Streaming must be observed before completion.** Delay two real transport chunks and the terminal event independently. The first chunk must render while the second and terminal event are withheld; the second must extend the same reply. Revealing a completed answer with timers does not pass. If previews are unavailable for a conversation type, report that limit and preserve its permission checks.
+- [ ] **Recovery preserves identity and text.** Drop and reconnect the stream after the first chunk, then replay an event. Previously shown text remains, replay adds no duplicate text, and terminal history leaves exactly one final reply. Reconnecting alone creates zero send requests. Navigating to a new conversation closes the old subscription and cannot leak its partial reply.
+
 ### Mobile platform
 - [ ] Inputs ≥ 16px font; zoom never disabled.
 - [ ] Full-height layouts use `dvh`/`svh`, not `vh`; fixed bars respect `env(safe-area-inset-*)`.
