@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.14
+
+- Check newly inserted live tool/status labels during entrance motion, not only after settling: readable small text must maintain 4.5:1 contrast from its first visible frame.
+- Inspect ancestor opacity as well as text colors. Remove label fades through a scoped component token when needed; retain unrelated motion and never mask the failure with delayed accessibility checks.
+- This requires rendered frames and composited colors; a static opacity match cannot establish contrast or which text is visible.
+
 ## 0.2.13
 
 - Require subtree exclusions in shared CSS to preserve selector specificity and the computed styles of unaffected routes.

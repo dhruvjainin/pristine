@@ -22,6 +22,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Large text (≥ 24px, or ≥ 18.66px bold): ≥ 3:1.
 - [ ] Icons, input borders, control boundaries, and focus indicators: ≥ 3:1.
 - [ ] Every pair passes in light AND dark theme, and in hover, active, selected, and disabled states (disabled is exempt from contrast, but must still be recognizable).
+- [ ] **Live labels are readable on arrival.** Sample each animation frame from insertion through completion for running and completed tool/status labels in both themes. Composite text and ancestor opacity against the actual background; small text must maintain at least 4.5:1 from its first visible frame. A settled screenshot or a delayed accessibility check cannot establish this. If a native component fades the label through low contrast, use its scoped motion token or remove only that label's fade; retain unrelated spinner motion. Do not suppress contrast checks or wait away a real transient failure.
 - [ ] Text on colored surfaces uses a tint or shade of that surface's hue, or the foreground color at reduced opacity. Never neutral gray on color.
 
 ### Color system
