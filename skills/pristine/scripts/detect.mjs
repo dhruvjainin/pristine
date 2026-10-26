@@ -144,6 +144,11 @@ for (const file of files) {
     const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
     let m;
     while ((m = ruleRe.exec(text))) {
+      for (const exclusion of m[1].matchAll(/:not\(\s*[.#][\w-]+\s+\*\s*\)/g)) {
+        if (/:where\(\s*$/.test(m[1].slice(0, exclusion.index))) continue;
+        const line = text.slice(0, m.index + exclusion.index).split("\n").length;
+        add(file, line, "warn", "subtree-exclusion-specificity", "Subtree :not() adds selector specificity even outside the excluded subtree. Use :where(:not(...)) when preserving the cascade; compare computed styles on unaffected routes. This narrow scan does not prove a regression.");
+      }
       const body = m[2];
       const fg = body.match(/(?:^|;|\s)color\s*:\s*([^;!]+)/);
       const bg = body.match(/background(?:-color)?\s*:\s*([^;!]+)/);

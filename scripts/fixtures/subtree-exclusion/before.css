@@ -1,0 +1,7 @@
+.page p:not(.embedded *) {
+  margin: 0;
+}
+
+.page .pricing-note {
+  margin-top: 22px;
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.13
+
+- Require subtree exclusions in shared CSS to preserve selector specificity and the computed styles of unaffected routes.
+- Add `subtree-exclusion-specificity`, a narrow warning for `:not(.scope *)` and ID equivalents outside an immediate `:where(...)` wrapper.
+- Add before/after fixtures proving the old exclusion is flagged and its zero-specificity wrapper passes. Runtime captures still establish whether a cascade regression occurs.
+
 ## 0.2.12
 
 - Verify exactly one exposed level-one heading in each composed document, including embedded applications after hydration and navigation. Inspect the actual tags rendered by shared headers, not their component names.

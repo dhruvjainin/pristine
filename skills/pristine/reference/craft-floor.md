@@ -52,6 +52,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Chips, badges, and tags inline with text sit on the text baseline: the row uses `align-items: baseline`, and the icon inside a chip uses `align-self: center`. Check in a zoomed capture that the chip label and the neighbouring text share one baseline.
 
 ### Theming variables
+- [ ] **Subtree exclusions do not strengthen shared rules.** Adding `:not(.embedded *)` also adds class specificity, even on unrelated routes. Prefer `:where(:not(.embedded *))` when exclusion must preserve the original cascade. Record the before/after specificity and compare computed typography and spacing on one excluded subtree and one unaffected route using the shared stylesheet. Unaffected values must remain equal to their pre-change baseline; a passing demo alone is insufficient.
 - [ ] A CSS variable that callers are told to set ("set `--card-padding`") is never re-declared on the component's own root element; a value set there beats anything a parent sets. Read it with a fallback (`padding: var(--card-padding, 16px)`), or put the default on `:root` or a zero-specificity `:where()` wrapper.
 - [ ] Docs, props, and comments name only variables that truly work from outside. Test one by overriding it from a parent.
 - [ ] Portaled content (popovers, tooltips, menus, dialogs rendered into `body`) doesn't inherit variables set on the component's DOM ancestors. Set the needed variables on the portaled element itself, or define them at `:root` or the theme scope.
