@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.9
+
+- Require real tool activity before the answer, with no extra generic thinking indicator during tool execution.
+- Verify receipt identity, replay and attempt isolation, reload persistence, and preservation of authorized metadata omissions.
+- Extend chat captures to running, completed and failed tool calls. Allow parallel tool states within one activity region.
+- These checks require event and history fixtures. A static scan cannot establish whether the backend supplies tool receipts or permits their metadata.
+
 ## 0.2.8
 
 - Capture the full chat lifecycle, including pending sends, incremental replies, interruptions and restored sends, rather than treating route coverage as chat coverage.
