@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.11
+
+- Require SSR/first-client tree parity on direct entry, handoff, reload of the marked history entry, and Back/Forward restoration, with zero hydration errors.
+- Verify retained editor node identity, draft and selection during live handoff, the intended standalone layout on reload, and no navigation-triggered duplicate sends.
+- Add the narrow `history-render-parity` warning for browser-guarded scalar `history.state` assignments immediately selecting returned JSX. It does not establish SSR or detect every render-time read; history handlers and guarded transition state remain allowed.
+- Add dependency-free detector fixtures: the old render is flagged, while server-matching initial state with observed path-transition handling and ordinary history handlers pass (`node scripts/test-detect.mjs`).
+
 ## 0.2.10
 
 - Chart axis rule: a line chart's plotted span must fill at least half of the axis range, so a fixed range cannot leave the plot mostly empty.

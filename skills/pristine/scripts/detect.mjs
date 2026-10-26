@@ -103,6 +103,16 @@ for (const file of files) {
   });
 
   if (/\.(jsx|tsx|vue|svelte|astro)$/.test(file)) {
+    // Deliberately narrow: a scalar history read immediately chooses returned JSX.
+    const historyRenderRe = /\b(?:const|let)\s+(\w+)\s*=\s*([^;{}]*\bhistory\s*(?:\?\.|\.)\s*state\b[^;{}]*);\s*return\s+\(?\s*\1\s*\?\s*\(?\s*</g;
+    let h;
+    while ((h = historyRenderRe.exec(text))) {
+      if (!/\btypeof\s+window\s*!==?\s*["']undefined["']/.test(h[2]) || /=>/.test(h[2])) continue;
+      add(file, text.slice(0, h.index).split("\n").length, "warn", "history-render-parity", "Browser-guarded history.state selects returned JSX. If server-rendered, a marker retained on reload can change the first client tree; verify zero hydration errors on that same history entry. Use server-matching initial state and an observed in-document transition for handoff-only layout. This narrow scan does not prove SSR or cover all render-time reads.");
+    }
+  }
+
+  if (/\.(jsx|tsx|vue|svelte|astro)$/.test(file)) {
     const ghostRe = /<(\w+)\b((?:[^<>]|=>)*?\bvariant\s*=\s*["'](?:ghost|link)["'](?:[^<>]|=>)*?)>\s*([^<{}]+?)\s*<\/\1>/g;
     let g;
     while ((g = ghostRe.exec(text))) {
