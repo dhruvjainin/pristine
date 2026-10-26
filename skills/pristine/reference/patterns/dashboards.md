@@ -47,6 +47,7 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 - Bar count matches the data's real granularity. No smoothed or faded lines that misstate values; no rounded-top bars floating without axes.
 - Series colors: generate in OKLCH stepping hue by ~25–30°, keeping series ≥10 lightness points apart so they survive grayscale and color-blindness; equal lightness and chroma only when every series is directly labeled. Highlight one series with the accent, mute the rest.
 - Legends close to the data, or label lines directly.
+- Set the y-axis range from the data. For a line chart, (max − min of the plotted values) ÷ (axis max − axis min) ≥ 0.5, rounded to even ticks. A fixed range that parks the series in the bottom fifth leaves the plot mostly empty. Bar charts start at 0.
 
 ## Overlays: pick by task weight
 

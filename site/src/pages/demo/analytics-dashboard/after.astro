@@ -10,7 +10,7 @@ const last = n - 1;
 const rate = signups.map((s, i) => (activated[i] / s) * 100);
 
 const metrics = {
-  rate: { label: "Activation rate", values: rate, min: 30, max: 45, step: 5, unit: "pct" },
+  rate: { label: "Activation rate", values: rate, min: 32, max: 44, step: 4, unit: "pct" },
   signups: { label: "Signups", values: signups, min: 800, max: 1400, step: 200, unit: "int" },
   mrr: { label: "MRR", values: mrr, min: 42000, max: 50000, step: 2000, unit: "usd" },
 };

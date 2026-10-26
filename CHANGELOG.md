@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10
+
+- Chart axis rule: a line chart's plotted span must fill at least half of the axis range, so a fixed range cannot leave the plot mostly empty.
+- Before/after comparisons and recordings must use the same emulated theme in both cells, checked with `dark.applied`.
+- A static scan cannot read series data or the visitor's OS theme, so neither rule has a `detect.mjs` check.
+
 ## 0.2.9
 
 - Require real tool activity before the answer, with no extra generic thinking indicator during tool execution.
