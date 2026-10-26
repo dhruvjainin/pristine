@@ -59,6 +59,7 @@ Re-compose for 390px; don't just stack. The hero visual still shows the product,
 ## Interactive product demos
 
 - Inventory the visible demo navigation from the rendered sidebar, tabs and menus, not from the screens already implemented. Visit 100% of those destinations at 390px and 1440px in both themes before scoring the whole demo.
+- If a component has embedded, expanded or standalone entry points, treat each as a separate capture target. Shared JSX does not prove shared layout. At 390px, check each title and action group's bounding box stays inside the header; actions must not require horizontal scrolling. Cap long chat titles at two lines and check the same controls after handoff.
 - Every destination has a non-empty page title and meaningful content or an intentional empty state with a next action. A blank panel fails even if its composer and navigation still work.
 - From every secondary page, switch the top-level example. The selected example, title and body must all change together. One owner controls the selected page; a stale local selection must not override it.
 - Suggested tasks and typed requests use the same entry path. Click a suggestion and verify the destination, exact draft, focus and send state. A prefilled but permanently disabled composer is a broken action.

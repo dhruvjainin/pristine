@@ -62,6 +62,7 @@ Open the Capture and look before touching code. Run these checks in order.
 
 ## Rules
 - [ ] Every text element maps to a named role; no stray px values.
+- [ ] Measure `getComputedStyle(heading).fontSize` after fonts and styles settle in every entry point and matrix cell. It must match the role's declared size (within 1px), or its declared fluid range. A declaration is not evidence when a generic heading selector wins the cascade; fix scope or specificity at the owning role, not by overriding library typography globally.
 - [ ] Heading, body, label, and caption distinguishable in a blurred Capture.
 - [ ] Body ≥ 16px, line-height 1.5–1.7, measure ≤ 75ch (dense desktop data/secondary text may be 13–14px; inputs never < 16px).
 - [ ] Hierarchy uses 3 text tints + weight + size, not size alone.

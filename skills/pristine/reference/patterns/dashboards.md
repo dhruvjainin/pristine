@@ -35,6 +35,8 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 - Row actions: one primary inline action at most; the rest in a triple-dot menu or on row hover (with a keyboard/touch path).
 - A text button repeated on every row ("Edit", "Copy", "Open") is a finding in tool-style UIs: make it an icon button with a tooltip and an `aria-label` that names the row ("Edit invoice 1042"). Keep text only when no icon is unambiguous for the action, or when it's the row's single primary action and the column has room.
 - Sticky header on long tables. Empty, loading (skeleton rows), and no-results states designed.
+- Exercise a successful connected response with an empty array, separately from offline, loading and error states. After loading settles, require a visible explanation and one usable next action; invoke it and check the destination and preserved draft without auto-submission.
+- A one-column name catalog must have `scrollWidth <= clientWidth + 1` at 390px, including its longest name. Do not inherit a multi-column table's minimum width. True column tables may scroll inside their own container, never the page.
 - Prefer pagination or "Load more" over infinite scroll when anything (footer, totals) lives below.
 
 ## Charts

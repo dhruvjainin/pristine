@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.7
+
+- Capture embedded, expanded and standalone entry points separately, including mobile title and action bounds after handoff.
+- Verify successful connected empty arrays with a usable next action, distinct from offline and failed requests.
+- Measure rendered heading sizes against their declared roles and reject pointless horizontal scrolling in one-column catalogs.
+- These checks use browser state and computed layout. Static selectors alone cannot establish whether they pass.
+
 ## 0.2.6
 
 - Interactive demos require a rendered navigation inventory with 100% destination coverage across both themes and screen sizes.
