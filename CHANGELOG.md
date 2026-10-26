@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.12
+
+- Verify exactly one exposed level-one heading in each composed document, including embedded applications after hydration and navigation. Inspect the actual tags rendered by shared headers, not their component names.
+- Require capability-limited controls to match the effective backend operation across primary and quick composers, stored preferences and handoffs. Check the selected label and new-send payload; replay preserves the original payload and request ID.
+- These checks require the composed DOM and the runtime capability/transport contract. A source-only scan cannot establish which headings coexist or which model the backend actually executes.
+
 ## 0.2.11
 
 - Require SSR/first-client tree parity on direct entry, handoff, reload of the marked history entry, and Back/Forward restoration, with zero hydration errors.
