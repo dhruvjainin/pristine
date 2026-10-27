@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.15
+
+- Require silent bot checks to have no challenge panel until a provider interaction callback or error; keep required challenges mounted, visible and keyboard-usable.
+- Separate editable drafts from server-verified send gating across main, quick and handoff composers. Preserve editor identity, draft, focus and replay payloads; callbacks and retries must not queue or duplicate sends.
+- Require runtime captures of silent, interactive, expired, error/retry and verified states, including a held server response after token delivery. Label fixtures separately from public verification; no speculative static detector is added.
+
 ## 0.2.14
 
 - Check newly inserted live tool/status labels during entrance motion, not only after settling: readable small text must maintain 4.5:1 contrast from its first visible frame.
