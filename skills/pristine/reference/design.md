@@ -5,7 +5,7 @@
 - **Fresh**: the UI doesn't exist yet (a new page, section, component, or flow).
 - **Redesign**: the UI exists and the user wants a new look, not just a better version of the current one.
 
-Both cases offer 2–3 **Directions**, build the one the user picks, and verify it visually. **It edits code.**
+Both cases offer 2–3 **Directions** (as side-by-side mocks when they differ in layout), build the one the user picks, and verify it visually. **It edits code.**
 
 | | Fresh | Redesign |
 |---|---|---|
@@ -50,6 +50,7 @@ Rules:
 - Stay inside DESIGN.md's Brand and Design System unless the user asked for a new look; for a redesign, at least one Direction should keep the brand recognizable.
 - Ground every choice in the Personas or the brief. "Modern and clean" is not a reason.
 - Mark one as **Recommended**, list it first, and say why in one line.
+- **Show them, don't only describe them.** When the Directions differ in layout or structure, build a mock of each and open them side by side as A, B, C, with the Recommended one marked, per [patterns/direction-mocks.md](patterns/direction-mocks.md). Skip the mocks when the Directions differ only in non-visual ways (copy tone, motion) or when the user named a direction or gave a reference image.
 - Present them with the harness's choice UI. If the user already named a direction ("make it brutalist", "like our marketing site"), turn that into a single Direction, state it in two lines, and proceed without asking.
 - **A reference image fixes the look, not the behavior.** When the user says "make it like this screenshot", skip the Directions, but don't guess what a still image can't show. Before building, list what the image leaves open: how states change (idle, running, success, error), what moves and how (a pulse, a spin, a progress sweep, nothing), hover and focus, and loading. Ask **one** question about motion and state behavior, offering 2–3 concrete options with a recommended one first (e.g. for a "running" status: 1. a slow opacity pulse, 2. a rotating dashed ring, 3. static with a label). Ask more only if another open behavior would change the build.
 

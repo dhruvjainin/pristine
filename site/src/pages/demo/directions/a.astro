@@ -1,0 +1,48 @@
+---
+import Frame from "../../../components/demo/directions/Frame.astro";
+const rows = [
+  ["Accounts included", "1", "3", "All"],
+  ["Extra account", "$4.99", "$4.99", "none"],
+  ["Invoices", "All", "All", "All"],
+  ["Tax reports", "No", "Yes", "Yes"],
+];
+---
+<Frame title="Direction A: Ledger">
+<style>
+  header { display: grid; gap: 8px; margin-bottom: 24px; }
+  .wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+  thead th { vertical-align: bottom; }
+  tbody th { font-weight: 500; color: var(--ink-2); }
+  tbody tr:last-child > * { border-bottom: 0; }
+  .plan { display: block; font-weight: 600; }
+  .price { font: 500 1.75rem/1.1 "Fraunces Variable", serif; }
+  .price small { font: 400 0.8125rem "Inter Variable", sans-serif; color: var(--ink-3); }
+  tfoot td { padding-block: 16px; border-top: 1px solid var(--line); }
+  tfoot .btn { padding: 0 10px; width: 100%; }
+  .price { font-size: 1.5rem; }
+</style>
+<header>
+  <p class="eyebrow">Ledgerline pricing</p>
+  <h1>Compare every plan in one glance.</h1>
+  <p class="lede">All plans start with 30 days free. No card.</p>
+</header>
+<div class="wrap" role="region" aria-label="Plan comparison" tabindex="0">
+  <table>
+    <caption class="eyebrow" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Plans, billed annually</caption>
+    <thead>
+      <tr>
+        <td></td>
+        <th scope="col"><span class="plan">Starter</span><span class="price num">$12<small>/mo</small></span></th>
+        <th scope="col"><span class="plan">Pro</span><span class="price num">$28<small>/mo</small></span></th>
+        <th scope="col"><span class="plan">Business</span><span class="price num">$56<small>/mo</small></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => <tr><th scope="row">{r[0]}</th>{r.slice(1).map((c) => <td class="num">{c}</td>)}</tr>)}
+    </tbody>
+    <tfoot><tr><td></td><td><a class="btn btn--quiet" href="#">Start</a></td><td><a class="btn" href="#">Start</a></td><td><a class="btn btn--quiet" href="#">Start</a></td></tr></tfoot>
+  </table>
+</div>
+</Frame>

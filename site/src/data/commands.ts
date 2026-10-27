@@ -18,9 +18,9 @@ export const commands = [
   {
     name: "design",
     usage: '/pristine design "a pricing page for teams"',
-    does: "Builds new UI from scratch, or redesigns existing UI in a new direction. Offers 2 to 3 Directions, builds the one you pick, keeps every feature on a redesign.",
+    does: "Builds new UI from scratch, or redesigns existing UI in a new direction. Shows 2 to 3 Directions as side-by-side mocks, builds the one you pick, keeps every feature on a redesign.",
     when: "Nothing exists yet, or the current look can't be polished to a 10.",
-    out: ["2 to 3 written Directions to choose from", "Production code to the craft floor, in light and dark, desktop and mobile", "A preserved-features checklist on redesigns"],
+    out: ["2 to 3 Directions as mocks, side by side, to choose from", "Production code to the craft floor, in light and dark, desktop and mobile", "A preserved-features checklist on redesigns"],
     edits: true,
   },
   {

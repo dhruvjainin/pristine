@@ -1,0 +1,33 @@
+---
+import Frame from "../../../components/demo/directions/Frame.astro";
+---
+<Frame title="Direction C: Letter">
+<style>
+  .grid { display: grid; gap: 32px; }
+  .copy { display: grid; gap: 16px; align-content: start; }
+  .copy .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px; }
+  .proof { color: var(--ink-3); font-size: 0.875rem; }
+  ul { list-style: none; padding: 0; display: grid; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  li { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 16px; border-bottom: 1px solid var(--line); }
+  li:last-child { border-bottom: 0; }
+  li b { font-weight: 600; }
+  li span { color: var(--ink-3); font-size: 0.875rem; }
+  li .price { grid-row: 1 / span 2; grid-column: 2; align-self: center; font: 500 1.375rem/1 "Fraunces Variable", serif; color: var(--ink); }
+  @container (min-width: 560px) { .grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+  main { container-type: inline-size; }
+</style>
+<div class="grid">
+  <div class="copy">
+    <p class="eyebrow">Ledgerline pricing</p>
+    <h1>Books that close themselves. From $12 a month.</h1>
+    <p class="lede">Start free for 30 days. No card. Cancel in one click.</p>
+    <div class="row"><a class="btn" href="#">Start free</a><a class="btn btn--quiet" href="#">Talk to us</a></div>
+    <p class="proof">Pro is the plan most small teams pick.</p>
+  </div>
+  <ul aria-label="Plans, billed annually">
+    <li><b>Starter</b><span>1 bank account</span><span class="price num">$12</span></li>
+    <li><b>Pro</b><span>3 accounts, sales tax reports</span><span class="price num">$28</span></li>
+    <li><b>Business</b><span>Unlimited accounts</span><span class="price num">$56</span></li>
+  </ul>
+</div>
+</Frame>
