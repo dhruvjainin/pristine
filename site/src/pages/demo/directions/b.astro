@@ -18,6 +18,7 @@ const fit: Record<number, string> = { 1: "starter", 3: "pro", 6: "pro", 12: "bus
   .opts label { display: inline-flex; align-items: center; justify-content: center; min-width: 56px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; font-variant-numeric: tabular-nums; }
   .opts input:checked + label { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
   .plans { display: grid; gap: 12px; }
+  @media (min-width: 900px) { .plans { grid-template-columns: repeat(3, 1fr); } .plan { align-content: start; } }
   .plan { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
   .plan h2 { font-size: 1rem; font-weight: 600; }
   .plan .note { color: var(--ink-3); font-size: 0.875rem; }

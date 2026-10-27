@@ -13,8 +13,7 @@ import Frame from "../../../components/demo/directions/Frame.astro";
   li b { font-weight: 600; }
   li span { color: var(--ink-3); font-size: 0.875rem; }
   li .price { grid-row: 1 / span 2; grid-column: 2; align-self: center; font: 500 1.375rem/1 "Fraunces Variable", serif; color: var(--ink); }
-  @container (min-width: 560px) { .grid { grid-template-columns: 1fr 1fr; align-items: start; } }
-  main { container-type: inline-size; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; } }
 </style>
 <div class="grid">
   <div class="copy">

@@ -9,7 +9,7 @@ Used by `design` Step 3 (fresh and redesign). The user sees 2–3 rendered Direc
    - Uses the real copy, the DESIGN.md tokens (inlined as CSS custom properties), and the real fonts the project already loads. No lorem ipsum, no new fonts or dependencies.
    - Renders without JS and without network. Inline CSS only, at most 250 lines per file.
    - Stays within the Direction's limits: same brand, content, and behavior (on a redesign). The Directions differ in **structure** (order, grid, density, where the primary action sits), not in shade. Three color swaps of one layout is one option.
-   - Works at 390px and at 480px wide: the page shows each in a column about that wide.
+   - Lays out for a **desktop viewport (1280×800)**. The page renders each mock at 1280px wide and scales it down to fit its column, so a mock that only has a mobile layout shows as a narrow strip. Mock the mobile layout only when the target is mobile-only (a `mobile-web` surface), and then render it at 390×844.
 3. Mark one **Recommended**. Say why in one line, tied to the primary Persona.
 4. Name each option in 1–2 words (e.g. `Calm`, `Dense`, `Split`).
 

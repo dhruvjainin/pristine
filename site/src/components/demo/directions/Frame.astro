@@ -21,9 +21,10 @@ const { title } = Astro.props;
     :root { --bg: #101417; --surface: #171d21; --ink: #eef1f3; --ink-2: #b9c0c6; --ink-3: #98a1a9; --line: #2a3238; --accent: #86bde3; --on-accent: #0c1a24; --accent-soft: #17303f; }
   }
   *, *::before, *::after { box-sizing: border-box; }
-  body { margin: 0; padding: 24px; background: var(--bg); color: var(--ink); font: 400 15px/1.55 "Inter Variable", system-ui, sans-serif; }
+  body { margin: 0; padding: clamp(24px, 5vw, 64px); background: var(--bg); color: var(--ink); font: 400 15px/1.55 "Inter Variable", system-ui, sans-serif; }
+  main { max-width: 1120px; margin: 0 auto; }
   h1, h2, h3, p, ul, dl, dd { margin: 0; }
-  h1 { font: 500 clamp(1.75rem, 5.5cqi + 0.5rem, 2.5rem)/1.08 "Fraunces Variable", Georgia, serif; letter-spacing: -0.02em; text-wrap: balance; }
+  h1 { font: 500 clamp(1.75rem, 4vw, 3rem)/1.08 "Fraunces Variable", Georgia, serif; letter-spacing: -0.02em; text-wrap: balance; }
   .eyebrow { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
   .lede { color: var(--ink-2); max-width: 46ch; }
   .num { font-variant-numeric: tabular-nums; }

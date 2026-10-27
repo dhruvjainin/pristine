@@ -123,7 +123,8 @@ const install = "npx skills add maddhruv/pristine";
         {directions.map((d) => (
           <li class:list={["dir", { "is-rec": d.rec }]}>
             <h3 class="dir__h"><span class="dir__tag mono" aria-hidden="true">{d.tag}</span>{d.name}{d.rec && <span class="dir__rec mono">Recommended</span>}</h3>
-            <iframe class="dir__frame" src={`/demo/directions/${d.tag.toLowerCase()}`} title={`Direction ${d.tag}: ${d.name}, a live Ledgerline pricing mock`} loading="lazy"></iframe>
+            <div class="dir__view"><iframe class="dir__frame" scrolling="no" src={`/demo/directions/${d.tag.toLowerCase()}`} title={`Direction ${d.tag}: ${d.name}, a live Ledgerline pricing mock`} loading="lazy"></iframe></div>
+            <a class="dir__open" href={`/demo/directions/${d.tag.toLowerCase()}`}>Open {d.tag} full size</a>
             <p class="dir__why">{d.why}</p>
           </li>
         ))}
@@ -314,6 +315,17 @@ const install = "npx skills add maddhruv/pristine";
   }
 </script>
 
+<script>
+  const fit = () => document.querySelectorAll<HTMLElement>(".dir__view").forEach((v) => {
+    const k = v.clientWidth / 1280;
+    v.classList.add("is-scaled");
+    v.style.height = `${600 * k}px`;
+    (v.firstElementChild as HTMLElement).style.transform = `scale(${k})`;
+  });
+  fit();
+  addEventListener("resize", fit);
+</script>
+
 <style>
   .hero { padding-block: var(--s-7) var(--s-9); }
   .hero__copy { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
@@ -369,7 +381,10 @@ const install = "npx skills add maddhruv/pristine";
   .dir__h { display: flex; align-items: center; gap: var(--s-2); font-size: var(--text-md, 1.0625rem); margin: 0; }
   .dir__tag { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8125rem; }
   .dir__rec { margin-left: auto; padding: 2px 8px; border-radius: 99px; background: var(--ok); color: var(--paper); font-size: 0.75rem; }
-  .dir__frame { width: 100%; height: 500px; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); }
+  .dir__view { height: 220px; overflow: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); }
+  .dir__view.is-scaled { overflow: hidden; }
+  .dir__frame { display: block; width: 1280px; height: 600px; border: 0; transform-origin: 0 0; }
+  .dir__open { font-size: var(--text-sm); }
   .dir__why { margin: 0; color: var(--ink-2); font-size: var(--text-sm); }
   .ask { margin: var(--s-5) 0 0; padding: var(--s-5); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface-2); overflow-x: auto; line-height: 1.7; }
   @media (max-width: 960px) { .dirs { grid-template-columns: 1fr; } }

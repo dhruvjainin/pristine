@@ -4,6 +4,7 @@
 
 - `design` and redesign now show their 2–3 Directions as real HTML mocks in a browser, side by side as A, B, C with one marked Recommended, then ask the user to pick in the harness's choice UI. Skipped when the Directions are not visual, or the user named a direction or gave a reference image.
 - Add `scripts/compare.mjs` (Node built-ins only) and `reference/patterns/direction-mocks.md`.
+- Mocks render at a desktop viewport (1280×800) scaled to fit each column, so they never show as mobile strips; mobile only for mobile-only targets. Rule in `direction-mocks.md`, enforced by `compare.mjs`.
 - Add a live Directions example to the site.
 
 ## 0.2.16
