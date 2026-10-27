@@ -1,6 +1,6 @@
 {
   "name": "pristine",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "description": "Make web UI pristine: write DESIGN.md, critique any page out of 10 through your users' eyes, design new pages, and polish existing ones with real screenshots before and after.",
   "author": {
     "name": "maddhruv",

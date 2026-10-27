@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.17
+
+- Add `polish compare`: builds 3 real HTML mocks of one layout decision, opens them side by side tagged A, B, C with one marked Recommended, and asks the user to pick before any code is edited. Opt-in only.
+- Add `scripts/compare.mjs` (Node built-ins only) and `reference/patterns/compare-mocks.md`.
+
 ## 0.2.16
 
 - Require provider/brand summaries to contain each brand once, in first-seen order, with matching accessible names and unique badge keys. Preserve distinct tool action IDs and helper agents.

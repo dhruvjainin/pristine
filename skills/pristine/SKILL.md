@@ -19,7 +19,7 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 | `/pristine init` | Learn the product, Personas, and Design System; write `DESIGN.md` | [reference/init.md](reference/init.md) |
 | `/pristine critique [target]` | Score the target out of 10 per Dimension, through the Personas, with the fixes to reach 10/10. No edits. | [reference/critique.md](reference/critique.md) |
 | `/pristine design [target]` | Build new UI from scratch, or redesign existing UI in a new Direction (keeping its content and behavior): offer 2–3 Directions, build the chosen one. Edits code. | [reference/design.md](reference/design.md) |
-| `/pristine polish [lens…] [target]` | Diagnose, then apply the Lenses that raise the Score, keeping the current look. Edits code. | [reference/polish.md](reference/polish.md) |
+| `/pristine polish [lens…|compare] [target]` | Diagnose, then apply the Lenses that raise the Score, keeping the current look. Edits code. | [reference/polish.md](reference/polish.md) |
 | `/pristine [target]` or any other design request | Routes by intent (below) to design or polish | — |
 
 **Intent routing** for a bare invocation or a plain-language request:
@@ -33,7 +33,7 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 
 If the request is truly ambiguous between a redesign and a polish, ask once. Otherwise state the route in one line and proceed. If polish finds the target below Level 6 (a template-level surface), recommend `/pristine design` in its report instead of quietly redesigning.
 
-Pattern files in `reference/patterns/` (landing pages, dashboards and charts, mobile web, onboarding and signup, vibe-code tells, motion recipes, worst-case data) are loaded by `critique`, `design`, and `polish` based on the surface's mode and the Lenses in play.
+Pattern files in `reference/patterns/` (landing pages, dashboards and charts, mobile web, onboarding and signup, vibe-code tells, motion recipes, worst-case data, compare mocks) are loaded by `critique`, `design`, and `polish` based on the surface's mode and the Lenses in play.
 
 ## Target
 
@@ -57,7 +57,7 @@ Routing rules:
 1. Load exactly one playbook above and follow it step by step.
 2. `critique` never edits files. `design` and `polish` always edit files.
 3. If `DESIGN.md` is missing, every command except `init` still runs (use the code as the Design System and generic Personas), then offer `/pristine init` at the end. Never block on it.
-4. Lens words after `polish` (e.g. `polish bolder animate`) force those Lenses. Valid Lenses are listed in [reference/polish.md](reference/polish.md).
+4. Lens words after `polish` (e.g. `polish bolder animate`) force those Lenses. Valid Lenses are listed in [reference/polish.md](reference/polish.md). `polish compare` is not a Lens: it adds a step that shows 3 mocks side by side (A, B, C) and lets the user pick before editing ([reference/patterns/compare-mocks.md](reference/patterns/compare-mocks.md)).
 
 ## Non-negotiables (every command)
 

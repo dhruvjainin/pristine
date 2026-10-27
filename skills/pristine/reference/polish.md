@@ -51,6 +51,10 @@ Conflicts: never apply **bolder + quieter** or **colorize + decolorize** togethe
 
 If the baseline Level is below 6 (template-level), polish can't reach 10/10 on its own. Still apply the Lenses, but recommend `/pristine design` (redesign) under "Still short of 10/10".
 
+### Compare mode (`polish compare`)
+
+Only when the user wrote `compare`. After Step 3, follow [patterns/compare-mocks.md](patterns/compare-mocks.md): build 3 HTML mocks, open them side by side as A, B, C with one marked Recommended, and let the user pick in the harness's choice UI. Do not edit project code until they pick. The pick becomes the layout plan for Step 4. Without `compare`, never run this step.
+
 ## Step 4: Apply
 
 1. Read [craft-floor.md](craft-floor.md) once before the first edit.
