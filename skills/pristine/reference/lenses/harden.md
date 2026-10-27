@@ -21,6 +21,7 @@ The Capture usually shows perfect data. Look at it, then actively try to break i
 **2. Empty the database, then overfill it.**
 - With 0 items, is there a blank area, or an explanation and a next action? First use, no results, filters, and no permission are different empty states.
 - With 1 item, exactly a page size and page size + 1, and 1,000+ items, does the list still look designed? Does a select with 50+ options stay usable?
+- For provider/brand summaries (such as `AgentFanout.tools`), try three distinct actions from one brand, a second brand, and an action with no brand. Deduplicate only the derived summary, in first-seen order: `[...new Set(actions.flatMap(action => action.brand ? [action.brand] : []))]`. Expect exactly two badges and each brand named once in the accessible summary, with zero duplicate-key console warnings. Inspect the shared badge component's key source. Keep every distinct tool action ID and helper agent; never deduplicate action rows by brand or hide the warning with index keys. The detector flags direct projections, not actual duplicate data; aliases, upstream uniqueness and the rendered result require inspection.
 
 **3. Unplug the network.**
 - Go offline, throttle to slow 3G, force a timeout. Does loading show nothing, or shift the layout when content arrives?

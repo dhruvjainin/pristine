@@ -130,6 +130,16 @@ for (const file of files) {
   }
 
   if (/\.(jsx|tsx|vue|svelte|astro)$/.test(file) && /<AgentFanout\b/.test(text)) {
+    const summaryRe = /<AgentFanout\b(?:[^<>]|=>)*?\s+tools\s*=\s*\{\s*[\w$]+(?:\s*\.\s*[\w$]+)*\s*\.\s*(map|flatMap)\(\s*\(?\s*([\w$]+)\s*\)?\s*=>\s*([^{};]*?)\)\s*\}/g;
+    let summary;
+    while ((summary = summaryRe.exec(text))) {
+      const body = summary[3].replace(/\s+/g, "");
+      const projection = summary[1] === "map"
+        ? body.match(/^([\w$]+)\.(brand|provider)$/)
+        : body.match(/^([\w$]+)\.(brand|provider)\?\[\1\.\2\]:\[\]$/);
+      if (!projection || projection[1] !== summary[2]) continue;
+      add(file, text.slice(0, summary.index).split("\n").length, "warn", "duplicate-brand-summary", "AgentFanout.tools directly projects brands/providers without uniqueness. Repeated operations can duplicate badge keys, icons and accessible names. Deduplicate only the derived summary in first-seen order; preserve tool action IDs and helper agents. Verify upstream uniqueness and rendered output; this narrow scan does not follow aliases or prove duplicates.");
+    }
     const stepperRe = /<ToolActivity\b(?:[^<>]|=>)*?\bvariant\s*=\s*["']stepper["']/g;
     let s;
     while ((s = stepperRe.exec(text))) {

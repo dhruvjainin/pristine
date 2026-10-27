@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.16
+
+- Require provider/brand summaries to contain each brand once, in first-seen order, with matching accessible names and unique badge keys. Preserve distinct tool action IDs and helper agents.
+- Add `duplicate-brand-summary`, a narrow warning for direct brand/provider `map` or conditional `flatMap` projections passed to `AgentFanout.tools`. Verify actual duplicates at runtime; the scan does not follow aliases or prove upstream uniqueness.
+- Add fixtures proving the repeated-brand projection is flagged, Set-wrapped summaries pass, and action lists are not flagged.
+
 ## 0.2.15
 
 - Require silent bot checks to have no challenge panel until a provider interaction callback or error; keep required challenges mounted, visible and keyboard-usable.
