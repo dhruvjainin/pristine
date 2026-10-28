@@ -56,6 +56,14 @@ Captivating = **structure first, then purposeful motion, then one well-built sur
 
 Re-compose for 390px; don't just stack. The hero visual still shows the product, crop it tighter. Nav collapses to a menu with the CTA still visible.
 
+## Reusable template catalogs
+
+- Record the actual card, outcome, preview, logo-role and setup-section selectors before judging. At 390px and 1440px in both supported themes, inspect 100% of rendered template cards, scrolling through the catalog. Each card must show a business outcome and a preview without a click or hover; titles, resource counts and decorative icons alone do not pass.
+- Each preview must show at least two source-derived fields, records or steps. Trace each displayed item to the template definition or approved example and record the source path. Use the template's actual labels and relationships; do not invent results, execution status or a connected service. Label example content as a preview, not a live workspace.
+- Every third-party logo must have an adjacent visible role label, such as publisher or style reference, and an accessible name identifying the brand. Verify the role against its source. For style references, state beside the mark that there is no affiliation or connection; never present them as customers, partners or integrations. Omit an unsupported mark rather than guessing its role. A logo does not satisfy the preview requirement.
+- On the 390px detail page, verify that the outcome and at least one complete preview appear before long setup requirements. Compare the rendered preview's bottom edge with the setup section's top edge; the preview must end first. A download control may precede the preview, but must not bring the entire requirements section ahead of it.
+- Record a pass or failure for each card and detail page using captures and source traces. Source fidelity, logo roles and visual ordering require this evidence; a static image, icon or selector-presence check cannot prove the gate.
+
 ## Interactive product demos
 
 - Inventory the visible demo navigation from the rendered sidebar, tabs and menus, not from the screens already implemented. Visit 100% of those destinations at 390px and 1440px in both themes before scoring the whole demo.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.5
+
+- Require every reusable-template card to show a business outcome and a preview with at least two source-derived fields, records or steps, verified across desktop and mobile captures.
+- Label third-party logo roles truthfully, distinguish style references from affiliations or connections, and keep mobile detail previews before long setup requirements.
+- Verify these semantic rules with source traces and rendered evidence, not a speculative static detector.
+
 ## 0.3.4
 
 - Preserve resource type when simplifying task labels. Type cues remain visible and accessible independently of pending, running and completed status.
