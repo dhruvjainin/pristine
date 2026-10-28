@@ -31,6 +31,7 @@ Open the Capture for two or three screens that share components and look before 
 - Are all icons from one library, with one stroke weight and one fill style (outline vs solid), on one size grid? Mixed sets, stroke widths, or fills look like clip art. A second style is acceptable only in a visually separate area (e.g. marketing illustrations vs app chrome).
 - Are emoji or Unicode glyphs standing in for icons?
 - Do icons align optically with adjacent text the same way everywhere?
+- Does a mixed-resource list preserve each item's type after its title is simplified? A clock, spinner or check communicates state, not type. Trace each type to the exact icon component or shared mapping already used in navigation and resource views; a similar icon from the same library is not parity.
 
 **6. Words.**
 - Is the same action named the same everywhere ("Delete" / "Remove" / "Trash" is three concepts to the user)? Does the primary nav CTA use the same label as the hero CTA?
@@ -81,6 +82,7 @@ Open the Capture for two or three screens that share components and look before 
 - [ ] One implementation per component concept; variants are props, not copies.
 - [ ] Every component variant has default, hover, focus-visible, active, disabled, and loading states.
 - [ ] One icon library, one stroke width, one fill style, sizes on the 16/20/24 grid; no emoji or glyphs as icons.
+- [ ] Mixed-resource rows expose type independently of state. For every supported type, compare the rendered icon and source mapping with the existing navigation or resource view, then check one pending and one completed row: the type cue persists while the status changes. The row's accessible name or description includes the type; hover alone is insufficient. Verify at desktop/mobile widths in both themes. Reuse an existing mapping when available, and never label a resource type as an owner to fit the wrong component slot.
 - [ ] One small-component radius everywhere; nested corners follow inner = outer − gap (pills exempt).
 - [ ] The same action has the same label, icon, and style everywhere; nav CTA label matches the hero CTA.
 - [ ] One capitalization style across headings, buttons, and labels.

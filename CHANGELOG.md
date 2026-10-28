@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.3.4
+
+- Preserve resource type when simplifying task labels. Type cues remain visible and accessible independently of pending, running and completed status.
+- Reuse exact navigation/resource icons and existing mappings, not lookalikes or ownership metadata. Verify source parity and rendered pending/completed rows across themes and widths.
+- These checks require the application's type mapping and live component output; no speculative static detector is added.
+
+## 0.3.3
+
+- Verify reference hierarchy through real child data, not just component choice. Group counts must match execution leaves; grouping preserves task identity, order, dependencies and final verification.
+- Require readable action/display-name labels with technical identity in expandable details.
+- Add `raw-task-title`, a narrow warning for direct kind/key title templates in files referencing plan/tree components, with before/after fixtures. Grouping and live-state fidelity still require rendered checks.
+
+## 0.3.2
+
+- Record component placement per journey stage, not one container for the whole task. An in-chat action can keep controls in the transcript while its structured progress belongs in the existing canvas.
+- Verify the exact requested design-system import, placement inside its assigned region and zero duplicate full views elsewhere. Reuse native side-panel and mobile behavior instead of substituting an inline copy.
+
+## 0.3.1
+
+- Treat the requested action surface as an acceptance criterion, not a layout choice. Record discovery and execution routes plus the execution-container selector before editing.
+- Verify that inputs, approvals, progress and completion stay in that real container. A separate form or chat-styled page does not satisfy an in-conversation action.
+- Check the journey from its actual entry point and after reload, retaining the server operation ID with no new execution or review on navigation. This requires the user brief and runtime evidence; a static source pattern cannot establish it.
+
 ## 0.3.0
 
 - `design` and redesign now show their 2–3 Directions as real HTML mocks in a browser, side by side as A, B, C with one marked Recommended, then ask the user to pick in the harness's choice UI. Skipped when the Directions are not visual, or the user named a direction or gave a reference image.
