@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+- Verify reference hierarchy through real child data, not just component choice. Group counts must match execution leaves; grouping preserves task identity, order, dependencies and final verification.
+- Require readable action/display-name labels with technical identity in expandable details.
+- Add `raw-task-title`, a narrow warning for direct kind/key title templates in files referencing plan/tree components, with before/after fixtures. Grouping and live-state fidelity still require rendered checks.
+
 ## 0.3.2
 
 - Record component placement per journey stage, not one container for the whole task. An in-chat action can keep controls in the transcript while its structured progress belongs in the existing canvas.

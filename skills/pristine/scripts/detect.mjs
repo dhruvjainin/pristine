@@ -147,6 +147,14 @@ for (const file of files) {
     }
   }
 
+  if (/\.(jsx?|tsx?|vue|svelte|astro)$/.test(file) && /\b(?:PlanOutline|TaskTree)\b/.test(text)) {
+    const rawTitleRe = /\btitle\s*:\s*`\$\{([\w$]+)\.(?:kind|type)\}:\s*\$\{\1\.(?:key|id)\}`/g;
+    let task;
+    while ((task = rawTitleRe.exec(text))) {
+      add(file, text.slice(0, task.index).split("\n").length, "warn", "raw-task-title", "Plan/tree task title directly combines a resource kind and storage key. Use a display name and action; keep technical identity in expandable details. This narrow scan does not follow aliases or prove which component receives the title; inspect the rendered preview and live plan.");
+    }
+  }
+
   if (!isTokenFile && hexCount >= 8) add(file, 0, "warn", "hardcoded-colors", `${hexCount} hard-coded hex colors outside token files: route through Design System tokens.`);
 
   // same-rule contrast for CSS-ish blocks

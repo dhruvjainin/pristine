@@ -52,3 +52,20 @@ for (const [name, expected] of [["before", 4], ["after", 0], ["non-summary", 0]]
   }
 }
 console.log("✓ duplicate-brand-summary: old projections flagged; unique summaries and action lists pass");
+
+for (const [name, expected] of [["before", 2], ["after", 0], ["diagnostics", 0]]) {
+  const output = execFileSync(process.execPath, [
+    "skills/pristine/scripts/detect.mjs",
+    `scripts/fixtures/task-titles/${name}.tsx`,
+    "--json",
+  ], { cwd: root, encoding: "utf8" });
+  const result = JSON.parse(output);
+  assert.equal(result.scanned, 1);
+  const findings = result.findings.filter((finding) => finding.rule === "raw-task-title");
+  assert.equal(findings.length, expected, `${name}: readable task titles`);
+  if (expected) {
+    assert.deepEqual(findings.map((finding) => finding.line), [6, 14]);
+    assert.ok(findings.every((finding) => finding.severity === "warn"));
+  }
+}
+console.log("✓ raw-task-title: raw titles flagged; readable names, detail keys and diagnostics pass");
