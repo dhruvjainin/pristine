@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- Treat the requested action surface as an acceptance criterion, not a layout choice. Record discovery and execution routes plus the execution-container selector before editing.
+- Verify that inputs, approvals, progress and completion stay in that real container. A separate form or chat-styled page does not satisfy an in-conversation action.
+- Check the journey from its actual entry point and after reload, retaining the server operation ID with no new execution or review on navigation. This requires the user brief and runtime evidence; a static source pattern cannot establish it.
+
 ## 0.3.0
 
 - `design` and redesign now show their 2–3 Directions as real HTML mocks in a browser, side by side as A, B, C with one marked Recommended, then ask the user to pick in the harness's choice UI. Skipped when the Directions are not visual, or the user named a direction or gave a reference image.
