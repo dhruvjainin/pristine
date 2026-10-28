@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4
+
+- Preserve resource type when simplifying task labels. Type cues remain visible and accessible independently of pending, running and completed status.
+- Reuse exact navigation/resource icons and existing mappings, not lookalikes or ownership metadata. Verify source parity and rendered pending/completed rows across themes and widths.
+- These checks require the application's type mapping and live component output; no speculative static detector is added.
+
 ## 0.3.3
 
 - Verify reference hierarchy through real child data, not just component choice. Group counts must match execution leaves; grouping preserves task identity, order, dependencies and final verification.
