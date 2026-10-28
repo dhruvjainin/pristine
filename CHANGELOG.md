@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+- Record component placement per journey stage, not one container for the whole task. An in-chat action can keep controls in the transcript while its structured progress belongs in the existing canvas.
+- Verify the exact requested design-system import, placement inside its assigned region and zero duplicate full views elsewhere. Reuse native side-panel and mobile behavior instead of substituting an inline copy.
+
 ## 0.3.1
 
 - Treat the requested action surface as an acceptance criterion, not a layout choice. Record discovery and execution routes plus the execution-container selector before editing.
