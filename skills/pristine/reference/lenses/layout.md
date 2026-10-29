@@ -33,6 +33,7 @@ Open the Capture and look before touching code. Run these checks in order.
 **5. The grid and width.**
 - Does the grid fit the content, or is it the framework default (three equal cards because that's what the template had)?
 - Are repeated items visually equal even though one matters more?
+- In a row of sibling cards, do all bottom edges, footers, and footer dividers sit on one line? A card that ends early because its text is shorter looks broken.
 - On a wide screen, do text lines run past ~75 characters? Does content sprawl across a 2560px display?
 
 **6. Reading and focus order.**
@@ -68,19 +69,21 @@ Write a 3-line **spatial thesis** before editing:
    - container max-width 1120–1440px, so text never spans a 4K screen.
 5. **Make importance visible.** Repeated items look equal only if their content is equal. If one matters more, make it larger or place it first. In nav and action rows, put the most-used items first and last (serial position effect); rarely used items go in the middle or an overflow menu.
 6. **Implement rhythm cleanly:** use `gap` on flex/grid for sibling spacing instead of margins on children; add `min-width: 0` on flex/grid children that contain text.
-7. **Align every edge to a shared line**, then fix optical alignment after rendering (icons beside text, hanging punctuation, play triangles).
-8. **Keep DOM order = visual order.** Avoid `order` and absolute positioning that reorder content for keyboard and screen-reader users. Set `scroll-padding-top` when there's a sticky header.
-9. **Let the data drive the form:** right-align numbers (with tabular numerals), chips for enumerated values, truncate long text with the full value on hover/expand, shade inactive rows, timelines for time-based data, avatars for people. Use alternating row backgrounds only when rows are dense.
-10. **Pick the overlay by task size:** popover for simple, non-blocking tasks; modal for complex tasks in the same context, followed by a confirming toast; a new page for large or permanent tasks, with back/breadcrumb.
-11. **Prefer "load more" over infinite scroll** so the footer stays reachable.
-12. **Let overlays escape clipping:** use `<dialog>`, the popover API, a portal, or `position: fixed` for menus and popovers inside `overflow: hidden` ancestors.
-13. **Add any new spacing or container value to DESIGN.md as a token.** No one-off pixel values.
+7. **Equalize sibling cards in a row.** Keep the grid/flex default `align-items: stretch` (no `align-items: start` or `align-self` on the cards). Make the card itself the grid item, or give it `height: 100%`. Make the card `display: flex; flex-direction: column` and push its footer down with `margin-top: auto` on the footer (or `flex: 1` on the body), so footers and their dividers line up. When inner sections (title, description, tags) must also line up across cards, use `grid-row: span N; grid-template-rows: subgrid` on the card. Never fix it with a hard `height` or `min-height` on the card.
+8. **Align every edge to a shared line**, then fix optical alignment after rendering (icons beside text, hanging punctuation, play triangles).
+9. **Keep DOM order = visual order.** Avoid `order` and absolute positioning that reorder content for keyboard and screen-reader users. Set `scroll-padding-top` when there's a sticky header.
+10. **Let the data drive the form:** right-align numbers (with tabular numerals), chips for enumerated values, truncate long text with the full value on hover/expand, shade inactive rows, timelines for time-based data, avatars for people. Use alternating row backgrounds only when rows are dense.
+11. **Pick the overlay by task size:** popover for simple, non-blocking tasks; modal for complex tasks in the same context, followed by a confirming toast; a new page for large or permanent tasks, with back/breadcrumb.
+12. **Prefer "load more" over infinite scroll** so the footer stays reachable.
+13. **Let overlays escape clipping:** use `<dialog>`, the popover API, a portal, or `position: fixed` for menus and popovers inside `overflow: hidden` ancestors.
+14. **Add any new spacing or container value to DESIGN.md as a token.** No one-off pixel values.
 
 ## Rules
 - [ ] Blurred Capture shows primary, secondary, and the groups in the intended order.
 - [ ] All spacing comes from the scale; within-group < between-group < between-section.
 - [ ] More space above each heading than below it.
 - [ ] No card inside a card; no identical card grid where content differs in importance.
+- [ ] Sibling cards in a row share one height: bottom edges and footers align to the pixel, via stretch + flex column + `margin-top: auto` footer, not a fixed height.
 - [ ] Groups separated by whitespace before dividers; zebra rows only on dense tables.
 - [ ] No undivided run of more than ~7 fields, settings, or links.
 - [ ] Most-used nav and action items sit first or last, never buried mid-row.
@@ -105,6 +108,6 @@ Write a 3-line **spatial thesis** before editing:
 - Infinite scroll on pages with a footer people need.
 
 ## Verify in the Capture Matrix
-- **Desktop light/dark:** squint again. Borders and dividers that defined groups in light mode must stay visible in dark (≥ 3:1 if they carry meaning).
+- **Desktop light/dark:** squint again. Borders and dividers that defined groups in light mode must stay visible in dark (≥ 3:1 if they carry meaning). In every card row, measure each card: heights and footer `top` values match to the pixel, including with the longest real description.
 - **Mobile light/dark:** stacking order follows priority, not source-order accident. Section spacing drops about one step (e.g. 96 → 64px) but stays larger than group spacing. Mobile needs more vertical space than expected; don't cram rows to fit a fold. Nothing scrolls horizontally at 320px.
 - Layout & spacing and Hierarchy & clarity should rise. Confirm no state (empty, error, long text) regressed.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.7
+
+- Require sibling cards in a row or grid to share one height, with footers and their dividers aligned. Use stretch, a flex-column card and a `margin-top: auto` footer (or subgrid for inner sections), never a fixed height.
+- Verify by measuring card heights and footer offsets in the rendered Capture with the longest real content.
+
 ## 0.3.6
 
 - Require an import-to-render inventory for every UI role when a component library is specified. Tokens or a few imported controls do not establish library adoption.
