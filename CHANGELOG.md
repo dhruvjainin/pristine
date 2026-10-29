@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.6
+
+- Require an import-to-render inventory for every UI role when a component library is specified. Tokens or a few imported controls do not establish library adoption.
+- Remove duplicate component styling, inspect cascade layers and compare native appearance across themes and viewports. Keep layout rules and explicitly justified semantic exceptions.
+- Verify component provenance and computed styles in the browser; broad class-name detection cannot prove these checks.
+
 ## 0.3.5
 
 - Require every reusable-template card to show a business outcome and a preview with at least two source-derived fields, records or steps, verified across desktop and mobile captures.

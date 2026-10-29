@@ -18,6 +18,9 @@ Open the Capture for two or three screens that share components and look before 
 - How many implementations exist for one concept? Two components doing the same job means one is duplicate.
 - Do variants differ by intent (primary, secondary, ghost, danger) or by accident? Accidental variants are drift; intentional ones need a name.
 - Does each variant have every state: default, hover, focus-visible, active, disabled, loading? Hover and tab through them to check.
+- When a library is specified, map **100% of rendered UI roles** (cards, navigation, buttons, inputs, badges, tables, breadcrumbs and disclosures) to an installed export and its actual rendered selector, or an explicit exception. Importing tokens and a few controls is not adoption. Inspect exports and supported composition before substituting hand-styled HTML.
+- For each mapped role, require **zero local appearance rules that recreate the library's default**: remove copied border, radius, shadow, padding, typography and state styling. Use supported variants, sizes and documented tokens; retain page layout and domain-specific illustration rules. Inspect cascade layers too: an unlayered rule outranks a library component layer even at lower specificity.
+- Compare one rendered instance of each role with its native variant in light/dark at desktop/mobile widths. Verify computed styles and keyboard behavior, not imports alone. Record any semantic exception, such as a native disclosure needed to preserve no-JavaScript access; do not silently replace it with a script-dependent control.
 
 **3. Spacing and shape.**
 - Do gaps look like they come from one scale, or do you see odd values (13px, 22px, 37px) when you inspect? Off-scale values mean someone eyeballed it.
