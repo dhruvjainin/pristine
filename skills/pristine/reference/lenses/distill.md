@@ -1,9 +1,10 @@
 # Distill
 
-Distill is about removing the obstacles between a Persona and their goal. Simplicity is not emptiness: every element on screen must justify its place, and anything that does not is noise the user has to read past. When two solutions both work, ship the simpler one (Occam's razor).
+Distill is about removing the obstacles between a Persona and their goal. Simplicity is not emptiness: every element on screen must justify its place, and anything that does not is noise the user has to read past; each one spends the Persona's limited attention (cognitive load). When two solutions both work, ship the simpler one (Occam's razor).
 
 **Raises:** Hierarchy & clarity, Persona fit.
 **Skip it when:** the target is sparse and the problem is flatness (use bolder) or missing information (use clarify or harden). For intensity problems without excess elements, use quieter. Never remove features the Personas need. This lens also covers "simplify".
+**Polish scope:** In polish, adjust within the existing structure; structural changes (new sections, reordering, cutting copy beyond filler, adding artifacts) go in the report as a `/pristine design` recommendation.
 
 ## What a designer looks at
 
@@ -16,7 +17,9 @@ Open the Capture and look before touching code. Then walk the primary task. Run 
 **2. Count the actions.**
 - How many buttons look primary (filled, accent-colored)? More than one means the user must choose before they can act.
 - How many secondary actions compete beside it? More than 2–3 visible is clutter.
-- How many options in each choice (selects, radios, tabs)? More than 5–7 visible needs search or grouping; every extra option slows the decision (Hick's law).
+- How many options in one control (a select, radio group, or tab set)? More than 7 needs search or grouping; every extra option slows the decision (Hick's law).
+- Among comparable offers (plans, templates, products), is one marked as the recommended or default pick? Many equal-weight options with no guidance make people put off the choice or leave (choice overload).
+- Which 1–3 tasks make up most of this Persona's visits? Most use comes from a few features (Pareto principle). Are those reachable in one click or tap from this screen's first viewport, or do they get the same weight as rare settings?
 
 **3. Inventory every element and ask "what if this were gone?"**
 - Point at each element and tag it: essential (needed for the goal), supporting (needed sometimes), redundant (said elsewhere), decorative (no function).
@@ -37,6 +40,7 @@ Open the Capture and look before touching code. Then walk the primary task. Run 
 **6. Count the steps.**
 - Walk the primary task and count clicks, screens, and questions. Can two steps merge? Can a step be inferred? Can a question become a smart default?
 - Does any edit open a modal where inline editing would do?
+- Between starting and finishing the primary task, does anything interrupt: a newsletter or rating prompt, a tour step, an upsell, a toast that steals focus, a forced page reload? Each one breaks concentration (flow), and the Persona has to find their place again.
 - Which questions could the system answer itself? Some complexity can't be removed, only moved (Tesler's law): asking for country, currency, timezone, a city the postcode implies, or a file type the system can detect pushes it onto the user.
 
 **7. Measure the copy.**
@@ -73,15 +77,21 @@ Write the screen's ONE goal in one sentence before editing.
    - move unavoidable complexity into the system, not the user (Tesler's law): infer from context (locale, currency, timezone, city from postcode), prefill from data already known, auto-detect formats and file types; never cut a choice the Persona needs just so the screen looks simpler;
    - inline editing instead of modal flows;
    - remove steps (merge them, or infer them);
-   - fewer options in choices (≤ 5–7 visible; search or group beyond that).
-7. **Simplify copy:** cut each paragraph by roughly half; active voice; no headings that restate intros; essential information only.
+   - fewer options per control (≤ 7 options in one control; search or group beyond that);
+   - among comparable offers, mark exactly one as recommended or preselect a sensible default (choice overload);
+   - give the 1–3 most-used tasks the prime slots, one click or tap from the first viewport, and move rarely used ones to overflow or settings (Pareto principle);
+   - keep the primary task uninterrupted (flow): no modal, prompt, tour, or upsell between its start and its completion; show feedback inline without moving focus; save state so a reload or back doesn't lose work.
+7. **Simplify copy:** cut each paragraph by roughly half; active voice; no headings that restate intros; essential information only. On Persuade surfaces, cut the filler, never the proof: every number, named technology, limit, and concrete detail in the before copy survives the edit (in the item, or as the artifact that shows it). Count them before and after; the count must not drop.
 8. **Simplify code:** delete dead CSS, unused components and variants, and orphaned files the cuts left behind.
 9. **Record what moved:** note what was removed or moved and where it is now reachable, so nothing a Persona needs is lost. Update DESIGN.md if a component variant or pattern was retired.
 
 ## Rules
 - [ ] The screen's one goal is stated and the primary action serves it.
 - [ ] Exactly one primary-styled action per view; ≤ 2–3 secondary actions visible.
-- [ ] ≤ 5–7 visible options per choice; search or group beyond that.
+- [ ] ≤ 7 options in one control; search or group beyond that.
+- [ ] Comparable offers have exactly one recommended or default option.
+- [ ] The 1–3 most-used tasks are reachable in one click or tap from the first viewport.
+- [ ] Nothing interrupts the primary task between its start and completion.
 - [ ] No duplicate KPIs, search bars, or placeholder cards; ≤ 3–4 pricing plans.
 - [ ] Per-card secondary actions live in an overflow menu; no flyout with only 1–2 items.
 - [ ] Each mobile screen does one thing.
@@ -90,6 +100,7 @@ Write the screen's ONE goal in one sentence before editing.
 - [ ] No nested cards; no containers that exist only for decoration.
 - [ ] ≤ 1 accent hue, ≤ 2 families, ≤ 5 type sizes (3–5), 2–3 weights on the target.
 - [ ] Every removed feature is either truly unused or reachable elsewhere.
+- [ ] On Persuade surfaces, the count of numbers, named technologies, and concrete details is the same or higher after the edit.
 - [ ] Copy says each idea once.
 - [ ] Dead code from the removed elements is deleted.
 

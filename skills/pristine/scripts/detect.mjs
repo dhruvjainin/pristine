@@ -70,7 +70,7 @@ const LINE_RULES = [
   ["emoji-icon", "info", null, "Emoji used as UI icon/heading decoration: use a consistent icon set."],
   ["fixed-wide", "info", /(?<!max-|min-)width\s*:\s*(\d{4,})px|\bw-\[(\d{4,})px\]/, "Fixed width ≥1000px: likely breaks on mobile; use max-width + fluid width."],
   ["generic-font", "info", /font-family\s*:\s*['"]?(Inter|Roboto|Arial|Open Sans)['"]?\s*[,;]/i, "Default/generic font as the primary family: fine for Operate surfaces, a missed opportunity for Persuade ones."],
-  ["ease-in", "warn", /\bease-in\b(?!-out)/, "ease-in on UI motion starts slow and feels sluggish; use ease-out (enter/exit) or ease-in-out (on-screen moves)."],
+  ["ease-in", "warn", /(?<!--)\bease-in\b(?!-out)/, "ease-in on UI motion starts slow and feels sluggish; use ease-out (enter/exit) or ease-in-out (on-screen moves)."],
   ["scale-zero", "warn", /scale\(\s*0(\.0+)?\s*\)|\bscale-0\b|scale\s*:\s*0\s*[,}]/, "Animating from scale(0) looks like it appears from nowhere; start at scale(0.9–0.97) with opacity 0."],
   ["vh-100", "info", /\b100vh\b|\bh-screen\b|\bmin-h-screen\b/, "100vh is taller than the visible area on mobile; use 100dvh (app shells) or 100svh (heroes)."],
   ["heavy-blur", "info", /blur\(\s*(\d+(?:\.\d+)?)px\s*\)/, "Blur over 20px is expensive to render (especially Safari); 2–5px is usually enough.", (m) => parseFloat(m[1]) > 20],
@@ -126,32 +126,6 @@ for (const file of files) {
     let r;
     while ((r = bgRe.exec(text))) {
       add(file, text.slice(0, r.index).split("\n").length, "warn", "background-refresh-shift", `Background refresh flag renders a <${r[1]}>: it appears and disappears on every poll and moves the content below. Reserve the space, show it inside an existing element, or drop it.`);
-    }
-  }
-
-  if (/\.(jsx|tsx|vue|svelte|astro)$/.test(file) && /<AgentFanout\b/.test(text)) {
-    const summaryRe = /<AgentFanout\b(?:[^<>]|=>)*?\s+tools\s*=\s*\{\s*[\w$]+(?:\s*\.\s*[\w$]+)*\s*\.\s*(map|flatMap)\(\s*\(?\s*([\w$]+)\s*\)?\s*=>\s*([^{};]*?)\)\s*\}/g;
-    let summary;
-    while ((summary = summaryRe.exec(text))) {
-      const body = summary[3].replace(/\s+/g, "");
-      const projection = summary[1] === "map"
-        ? body.match(/^([\w$]+)\.(brand|provider)$/)
-        : body.match(/^([\w$]+)\.(brand|provider)\?\[\1\.\2\]:\[\]$/);
-      if (!projection || projection[1] !== summary[2]) continue;
-      add(file, text.slice(0, summary.index).split("\n").length, "warn", "duplicate-brand-summary", "AgentFanout.tools directly projects brands/providers without uniqueness. Repeated operations can duplicate badge keys, icons and accessible names. Deduplicate only the derived summary in first-seen order; preserve tool action IDs and helper agents. Verify upstream uniqueness and rendered output; this narrow scan does not follow aliases or prove duplicates.");
-    }
-    const stepperRe = /<ToolActivity\b(?:[^<>]|=>)*?\bvariant\s*=\s*["']stepper["']/g;
-    let s;
-    while ((s = stepperRe.exec(text))) {
-      add(file, text.slice(0, s.index).split("\n").length, "warn", "open-finished-tools", "ToolActivity variant=\"stepper\" in a file that also renders AgentFanout: finished tool steps stay open and push the agents below the fold. Use the collapsible variant so settled tools fold to one row. Possible false positive if this ToolActivity never sits above the fanout.");
-    }
-  }
-
-  if (/\.(jsx?|tsx?|vue|svelte|astro)$/.test(file) && /\b(?:PlanOutline|TaskTree)\b/.test(text)) {
-    const rawTitleRe = /\btitle\s*:\s*`\$\{([\w$]+)\.(?:kind|type)\}:\s*\$\{\1\.(?:key|id)\}`/g;
-    let task;
-    while ((task = rawTitleRe.exec(text))) {
-      add(file, text.slice(0, task.index).split("\n").length, "warn", "raw-task-title", "Plan/tree task title directly combines a resource kind and storage key. Use a display name and action; keep technical identity in expandable details. This narrow scan does not follow aliases or prove which component receives the title; inspect the rendered preview and live plan.");
     }
   }
 

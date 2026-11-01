@@ -11,6 +11,7 @@ Define once, reuse everywhere. Built-in `ease`/`ease-out` keywords are too weak 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);      /* enter, exit, responses */
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* elements moving on screen */
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);   /* sheets and drawers */
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);        /* only exits that leave the screen */
   --dur-press: 140ms; --dur-small: 180ms; --dur-medium: 240ms; --dur-large: 400ms;
 }
 ```

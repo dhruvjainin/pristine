@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.0
+
+- Read every `DESIGN.md` that applies to a target, not just the root one: repo root, monorepo app or package, component directory, and any file named on an `Extends:` line. The nearest file wins; everything else is inherited. `scripts/design-context.mjs` resolves the chain, and `/pristine init [path]` writes a package or component file holding only its overrides.
+- List the UX laws in `SKILL.md`, one line each, linked to the Lens or pattern that applies them.
+- Critique reports are a target line, an overall score and one paragraph of what's good, then what's bad. Every known state must be captured; an uncaptured known state is a miss.
+- Add `patterns/forms.md`: labels, grouping, country-aware addresses, input formats, validation timing, form-level failure and inline success, a submit button that keeps its size, and a Verify list.
+- Add `patterns/chat-and-agents.md`, moving composer, streaming, tool-activity and first-render rules out of the craft floor.
+- Landing pages: every feature item shows a product artifact; equal-weight text-only feature grids are banned; Persuade pages at Level 6 or below get a `/pristine design` recommendation; distill never cuts proof. New vibe-code tell: decorative icon tiles above feature headings.
+- Tables keep one row height and one vertical centre, size columns to content, and use row dividers by default.
+- Content width: a page is either full-bleed or a centred container; never an uncentred `max-width`. Direction mocks follow the same rule.
+- `capture.mjs` measures controls that share a row and reports unequal heights in `rowMismatches`, which must be empty before design or polish finish.
+- Design and polish end with an independent critique in a fresh context; below 8, fix and re-critique up to two rounds, and report that score.
+- Compare page: the whole card opens the mock full size.
+- Resolve conflicting rules: one source for motion tokens, type floor, line-height, spacing scale, frame budget, truncation and choice counts; bans yield only to an explicit DESIGN.md exception (never for accessibility or dark patterns); critique never edits; polish keeps structure and recommends design for structural changes.
+- Remove the product-specific `duplicate-brand-summary`, `open-finished-tools` and `raw-task-title` detectors.
+
 ## 0.3.7
 
 - Require sibling cards in a row or grid to share one height, with footers and their dividers aligned. Use stretch, a flex-column card and a `margin-top: auto` footer (or subgrid for inner sections), never a fixed height.

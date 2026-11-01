@@ -33,7 +33,7 @@ Look at the Capture, then load and use the target as the Persona would. DESIGN.m
 - How many font files? Are they woff2 and subset? Are there unused third-party scripts?
 - In the Performance panel, are there long tasks > 50ms or frame drops during interaction?
 
-**6. Profile the motion.** The frame budget is 16.7ms at 60Hz and ~8ms at 120Hz; design for the smaller one, judged on a mid-range phone, not a fast laptop. Record a Performance trace while each animation plays (open a drawer, drag, switch tabs during navigation).
+**6. Profile the motion.** One budget: 60fps (16.7ms frames), with script work under 8ms per frame, judged on a mid-range phone, not a fast laptop. Record a Performance trace while each animation plays (open a drawer, drag, switch tabs during navigation).
 - Which tier does each animated property hit? Composite-only (`transform`, `opacity`; increasingly `filter`, `clip-path`, `background-color`) is cheap; paint (`box-shadow`, `border-radius`, `color`) redraws every frame; layout (`width`, `height`, `padding`, `margin`, `top`, `left`, `border-width`) re-measures, and also moves neighbors (a sidebar animating `margin` re-lays out the whole page).
 - Does it stutter only while the page is busy (navigation, hydration, fetch)? Then it is a main-thread animation (rAF or a JS library) competing with that work.
 - Does it get worse as content grows? Suspect an inherited CSS variable updated per frame on a parent, or too many nodes.
@@ -92,7 +92,7 @@ Before editing, record the baseline and name the top 3 bottlenecks with evidence
 - [ ] Fonts: woff2, subset, ≤ 4 files, no visible layout shift on swap.
 - [ ] No long task > 50ms during core interactions.
 - [ ] Heavy components load on demand.
-- [ ] Animations stay inside an 8ms frame on a mid-range phone trace; only composite-tier properties animate unless measured.
+- [ ] Animations hold 60fps (16.7ms frames) with script work < 8ms per frame on a mid-range phone trace; only composite-tier properties animate unless measured.
 - [ ] No per-frame React state updates or per-frame inherited CSS variables; motion during navigation/hydration runs in CSS or WAAPI.
 - [ ] Lists of 1,000+ rows are virtualized or paginated.
 - [ ] Functionality and visuals unchanged.

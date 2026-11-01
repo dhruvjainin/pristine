@@ -50,7 +50,7 @@ Demo data is chosen, usually without anyone noticing, to make a design look good
 | Translated button overflows | Content width with `min-width`, never fixed `width` |
 | Diacritics clipped | Looser `line-height`, no `overflow: hidden` on text |
 | Broken image icon | `onError` → initials; `object-fit: cover`; `aspect-ratio` set |
-| Ellipsis with no way to read the rest | `title`/tooltip plus the full value in a detail view |
+| Ellipsis with no way to read the rest | Tooltip or popover reachable on hover and keyboard focus, plus the full value in a detail view |
 | 1,000 rows stutter | Virtualize or paginate |
 | Raw `<b>` / `&amp;` / `**text**` | Escape once, at render |
 
@@ -60,6 +60,7 @@ Demo data is chosen, usually without anyone noticing, to make a design look good
 - **End-truncate** secondary metadata where the start carries meaning (role, preview), and give a way to see it all.
 - **Middle-truncate** things that differ at the end: file names, paths, hashes, emails sharing a domain.
 - **Clamp** (`line-clamp: 2`) card previews so heights stay predictable.
+- **Dense table cells:** one line, ellipsis (`white-space: nowrap; overflow: hidden; text-overflow: ellipsis`), full value on hover and keyboard focus.
 - **Never truncate** numbers, amounts, or dates people compare.
 
 ## Check it in

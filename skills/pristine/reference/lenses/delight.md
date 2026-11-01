@@ -44,7 +44,7 @@ Rank the moments by emotional weight and pick 1–3. People judge a whole flow b
 2. **Pick 1–3 moments** from the checks above, ranked by emotional weight, each with a written thesis. If the flow's ending is bare, it is one of them: a closing screen that confirms what was done and what happens next, in the product's voice.
 3. **Choose the smallest treatment that delivers it:**
    - **copy:** product-specific, warm, still clear (the next action stays obvious);
-   - **micro-interaction:** a tactile response on the core action (check mark draw, count tick), 150–400ms; e.g. a hold-to-confirm fill (`clip-path` growing over ~2s linear, snapping back fast on release), a number ticker on `tabular-nums` so digits don't jitter, a `clip-path` reveal on a milestone;
+   - **micro-interaction:** a tactile response on the core action (check mark draw, count tick), timed with the [motion tokens](../patterns/motion-recipes.md#tokens); e.g. a hold-to-confirm fill (`clip-path` growing over ~2s linear, snapping back fast on release), a number ticker on `tabular-nums` so digits don't jitter, a `clip-path` reveal on a milestone;
    - **illustration or icon moment:** drawn in the Design System's style, not stock;
    - **useful waiting:** real progress, what is happening, or a tip relevant to the task;
    - **celebration:** only for genuine milestones, proportional to effort;

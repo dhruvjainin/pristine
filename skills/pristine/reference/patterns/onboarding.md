@@ -17,9 +17,9 @@ Onboarding is judged in mode **Operate** for the steps and **Persuade** for any 
 
 **1. Give value before you ask.** Let the Persona try the product, see a result, or get a useful partial answer before asking for an account, email, payment, or permission. Show the result unlocked: a score, the top issues, a first draft, a real preview. Ask for the account in order to *save, share, or go deeper* ("Save your report"), never to see what they just made. A blurred or locked result is a ransom note.
 
-**2. Let them build before they sign up.** Choosing a goal, a name, a template, a style, or doing the first lesson creates ownership; people value what they made. Collect those choices first, keep them across the signup step, and label the button "Continue", not "Sign up". Never discard work done before signup.
+**2. Let them build before they sign up.** Choosing a goal, a name, a template, a style, or doing the first lesson creates ownership; people value what they made. Collect those choices first, keep them across the signup step, and label the button with a verb + object such as "Save and continue" or "Create my <thing>", not "Sign up". Never discard work done before signup.
 
-**3. Never start at zero.** Count real work already done: an account created, a choice made, data imported. "Step 2 of 5" or a 20% bar from that real step creates momentum; 0% says "you haven't started". Progress must reflect real, completed steps; never pad it with fake ones.
+**3. Never start at zero.** Count real work already done: an account created, a choice made, data imported. "Step 2 of 5" or a 20% bar from that real step creates momentum (goal-gradient effect); 0% says "you haven't started". Progress must reflect real, completed steps; never pad it with fake ones.
 
 **4. Smart defaults over questions.** Pre-fill the most common or inferred choice for every field (locale, timezone, currency, workspace name from the email domain, the plan most people pick). Most users keep defaults and read them as recommendations, so the default must be the choice that serves *them* (never pre-ticked marketing consent, paid add-ons, or the most expensive plan). The user's job becomes "scan and adjust", not "fill from scratch".
 
@@ -44,12 +44,7 @@ Onboarding is judged in mode **Operate** for the steps and **Persuade** for any 
 
 ### Background bot verification
 
-- **Silent means no challenge panel.** When a provider supports interaction-only verification, a session's `verification_required` response means a check is needed, not that a human is needed. Before the provider's before-interactive callback, require zero visible challenge explanations, panel borders, padding or reserved panel height. Keep any connection status in an existing status slot; do not insert a loading panel.
-- **Required challenges remain usable.** Reveal the explanation and panel on the provider's interaction callback or a load, challenge or server-verification error. Keep the live widget mounted while a check runs. Never put its iframe or ancestor under `display: none`, `visibility: hidden`, `inert`, clipping or off-screen positioning to simulate quiet verification. Let the provider own its silent appearance, and verify the actual iframe becomes visible and keyboard-reachable when interaction is required.
-- **Drafting and sending have separate gates.** Main, quick and embedded composers stay editable while the connection is being verified; browsing remains available. All submission paths, including Enter, stay blocked until a server-verified session exists. A client token or completed challenge alone cannot unlock Send. Do not change authentication, authorization, backend checks, quotas or replay identity to make a UI quieter.
-- **Preserve work, not accidental send intent.** Capture editor node identity, draft, selection and focus before silent → interactive → retry → verified transitions. Background transitions must not replace the editor, erase text or steal focus. Typing, callbacks, retries, navigation and verification completion create zero new send requests; never queue a draft implicitly. Announce why a drafted message cannot yet send through an associated status region, without claiming it has been sent. Existing interrupted operations retain their original payload and request ID.
-- **Check failure and recovery at the boundary.** Hold the server response after a token arrives: Send must remain disabled. Exercise script failure, challenge error, timeout, expiry, rejected token and manual retry. Errors expose a usable recovery action; retry may return to a quiet check, and automatic recovery clears stale error presentation. No error or expiry unlocks Send. After server acceptance, a deliberate send creates exactly one operation.
-- **Evidence is runtime-specific.** Capture silent, human-required, error/retry and server-verified states in light/dark × desktop/mobile, including homepage handoff and both composers. Label controlled provider/API fixtures separately from genuine public verification, block paid calls in fixtures, and never bypass a real challenge. This contract requires callbacks, DOM visibility and request counts; a static source match cannot prove it.
+- **Invisible until a human is needed.** Prefer an interaction-only (invisible) check: zero visible challenge panel or reserved height until the provider asks for interaction. Then show the challenge visible, keyboard-reachable, and explained; never hide a required challenge with `display: none`, `visibility: hidden`, or off-screen positioning. Typed input survives every verification state, and errors offer a retry. Composer-specific rules are in [chat-and-agents.md](chat-and-agents.md#composer).
 
 ## Setup steps
 
@@ -62,8 +57,8 @@ Onboarding is judged in mode **Operate** for the steps and **Persuade** for any 
 ## First run
 
 - **No blank first screen.** Use templates, sample data (clearly labeled and removable in one click), or a guided first action. The empty state names what will appear, why it matters, and the one action to create it.
-- **Teach in context, not in a tour.** Replace multi-step coach-mark tours and welcome modals with sequenced, contextual hints that appear when the related feature is first needed, and can be dismissed for good.
-- **A checklist only for real setup work** (3–5 items, progress counted from real steps, dismissible, collapses once done). Never a checklist of features to "explore".
+- **Teach in context, not in a tour.** Replace multi-step coach-mark tours and welcome modals with sequenced, contextual hints that appear when the related feature is first needed, and can be dismissed for good. People start using the product right away and skip anything that asks to be read first (paradox of the active user).
+- **A checklist only for real setup work** (3–5 items, progress counted from real steps, dismissible, collapses once done). Never a checklist of features to "explore". A visible unfinished item pulls people back to finish it (Zeigarnik effect), so show the checklist again on return until it's done or dismissed.
 - **Permission prompts in context.** Ask for notifications, location, camera, or contacts at the moment it's needed, after a short in-product explanation of the benefit, with a "Not now" that doesn't ask again on every visit. Never on page load.
 - **Celebrate the first real success** briefly and specifically ("Your first invoice is sent"), then point to the next useful step.
 
@@ -76,7 +71,7 @@ Onboarding is judged in mode **Operate** for the steps and **Persuade** for any 
 
 ## Bans (dark patterns)
 
-These break trust and are absolute, whatever they do to conversion in the short term:
+These break trust. Like accessibility bans, they never yield: not to a DESIGN.md exception, and not to short-term conversion.
 
 - **Guilt-trip dismiss copy** ("No thanks, I hate saving money", "I'll risk it"). Decline options stay neutral: "Not now", "Skip", "No thanks".
 - **Fake urgency and scarcity**: countdowns that reset, invented "3 people are viewing this", deadlines that aren't real.

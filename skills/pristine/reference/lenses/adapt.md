@@ -70,7 +70,7 @@ Open the mobile and desktop Captures and look before touching code. Then interac
 11. **Viewport units:** `100dvh`/`100svh` instead of `100vh` for full-height sections so mobile browser chrome doesn't hide content.
 12. **Forms:** inputs ≥ 16px font, correct `type`, `inputmode`, and `autocomplete`; labels above fields on mobile.
 13. **Images:** `srcset` + `sizes` for resolution, `<picture>` for art-directed crops; set `width`/`height` or `aspect-ratio`.
-14. **Wide screens:** cap content width (1120–1440px) and line length (≤ 75ch); use extra space for secondary panels, not longer lines.
+14. **Wide screens:** keep the project's existing content width. Marketing and reading pages cap content at their existing container (or 1120–1440px if they have none). App surfaces (tables, lists, dashboards, editors) fill the shell's content area like their sibling pages, using extra space for more columns or secondary panels. Prose blocks cap line length at ≤ 75ch on the text itself.
 15. **Flexibility:** when no single layout fits every Persona, let people personalize (collapse panels, reorder or hide what they don't use) rather than forcing one compromise.
 16. **Add any new breakpoints or fluid tokens to DESIGN.md.**
 
@@ -86,7 +86,7 @@ Open the mobile and desktop Captures and look before touching code. Then interac
 - [ ] Every desktop feature is reachable on mobile (maybe reorganized, never removed).
 - [ ] Full-height sections use `dvh`/`svh`; fixed bars respect safe areas.
 - [ ] Container queries used for components rendered in more than one width context.
-- [ ] Content max-width set for ≥ 1440px screens.
+- [ ] At ≥ 1440px, marketing and reading content is capped; app surfaces match their sibling pages' content width and leave no empty strip.
 - [ ] Landscape phone (e.g. 844×390) keeps the primary action visible.
 
 ## Avoid

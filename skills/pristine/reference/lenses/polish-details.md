@@ -11,7 +11,7 @@ Walk the full path the Persona takes (arrive → act → result → recover) wit
 
 **1. Zoom the screenshot to 200% and inspect edges.**
 - Do shared left edges align to the pixel? Are baselines aligned in rows that mix text sizes?
-- Are icons optically centered with adjacent text, or 1px high/low? Is the icon + label gap the same everywhere (6–8px)?
+- Are icons optically centered with adjacent text, or 1px high/low? Is the icon + label gap the same everywhere (8px)?
 - Does any text touch a container edge? Is there more space above headings than below?
 
 **2. Compare siblings.**
@@ -36,7 +36,7 @@ Walk the full path the Persona takes (arrive → act → result → recover) wit
 - Do link underlines collide with descenders? Do aligned number columns wobble because digits are proportional?
 - Is there a favicon and a meaningful page `<title>`?
 
-**6. Inspect charts and tables.** Do charts have axes, gridlines, labels, a summary value, a date-range selector, and a hover tooltip? Are bars rounded on top with no axis, or lines smoothed/faded so they misrepresent the data? Do dense tables use alternating row backgrounds?
+**6. Inspect charts and tables.** Do charts have axes, gridlines, labels, a summary value, a date-range selector, and a hover tooltip? Are bars rounded on top with no axis, or lines smoothed/faded so they misrepresent the data? Do tables use horizontal row dividers, with zebra striping instead of dividers (never both) only on dense tables wider than 6 columns?
 
 **7. Read the type closely.** Single orphan words on the last line of headings? Straight quotes and apostrophes instead of real ones? Mixed capitalization? Numbers formatted differently in different places?
 
@@ -60,7 +60,7 @@ Triage what you found before editing (see step 2 below). Fix tasks and states be
    3. alignment, spacing, and type inconsistencies;
    4. color, icon, and motion inconsistencies;
    5. code and asset cleanup.
-3. **Alignment and spacing:** every element on the spacing scale; similar components share identical padding; shared left edges align to the pixel; baselines align in rows mixing text sizes; icons optically centered with adjacent text (often a 1px nudge); icon + label gap 6–8px; more space above headings than below.
+3. **Alignment and spacing:** every element on the spacing scale; similar components share identical padding; shared left edges align to the pixel; baselines align in rows mixing text sizes; icons optically centered with adjacent text (often a 1px nudge); icon + label gap 8px; more space above headings than below.
 4. **Interactive states for every control:** default, hover, focus-visible, active, disabled, loading, and (where relevant) selected, error, success.
    - focus ring: ≥ 2px, ≥ 3:1 contrast against adjacent colors, `outline-offset: 2px`, visible on every background, only on `:focus-visible`;
    - disabled: reduced emphasis plus `cursor: not-allowed` and no hover effect; never the only way to explain why;
@@ -71,7 +71,7 @@ Triage what you found before editing (see step 2 below). Fix tasks and states be
    - shadows share the same light direction; no border + large shadow combos;
    - images with `aspect-ratio`, `object-fit: cover`, correct crop focus, useful `alt`;
    - no text touching container edges (≥ 12px inner padding on small components, ≥ 16px on cards).
-6. **Feedback and data details:** tooltips on ambiguous icons; a confirming toast after a modal task completes; alternating row backgrounds on dense tables; charts with axes, gridlines, labels, a summary value, a date-range selector, and a hover tooltip.
+6. **Feedback and data details:** tooltips on ambiguous icons; a confirming toast after a modal task completes; horizontal row dividers on tables, with zebra striping instead (never both) only on dense tables wider than 6 columns; charts with axes, gridlines, labels, a summary value, a date-range selector, and a hover tooltip.
 7. **Browser surfaces:** `::selection`, `caret-color`, `accent-color` from the palette; `color-scheme` set; scrollbars consistent with the theme; `text-underline-offset` ≈ 0.15em on links; `tabular-nums` on aligned numbers; favicon and page `<title>` present.
 8. **Typography details:** no orphan words in headings (`text-wrap: balance`), real quotes and apostrophes, consistent capitalization, numbers formatted consistently.
 9. **Layers and overlays:**

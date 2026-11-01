@@ -21,7 +21,7 @@ The Capture usually shows perfect data. Look at it, then actively try to break i
 **2. Empty the database, then overfill it.**
 - With 0 items, is there a blank area, or an explanation and a next action? First use, no results, filters, and no permission are different empty states.
 - With 1 item, exactly a page size and page size + 1, and 1,000+ items, does the list still look designed? Does a select with 50+ options stay usable?
-- For provider/brand summaries (such as `AgentFanout.tools`), try three distinct actions from one brand, a second brand, and an action with no brand. Deduplicate only the derived summary, in first-seen order: `[...new Set(actions.flatMap(action => action.brand ? [action.brand] : []))]`. Expect exactly two badges and each brand named once in the accessible summary, with zero duplicate-key console warnings. Inspect the shared badge component's key source. Keep every distinct tool action ID and helper agent; never deduplicate action rows by brand or hide the warning with index keys. The detector flags direct projections, not actual duplicate data; aliases, upstream uniqueness and the rendered result require inspection.
+- Does a summary of repeated entities (one badge per provider, author, or tag) show each entity once? Try three items from one entity, a second entity, and an item with none: expect exactly two badges, deduplicated in first-seen order, with zero duplicate-key console warnings. Keep every underlying row; never deduplicate the rows themselves or hide the warning with index keys.
 
 **3. Unplug the network.**
 - Go offline, throttle to slow 3G, force a timeout. Does loading show nothing, or shift the layout when content arrives?
@@ -58,9 +58,7 @@ Before editing, read the Personas' locales, devices, connection quality, and rol
 2. **Overflow and wrapping:**
    - `min-width: 0` on flex/grid children holding text;
    - `overflow-wrap: anywhere` on user-generated strings and URLs;
-   - single-line truncation with `text-overflow: ellipsis` plus the full value in a `title` or tooltip;
-   - multi-line clamp with `line-clamp: 2–3` only where a detail view exists;
-   - decide per field: **wrap** identifying text (names, titles); **end-truncate** secondary metadata (role, preview); **middle-truncate** values that differ at the end (file names, hashes, paths, shared-domain emails); **clamp** card previews; **never truncate** numbers, amounts, or dates;
+   - wrap, truncate, or clamp each field per [worst-case-data](../patterns/worst-case-data.md#truncate-wrap-or-clamp-decide-per-field); a truncated value's full text is in a tooltip or popover reachable on hover and keyboard focus; clamp only where a detail view exists;
    - no fixed widths on buttons or text containers; allow 30–40% expansion for translations.
    **Failure signature → fix:**
    - squished avatar or icon → `flex-shrink: 0`;
@@ -70,7 +68,7 @@ Before editing, read the Personas' locales, devices, connection quality, and rol
    - avatar adrift beside wrapped text → `align-items: flex-start`;
    - tall scripts clipped → looser `line-height`, no `overflow: hidden` on text boxes;
    - mid-word breaks in headings → `overflow-wrap: anywhere`, not `word-break: break-all`;
-   - ellipsis with no way to read the value → `title`/tooltip plus the full value in a detail view;
+   - ellipsis with no way to read the value → tooltip or popover reachable on hover and keyboard focus, plus the full value in a detail view;
    - raw HTML or markdown in data → escape once at render; never inject user data as HTML;
    - wrong initials → first + last word via grapheme clusters (`Intl.Segmenter`), icon fallback;
    - missing optional field → omit the line or reserve its height on purpose.

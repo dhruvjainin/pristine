@@ -41,7 +41,7 @@ Static Captures can't prove motion. Walk through the interface by hand, then slo
 **6. Interrupt it.** Hover off mid-transition, double-click a toggle, add toasts in quick succession, close a menu while it opens, grab a closing drawer. Does it reverse smoothly from where it is, or snap and restart? Is input ignored until the animation finishes?
 
 **7. Throttle and watch for jank.** Set CPU throttling to 4× and record in the Performance panel.
-- Are there long frames (> 16ms) or stutter during transitions? That usually means `width`, `height`, `top`, `left`, `margin`, `padding`, `box-shadow`, or filters are animating. Diagnose with optimize's animation-performance checks.
+- Are there frames over 16.7ms (below 60fps), script work over 8ms per frame, or stutter during transitions? That usually means `width`, `height`, `top`, `left`, `margin`, `padding`, `box-shadow`, or filters are animating. Diagnose with optimize's animation-performance checks.
 - Does anything use `will-change` globally? Do decorative loops keep running offscreen?
 
 **8. Load and scroll.** Reload the page.
@@ -55,21 +55,14 @@ Static Captures can't prove motion. Walk through the interface by hand, then slo
 
 ## How to fix
 
-1. **Read DESIGN.md's motion tokens** (durations, easings) and reuse them; never fork a curve per component. If none exist, define them first and add them to DESIGN.md:
-   - `--duration-instant: 100ms`, `--duration-fast: 150ms`, `--duration-base: 220ms`, `--duration-slow: 400ms`;
-   - `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` (enter/exit; `0.16, 1, 0.3, 1` is an equally strong alternative), `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)` (moves and morphs on screen; or `0.65, 0, 0.35, 1`), `--ease-drawer: cubic-bezier(0.32, 0.72, 0, 1)` (sheets, drawers), `--ease-in: cubic-bezier(0.7, 0, 0.84, 0)` (only for elements thrown fully off-screen). Built-in keywords are too weak for enter/exit.
+1. **Read DESIGN.md's motion tokens** (durations, easings) and reuse them; never fork a curve per component. If none exist, add the token set from [motion-recipes → Tokens](../patterns/motion-recipes.md#tokens) to the code and DESIGN.md first. Built-in keywords are too weak for enter/exit.
 2. **Gate, then list the jobs.** Apply the frequency gate from check 1; delete motion on keyboard-initiated and 100+/day actions. For what remains, name the job: acknowledge an action (hover, press, toggle, submit); show a state change (open/close, expand/collapse, selected, loading → done); preserve continuity (list → detail, reorder, page navigation); direct attention to one meaningful moment.
 3. **Pick easing by motion type:** enter/exit → `--ease-out`; on-screen move or morph → `--ease-in-out`; hover and color → `ease`; constant motion (marquee, progress) → `linear`. Never ease-in on entrances, hovers, menus, or anything the user is waiting on; it delays the moment they're watching.
-4. **Set durations by distance and consequence; UI motion stays under 300ms by default:**
-   - press feedback 100–160ms; hover, focus, toggle 120–200ms;
-   - tooltips and small popovers 125–200ms; dropdowns, selects, toasts 150–250ms;
-   - modals, drawers, panels, page/view transitions 200–500ms;
-   - marketing and explanatory motion can run longer: one authored focal entrance up to ~700ms.
-   Exits run ~20–30% faster than entrances. Faster motion makes the whole product feel more performant.
-5. **Animate only `transform` and `opacity` by default;** they stay on the compositor and hold 60fps. Never animate `width`, `height`, `top`, `left`, `margin`, or `padding`; use `transform: scale/translate`, FLIP, or `grid-template-rows: 0fr → 1fr` for expand/collapse. Blur, `clip-path`, and filters only on small, isolated elements and after measuring. List exact properties; never `transition: all`.
+4. **Set durations by distance and consequence** from the duration tokens and the moment table in [motion-recipes → Tokens](../patterns/motion-recipes.md#tokens); UI motion stays under 300ms by default. Exits run ~20–30% faster than entrances. Faster motion makes the whole product feel more performant.
+5. **Animate only `transform` and `opacity` by default;** they stay on the compositor and hold 60fps. Never animate `width`, `height`, `top`, `left`, `margin`, or `padding`, except the accordion recipe in [motion-recipes](../patterns/motion-recipes.md); use `transform: scale/translate`, FLIP, or `grid-template-rows: 0fr → 1fr` for expand/collapse. Blur, `clip-path`, and filters only on small, isolated elements and after measuring. List exact properties; never `transition: all`.
 6. **Implement micro-transitions:**
-   - **hover:** color/background/opacity change, 120–150ms; optional 1–2px translate only on clickable cards; gate hover motion behind `@media (hover: hover) and (pointer: fine)`;
-   - **press:** `transform: scale(0.95–0.98)` (default 0.97) on `:active`, 80–160ms ease-out; every pressable gets it, not just buttons;
+   - **hover:** color/background/opacity change, timed per the motion table; optional 1–2px translate only on clickable cards; gate hover motion behind `@media (hover: hover) and (pointer: fine)`;
+   - **press:** `transform: scale(0.95–0.98)` (default 0.97) on `:active`, `var(--dur-press) var(--ease-out)`; every pressable gets it, not just buttons;
    - **focus:** ring appears instantly or ≤ 100ms; never animate it from invisible slowly;
    - **enter:** opacity 0 → 1 plus translate 4–12px or scale 0.9–0.97 → 1, ease-out; never from `scale(0)`; use `@starting-style` for elements entering from `display: none` (no JS needed);
    - **origin:** popovers, menus, and tooltips scale from their trigger (`transform-origin` at the trigger side, or a headless primitive's `--transform-origin` variable); modals are exempt and stay centered;
@@ -93,7 +86,7 @@ Static Captures can't prove motion. Walk through the interface by hand, then slo
 - [ ] Every animation has a named job; removing it would lose feedback or context.
 - [ ] No animation on keyboard-initiated or 100+/day actions; tens-per-day motion is near-imperceptible.
 - [ ] Only `transform`/`opacity` animated, except measured exceptions; no `transition: all`.
-- [ ] All durations and easings come from tokens; UI motion < 300ms (micro 100–200ms); modals/drawers 200–500ms; only marketing/explanatory motion runs longer.
+- [ ] All durations and easings come from the motion token set ([motion-recipes](../patterns/motion-recipes.md#tokens)); routine UI motion < 300ms; only modals, drawers, and marketing/explanatory motion run longer.
 - [ ] Easing matches motion type; no ease-in on entrances, hovers, or anything the user waits on.
 - [ ] Exits faster than entrances and along the same path; no bounce or elastic easing on UI controls (critically-damped springs allowed; bounce 0.1–0.3 only after momentum or in rare playful moments).
 - [ ] Every pressable has press feedback (scale 0.95–0.98, ~0.97, on `:active`).
@@ -103,7 +96,7 @@ Static Captures can't prove motion. Walk through the interface by hand, then slo
 - [ ] Animations are interruptible (hover off mid-transition reverses smoothly); rapidly re-triggered UI uses transitions, not keyframes; input never locked.
 - [ ] Hover motion gated to `(hover: hover) and (pointer: fine)`.
 - [ ] `prefers-reduced-motion` path exists and keeps state feedback.
-- [ ] No layout shift caused by animation; Performance panel shows no long frames (> 16ms) during transitions.
+- [ ] No layout shift caused by animation; transitions hold 60fps (16.7ms frames) with script work < 8ms per frame in the Performance panel.
 - [ ] `will-change` is not set globally.
 - [ ] Offscreen or hidden loops pause.
 
@@ -115,7 +108,7 @@ Static Captures can't prove motion. Walk through the interface by hand, then slo
 - Animating layout properties or `box-shadow` on large elements; `transition: all`.
 - Durations over 300ms for routine UI (over 500ms for anything but marketing); long feedback feels like lag.
 - Infinite decorative loops (pulsing buttons, floating blobs).
-- `scale(0)` entrances, ease-in on UI, and motion on keyboard-initiated actions.
+- `scale(0)` entrances, ease-in on entering or on-screen UI, and motion on keyboard-initiated actions.
 - `@keyframes` on toggles, toasts, or anything re-triggered rapidly.
 - Identical speed for enter and exit; exits that leave by a different edge than they came in.
 - A new easing curve per component.

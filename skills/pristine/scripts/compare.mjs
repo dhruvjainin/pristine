@@ -36,7 +36,7 @@ const cols = files.map((f, i) => {
   const name = opt.names[i] ? ` <span class="name">${esc(opt.names[i])}</span>` : "";
   return `<section class="col${rec ? " rec" : ""}">
   <h2><span class="tag">${tag}</span>${name}${rec ? '<span class="badge">Recommended</span>' : ""}</h2>
-  <div class="view"><iframe title="Option ${tag}" srcdoc="${esc(readFileSync(f, "utf8"))}"></iframe></div>
+  <div class="view"><iframe title="Option ${tag} preview" tabindex="-1" scrolling="no" srcdoc="${esc(readFileSync(f, "utf8"))}"></iframe></div>
   <a class="open" href="${pathToFileURL(resolve(f)).href}" target="_blank" rel="noopener">Open ${tag} full size</a>
 </section>`;
 }).join("\n");
@@ -50,15 +50,19 @@ const page = `<!doctype html>
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif}
 .grid{display:grid;grid-template-columns:repeat(${files.length},minmax(0,1fr));gap:16px}
-.col{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.col{position:relative;border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s,transform .15s}
+.col:hover{border-color:var(--fg)}
+.col:has(.open:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 .col.rec{border:2px solid var(--accent)}
+@media (prefers-reduced-motion:no-preference){.col:hover{transform:translateY(-2px)}}
 h2{margin:0;font-size:16px;display:flex;align-items:center;gap:8px}
 .tag{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--fg);color:var(--bg)}
 .badge{margin-left:auto;padding:2px 8px;border-radius:99px;background:var(--accent);color:var(--on-accent);font-size:12px}
-.view{border:1px solid var(--line);border-radius:4px;overflow:auto;height:60vh;background:#fff}
-.view.scaled{overflow:hidden}
-iframe{display:block;width:${W}px;height:${H}px;border:0;transform-origin:0 0}
+.view{border:1px solid var(--line);border-radius:4px;overflow:hidden;height:60vh;background:var(--bg)}
+iframe{display:block;width:${W}px;height:${H}px;border:0;transform-origin:0 0;pointer-events:none}
 .open{color:var(--fg);font-size:14px}
+.open:focus-visible{outline:none}
+.open::after{content:"";position:absolute;inset:0;border-radius:inherit}
 @media (max-width:900px){.grid{grid-template-columns:1fr}}
 </style></head><body>
 <div class="grid">

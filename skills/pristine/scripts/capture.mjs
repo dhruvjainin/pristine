@@ -117,6 +117,50 @@ function readBackground() {
   return { color: `rgb(${rgb.join(", ")})`, source, luminance: Math.round(luminance * 1000) / 1000 };
 }
 
+// Controls that sit side by side (input next to a segmented control, button next to a select) must share one height.
+// Measures each control's visible box: the outermost bordered/filled wrapper (≤ 40px taller) that holds only that
+// control, or a segmented group whose controls touch edge to edge. Then it
+// chains boxes that overlap vertically within 48px horizontally, and reports rows whose heights differ by more than 1px.
+function readRowMismatches() {
+  const SEL = 'input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=range]):not([type=color]), select, button, [role=button], [role=tab], [role=combobox], [role=searchbox]';
+  const visible = (r, s) => r.width > 0 && r.height > 0 && s.visibility !== "hidden" && s.display !== "none";
+  const painted = (s) => parseFloat(s.borderTopWidth) > 0 && !/transparent|rgba\(0, 0, 0, 0\)/.test(s.borderTopColor)
+    || !/transparent|rgba\(0, 0, 0, 0\)/.test(s.backgroundColor);
+  const label = (el) => {
+    const t = (el.getAttribute("aria-label") || el.placeholder || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 30);
+    return `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}${t ? ` "${t}"` : ""}`;
+  };
+  const boxes = new Map();
+  for (const el of document.querySelectorAll(SEL)) {
+    const r0 = el.getBoundingClientRect();
+    if (!visible(r0, getComputedStyle(el))) continue;
+    let box = el;
+    for (let p = el.parentElement, i = 0; p && p !== document.body && i < 4; p = p.parentElement, i++) {
+      const r = p.getBoundingClientRect();
+      if (r.height > r0.height + 40) break;
+      if (!painted(getComputedStyle(p))) continue;
+      const inner = [...p.querySelectorAll(SEL)].map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0).sort((a, b) => a.left - b.left);
+      const segmented = inner.length > 1 && inner.every((c, k) => !k || Math.abs(c.left - inner[k - 1].right) <= 2) && r.height <= Math.max(...inner.map((c) => c.height)) * 1.3;
+      if (inner.length === 1 || segmented) box = p;
+      else break;
+    }
+    if (!boxes.has(box)) boxes.set(box, { r: box.getBoundingClientRect(), name: label(el) });
+  }
+  const list = [...boxes.values()].sort((a, b) => a.r.left - b.r.left);
+  const rows = [];
+  for (const b of list) {
+    const row = rows.find((row) => row.some((o) => {
+      const overlap = Math.min(o.r.bottom, b.r.bottom) - Math.max(o.r.top, b.r.top);
+      const gap = b.r.left - o.r.right;
+      return overlap > Math.min(o.r.height, b.r.height) * 0.5 && gap >= -1 && gap <= 48;
+    }));
+    row ? row.push(b) : rows.push([b]);
+  }
+  return rows
+    .filter((row) => row.length > 1 && Math.max(...row.map((b) => b.r.height)) - Math.min(...row.map((b) => b.r.height)) > 1)
+    .map((row) => row.map((b) => ({ control: b.name, height: Math.round(b.r.height * 10) / 10, top: Math.round(b.r.top + scrollY) })));
+}
+
 async function applyState(page, el) {
   await el.scrollIntoViewIfNeeded();
   if (opt.state === "hover") await el.hover();
@@ -167,6 +211,7 @@ for (const [device, ctxOpts] of Object.entries(viewports)) {
       });
       const background = await page.evaluate(readBackground);
       const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+      const rowMismatches = await page.evaluate(readRowMismatches);
       const file = join(outDir, `${name}.png`);
       if (opt.selector) {
         const el = page.locator(opt.selector).first();
@@ -187,8 +232,9 @@ for (const [device, ctxOpts] of Object.entries(viewports)) {
         await page.screenshot({ path: file, fullPage: opt.full });
       }
       const darkMissing = scheme === "dark" && background.luminance > 0.4;
-      report.captures.push({ cell: name, file, state: opt.state || "rest", background, horizontalOverflow, consoleErrors });
-      console.log(`✓ ${name}: ${file}  bg ${background.color}${darkMissing ? "  ⚠ background is light; dark mode did not apply" : ""}${horizontalOverflow ? "  ⚠ horizontal overflow" : ""}${consoleErrors.length ? `  ⚠ ${consoleErrors.length} console error(s)` : ""}`);
+      report.captures.push({ cell: name, file, state: opt.state || "rest", background, horizontalOverflow, rowMismatches, consoleErrors });
+      console.log(`✓ ${name}: ${file}  bg ${background.color}${darkMissing ? "  ⚠ background is light; dark mode did not apply" : ""}${horizontalOverflow ? "  ⚠ horizontal overflow" : ""}${rowMismatches.length ? `  ⚠ ${rowMismatches.length} row(s) of controls with unequal heights` : ""}${consoleErrors.length ? `  ⚠ ${consoleErrors.length} console error(s)` : ""}`);
+      for (const row of rowMismatches) console.log(`    ↳ ${row.map((b) => `${b.control} ${b.height}px`).join("  |  ")}`);
     } catch (e) {
       report.errors.push({ cell: name, error: String(e?.message || e) });
       console.error(`✗ ${name}: ${e?.message || e}`);

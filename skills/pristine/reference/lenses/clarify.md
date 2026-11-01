@@ -11,6 +11,7 @@ Open the Capture and read the whole flow in order, not isolated strings. Then us
 
 **1. Read every label aloud as the Persona.**
 - Use their vocabulary, expertise, and emotional state from DESIGN.md. Do you stumble on any word? Would they say it themselves? If not, it is internal jargon.
+- Do names, structure, and icons match what the Persona already believes about how this works (mental model)? A "cart" that saves for later, a trash icon that deletes permanently, or settings grouped by database table instead of by task all break that belief.
 - "Would my parent understand this button?" "Submit", "OK", "Yes/No", "Click here" fail: they describe the gesture, not the outcome.
 - Read each link out of context (as a screen reader list would). "Learn more" or "click here" alone means nothing.
 - Are nav items and section names specific to their contents ("Invoices", "Library"), or safe umbrellas ("Home", "Misc", "General", "Other stuff")?
@@ -33,13 +34,17 @@ Open the Capture and read the whole flow in order, not isolated strings. Then us
 - **Loading:** does it say "Loading…" or name the real operation ("Importing 1,240 contacts…")? Is there determinate progress when the system knows it?
 - **Success:** does it confirm the outcome briefly? Does it mention a next step only when that changes what the user does?
 
-**5. Walk the flow's edges.** Can the user skip an optional step, search a long list, pick "Other" when no option fits, and go back without losing input? Is onboarding a 6-bullet modal no one reads, or tips that appear where and when they matter?
+**5. Walk the flow's edges.** Can the user skip an optional step, search a long list, pick "Other" when no option fits, and go back without losing input? Is onboarding a 6-bullet modal no one reads, or tips that appear where and when they matter? People start using the product right away and skip instructions (paradox of the active user), so any help that must be read first gets skipped.
 - In a multi-step flow (checkout, onboarding, setup), can the Persona see where they are and how much is left? People speed up as the finish gets closer (goal-gradient effect); a flow with no visible progress feels endless, and one that starts at 0% feels like a chore.
 - Does the flow start from zero? Count a step the Persona has already done (account created = step 1) so progress never reads 0%; never pad it with fake steps. Are fields pre-filled with the most common or inferred choice?
+- Leave the flow halfway, then come back. Is the work saved, and does the screen show what's left ("2 of 5 done", a saved draft, "Continue setup")? Unfinished tasks stay on people's minds and pull them back (Zeigarnik effect), but only if the product shows what's unfinished.
+- Does the flow say how long it takes ("About 2 minutes", "3 steps")? A task stretches to fill the time it seems to need (Parkinson's law). Do fields carry `autocomplete` tokens so the browser can fill them?
+- Does step N need something from an earlier step (plan picked, address, selected filters, items in the cart)? If the Persona has to remember it, show it on the screen. People hold only a few things in mind at once (working memory).
+- Look at the defaults and framing. Is the preselected option the one most Personas would pick, at no extra cost? Are anchors honest (a crossed-out price that was really charged)? Defaults and framing steer decisions (cognitive bias). Using them against the user (preselected paid add-ons, fake countdowns, fake scarcity) breaks trust.
 - Does any screen ask (sign up, pay, allow) before it has given something? Does a decline button guilt-trip? See [../patterns/onboarding.md](../patterns/onboarding.md).
 - On pricing, is the price the largest text, the plan name small, any discount shown, and what the next plan adds stated?
 
-**6. Inspect the forms.**
+**6. Inspect the forms.** The full form rules are in [../patterns/forms.md](../patterns/forms.md).
 - Cover the placeholders. Can you still tell what each field is? If not, placeholders are being used as labels; they vanish on typing and force the user to remember what was asked (recognition over recall).
 - Are format rules shown before submission, or only revealed by the error?
 - Are both required *and* optional fields marked? Mark only the minority.
@@ -76,8 +81,10 @@ Before editing, list every unclear string with its location and why it fails: va
    - **Errors:** what failed, why (if known and useful), how to recover; keep codes secondary.
    - **Empty states:** separate copy for first use, no results, filtered out, no permission, and failed to load; each explains the state and offers the next action. First-run: explain the value + one primary action. No results: suggestions and a "Clear filters" action.
    - **Marketing and value copy:** short and punchy; lead with how it helps the user, not what it does; friendly, not corporate.
-   - **Onboarding:** sequenced contextual tips at the moment of use, not a front-loaded multi-bullet modal.
-   - **Flows:** include skip, search, an "Other" option, and back wherever a Persona could get stuck. Multi-step flows show position and what's left ("Step 2 of 4", named steps), and credit work already done so progress never starts at zero (goal-gradient effect); keep the step count honest.
+   - **Onboarding:** sequenced contextual tips at the moment of use, not a front-loaded multi-bullet modal; nothing must be read before the product can be used (paradox of the active user).
+   - **Flows:** include skip, search, an "Other" option, and back wherever a Persona could get stuck. Multi-step flows show position and what's left ("Step 2 of 4", named steps), and credit work already done so progress never starts at zero (goal-gradient effect); keep the step count honest. State the expected time up front ("About 2 minutes") and add `autocomplete` tokens to every field the browser can fill (Parkinson's law). Autosave partial work and show what's unfinished on return ("Continue setup: 2 of 5 done") (Zeigarnik effect). Show earlier choices the current step depends on, such as a summary of the order, plan, or filters, instead of asking the Persona to remember them (working memory).
+   - **Defaults and framing:** preselect the option most Personas would pick, never a paid extra; anchors and urgency must be true (cognitive bias).
+   - **Names and structure:** match the Persona's mental model: their words for things, grouping by their task, and icons that do what they usually do.
    - **Pricing:** price large, plan name small, discount shown, and each plan states what it adds over the previous one.
    - **Loading:** name the real operation; show determinate progress when available.
    - **Success:** confirm the outcome briefly; mention the next step only if it changes what the user does.
@@ -101,6 +108,11 @@ Before editing, list every unclear string with its location and why it fails: va
 - [ ] Unfamiliar icons have a visible label or a delayed tooltip (~0.5–1s).
 - [ ] Flows offer skip, back, and "Other" where choices may not fit.
 - [ ] Multi-step flows show the current step and what's left.
+- [ ] Multi-step flows state their expected time; fillable fields have `autocomplete` tokens.
+- [ ] Leaving a flow halfway keeps the work and shows what's unfinished on return.
+- [ ] No step asks the Persona to remember an earlier choice; it is shown on screen.
+- [ ] No preselected paid option, fake countdown, or untrue anchor price.
+- [ ] Nothing must be read before first use; help appears in context.
 - [ ] No placeholder-as-label; all inputs have visible labels.
 - [ ] One term per concept across the flow.
 - [ ] No heading/intro/helper text repeating the same idea.

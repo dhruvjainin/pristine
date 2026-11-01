@@ -1,10 +1,14 @@
 # Init
 
-`/pristine init` writes (or updates) `DESIGN.md` at the project root: the single source of truth for **Product**, **Personas**, and **Design System**. Every Critique and Polish reads it.
+`/pristine init [path]` writes (or updates) `DESIGN.md`: the source of truth for **Product**, **Personas**, and **Design System**. Every Critique and Polish reads it. With no path it writes the repo root file; with a package, app, or component directory it writes that directory's file, which holds only what differs from its ancestors ([design-context.md](design-context.md)).
 
 ## Step 1: Load current state
 
-- **No DESIGN.md**: explore, interview, write.
+Run `node <skill dir>/scripts/design-context.mjs <path or .>` to find every existing `DESIGN.md` in the chain and, for a directory, the nested ones below it.
+
+- **No DESIGN.md anywhere**: explore, interview, write the root file.
+- **Writing a nested file**: read the chain above it first. Interview only about what this scope changes (its own Personas, tokens, surfaces), add an `Extends:` line if it builds on a non-ancestor design-system package, and never copy inherited sections. If nothing differs, don't create the file.
+- **Monorepo with no root file**: if packages share a product and system, write the root file and keep package files for overrides. If they are separate products, ask which package to init and write it there.
 - **DESIGN.md exists**: read it, report what looks stale or missing versus the code, and ask only about those gaps. Never silently overwrite confirmed content; edit in place.
 - **Other context files** (`PRODUCT.md`, `README`, brand guides, Figma tokens): mine them as evidence. Don't delete them.
 
@@ -43,7 +47,13 @@ Stop when you could write every section below with confidence. Mark anything sti
 
 ## Step 4: Write DESIGN.md
 
-Use this structure. Omit sections that genuinely don't apply; keep everything concrete (values, not adjectives alone).
+Use this structure. Omit sections that genuinely don't apply; keep everything concrete (values, not adjectives alone). A nested file starts with its scope and keeps only the sections it overrides:
+
+```markdown
+# DESIGN.md: <Package or component name>
+> **Scope:** apps/web only. Inherits the root DESIGN.md; nearest wins.
+> **Extends:** [packages/ui](../../packages/ui/DESIGN.md)
+```
 
 ```markdown
 # DESIGN.md: <Product name>
@@ -93,8 +103,8 @@ Rules: <e.g. accent ≤ 10% of any screen; never color-only meaning>
 - Radii: <…>  Shadows: <…>  Borders: <…>
 
 ### Motion
-- Durations: <micro 120–200ms, standard 200–300ms, large 300–500ms>
-- Easing: <curves>
+- Durations: <tokens, ≤ 4; default to the motion token set in the skill's patterns/motion-recipes.md>
+- Easing: <tokens from the same set>
 - Reduced motion: <policy>
 
 ### Components

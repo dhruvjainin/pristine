@@ -50,6 +50,7 @@ export const commandDocs: CommandDoc[] = [
       { cmd: "/pristine init", note: "The usual start. It explores the repo, then asks a few short questions, one at a time." },
       { cmd: "/pristine init this is a budgeting app for freelancers who get paid irregularly", note: "Say what the product is up front and it skips that question." },
       { cmd: "/pristine init update the personas, we now sell to agencies too", note: "Run it again any time. It edits the existing DESIGN.md instead of starting over." },
+      { cmd: "/pristine init apps/admin", note: "In a monorepo, give a package or component its own DESIGN.md. It holds only what differs; the rest is inherited from the files above it." },
     ],
     steps: [
       { t: "Reads what already exists", d: "An existing DESIGN.md, README, package.json, the routes and the shared components." },
@@ -57,7 +58,7 @@ export const commandDocs: CommandDoc[] = [
       { t: "Asks what code can't show", d: "What the product does, who uses it, what they must feel in five seconds, and their deal-breakers. One question at a time, with a recommended answer first." },
       { t: "Writes DESIGN.md", d: "Product, Personas, Brand, Design System and Do / Don't. The default standard is filled in for you: WCAG 2.2 AA, evergreen browsers, readable with JS off, reduced motion, LCP under 2.5s on mobile." },
     ],
-    youGet: ["DESIGN.md at the project root", "Two or three named Personas with a job, context and deal-breakers", "Your real tokens, written down"],
+    youGet: ["DESIGN.md at the repo root, or a package's overrides when you pass a path", "Two or three named Personas with a job, context and deal-breakers", "Your real tokens, written down"],
     check: [
       "Read the Personas. If one doesn't sound like a real customer, say so; every score is judged through them.",
       "Check the token table against your CSS. Wrong tokens mean every later fix uses the wrong values.",

@@ -26,7 +26,7 @@ If the target opts out of devices its neighbors already use, that is the diagnos
 
 **4. The swap-the-logo test.** Cover the logo. Could this section belong to any competitor? If yes, it is interchangeable: the brand color is absent from key moments and no signature motif from DESIGN.md is present. For an audience that expects confidence, that is a Persona fit failure.
 
-**5. Count the weights.** How many weights are visible, and how far apart are they? If adjacent roles differ by less than 300 weight and less than 2× size, nothing has conviction.
+**5. Count the weights.** How many weights are visible, and how far apart are they? If adjacent roles differ by less than 300 weight and less than 2× size (the Lens target, above the craft-floor minimum), nothing has conviction.
 
 **6. Where does the accent live?** If the brand color appears only as small specks (an icon, a link underline), it is sprinkled, not committed.
 
@@ -40,7 +40,7 @@ Write down before editing: **why it reads flat** (from check 3) and **the ONE mo
 2. **Fix the scope.** Touch only the named target. Everything outside it stays byte-for-byte unchanged unless the user asks otherwise.
 3. **Choose ONE decisive move.** Options, in order of preference:
    - **Scale contrast:** raise the lead element 1.5–2.5× over its current size (stay ≤ 6rem) and drop secondary text one step.
-   - **Weight contrast:** pair a heavy display weight (700–900) with a light body (300–400); adjacent roles should differ by ≥ 300 weight.
+   - **Weight contrast:** pair a heavy display weight (700–900) with body at 400; Lens target: adjacent roles differ by ≥ 300 weight (above the craft-floor minimum of 200).
    - **Color commitment:** let the accent own a whole region (a band, a panel, the primary action) instead of sprinkling it on small details.
    - **Space:** double the whitespace around the focal element so it reads as the peak of the scroll.
    - **Composition:** break the even grid once (asymmetric 7/5 or 8/4 split, a deliberate overlap, a full-bleed image).
@@ -51,7 +51,7 @@ Write down before editing: **why it reads flat** (from check 3) and **the ONE mo
 
 ## Rules
 - [ ] Exactly one focal element per viewport; it is identifiable within 1 second in the Capture.
-- [ ] Lead element ≥ 2× the size of body text, or ≥ 300 weight heavier than its neighbors.
+- [ ] Lead element ≥ 2× the size of body text, or ≥ 300 weight heavier than its neighbors (Lens target, above the craft floor).
 - [ ] Accent color covers a deliberate region or role, not scattered specks.
 - [ ] No new font family, color, radius, or shadow outside DESIGN.md (or added to it with a reason).
 - [ ] Primary action is still the most findable control.

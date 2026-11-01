@@ -29,9 +29,9 @@ Conflicts: never apply **bolder + quieter** or **colorize + decolorize** togethe
 
 ## Step 1: Context
 
-1. Read `DESIGN.md` (Product, Personas, Design System). If missing, infer the system from tokens/components and proceed; offer `/pristine init` at the end.
+1. Resolve and read the target's `DESIGN.md` chain ([design-context.md](design-context.md)): Product, Personas, Design System. If none applies, infer the system from tokens/components and proceed; offer `/pristine init` at the end.
 2. Read the target's source and its neighbors: shared components, tokens, and similar screens. **Before drawing or hand-styling any component, search the system for one with the same job** (component folders, Storybook, the UI library in `package.json`; search by role: `Tooltip`, `Chip`, `Avatar`, `IconButton`, `EmptyState`). Reuse or extend it. If none exists, say what you searched for in the report. Fix problems at the right level: a missing token goes into the system, a one-off becomes the shared component, a local bug gets fixed locally.
-3. Identify the mode (Persuade / Operate / Read / Experience, see [critique.md](critique.md)) and read the matching pattern files: [patterns/landing-pages.md](patterns/landing-pages.md) for Persuade, [patterns/dashboards.md](patterns/dashboards.md) for Operate or any table/chart, [patterns/mobile-web.md](patterns/mobile-web.md) whenever a mobile cell exists, [patterns/onboarding.md](patterns/onboarding.md) for signup, login, verification, setup, first-run, permission, trial, upgrade, or paywall surfaces, and always [patterns/vibe-code-tells.md](patterns/vibe-code-tells.md).
+3. Identify the mode (Persuade / Operate / Read / Experience, see [critique.md](critique.md)) and read the matching pattern files: [patterns/landing-pages.md](patterns/landing-pages.md) for Persuade, [patterns/dashboards.md](patterns/dashboards.md) for Operate or any table/chart, [patterns/mobile-web.md](patterns/mobile-web.md) whenever a mobile cell exists, [patterns/onboarding.md](patterns/onboarding.md) for signup, login, verification, setup, first-run, permission, trial, upgrade, or paywall surfaces, [patterns/forms.md](patterns/forms.md) whenever the target has an input, select, or submit action, [patterns/chat-and-agents.md](patterns/chat-and-agents.md) whenever the target has a message composer, streaming responses, or agent/tool activity, and always [patterns/vibe-code-tells.md](patterns/vibe-code-tells.md).
 
 ## Step 2: Baseline Capture + diagnosis
 
@@ -44,12 +44,12 @@ Conflicts: never apply **bolder + quieter** or **colorize + decolorize** togethe
 ## Step 3: Plan the Lenses
 
 - **Forced Lenses** (named by the user) always run. Also fix any P0 issue you see, and mention it.
-- **Otherwise** pick the Lenses for every Dimension scoring below 9, ordered by impact. Usually 3–6 Lenses; **polish-details** always runs last.
+- **Otherwise** pick the Lenses for every Dimension scoring below 9, ordered by impact. Usually 3–6 Lenses; **polish-details** always runs last. Structural fixes a Lens suggests follow the polish scope rule in [layout](lenses/layout.md): adjust within the existing structure, and recommend the rest as `/pristine design`.
 - Fix in this order: broken or blocked tasks and a11y blockers → missing states → hierarchy/layout/responsive → type/color/consistency → motion/delight → cleanup.
 
 **Ask before proceeding only if** the plan would: change brand identity or the overall visual direction (that's a redesign; offer to switch to `/pristine design`, see [design.md](design.md)), change factual copy or claims, add a dependency (font, library), or remove a feature. Otherwise proceed without asking; state the plan in one or two lines.
 
-If the baseline Level is below 6 (template-level), polish can't reach 10/10 on its own. Still apply the Lenses, but recommend `/pristine design` (redesign) under "Still short of 10/10".
+If the baseline sits below Level 6 (template), or the surface is Persuade at Level 6 or below, polish can't reach 10/10 on its own: it keeps the look, and a Persuade page moves past 6 only through a product idea that polish isn't allowed to invent. Still apply the Lenses, but recommend `/pristine design` (redesign) under "Still short of 10/10", naming the artifact or idea each weak section is missing.
 
 ## Step 4: Apply
 
@@ -65,16 +65,18 @@ If the baseline Level is below 6 (template-level), polish can't reach 10/10 on i
 1. Run the project's type-check/lint/build if they exist and are fast. Fix what you broke.
 2. Re-run the detector on edited files. Fix real findings. Accept a flagged item only after you've verified it's safe, and record why in the report (e.g. `outline: none` is fine only when you confirmed a visible `:focus-visible` replacement such as a ring or border, in light and dark).
 3. Run the project's tests that touch what you changed. New UI can break selectors: e.g. a search box inside a popup adds a second combobox, so tests must find each one by its accessible name, not by role alone. Update tests to be specific; never delete or skip them to pass.
-4. Run an **after** Capture across the same cells (`--label after`), plus rest, hover, pressed, and focus-visible (and tooltip/menu states) for every control you changed. Confirm each dark cell really rendered dark ([capture.md](capture.md) → Step 3). Check for regressions in every cell, especially dark mode and mobile.
-5. Fix what the Capture shows, then re-capture **once** to confirm. Don't loop on cosmetic churn.
+4. Run an **after** Capture across the same cells (`--label after`), plus rest, hover, pressed, and focus-visible (and tooltip/menu states) for every control you changed. Confirm each dark cell really rendered dark ([capture.md](capture.md) → Step 3). Check for regressions in every cell, especially dark mode and mobile. Every cell's `rowMismatches` must be empty ([craft-floor.md](craft-floor.md) → Spacing and layout).
+5. Fix what the Capture shows, then re-capture **once** to confirm. Don't loop on cosmetic churn; only the gate in step 9 adds further rounds.
 6. **If you regenerated visual-test baselines, open and look at them.** A baseline clipped by the test viewport, or taken mid-animation, locks in a bug. Fix the test's viewport or wait condition, not just the image.
 7. **"Done" includes the surrounding docs.** Update everything that describes what you changed: prose about motion, tokens, and components (DESIGN.md, READMEs, Storybook/MDX docs, code comments), skill or agent references, and visual baselines. A token that was renamed or retimed must match everywhere it's documented.
 8. Re-score each Dimension honestly, applying the uncaptured-state caps from [critique.md](critique.md) → Calibration. In the report, say "verified" only for what was checked under the user's real conditions ([capture.md](capture.md) → Step 2).
+9. **Independent critique gate.** The builder doesn't grade its own work. Run [critique.md](critique.md) on the after-Capture in a fresh context: a sub-agent if the harness has one; otherwise re-read critique.md and judge from the captures alone, ignoring what you meant to build. Give it the target, the DESIGN.md chain, and the capture paths, not your change list or intent. If its Overall is below 8, or below Level 8 for the mode, fix its Priority fixes that fit this command (polish keeps the look), re-capture, and run a new fresh critique. Stop after 2 rounds. The report's after-Score is the last independent critique's score, not your own, and its open findings go under "Still short of 10/10".
 
 ## Step 6: Report
 
 ```markdown
 ## Pristine Polish: <target> (<url | screenshot | file | feature>; files: <edited files>)
+Design context: <DESIGN.md chain, or "none">
 **Score: X/10 → Y/10** · Lenses: <applied> · Captured: <cells and states> (before/after paths) · Not captured: <states, or "none">
 
 ### Changes

@@ -4,18 +4,18 @@
 
 ## Step 1: Gather context
 
-1. Read `DESIGN.md`. If it is missing, use the code's conventions as the Design System and choose 2 fallback Personas from the table at the bottom. Say so in the report.
+1. Resolve and read the target's `DESIGN.md` chain ([design-context.md](design-context.md)). If none applies, use the code's conventions as the Design System and choose 2 fallback Personas from the table at the bottom. Say so under "Through the Personas' eyes".
 2. Identify the surface's **mode**, which changes what "good" means:
    - **Persuade** (landing, marketing, pricing): earn attention, belief, and action. Distinctiveness matters.
    - **Operate** (app, dashboard, admin, settings, tools, charts): task speed, scanability, consistency. Restraint is a virtue.
    - **Read** (docs, blog, articles, changelog): comprehension and reading comfort.
    - **Experience** (portfolio, gallery, showcase): the work leads; UI recedes.
-3. Read the matching pattern files: [patterns/landing-pages.md](patterns/landing-pages.md) for Persuade, [patterns/dashboards.md](patterns/dashboards.md) for Operate or any table/chart, [patterns/mobile-web.md](patterns/mobile-web.md) whenever a mobile cell exists, [patterns/onboarding.md](patterns/onboarding.md) for signup, login, verification, setup, first-run, permission, trial, upgrade, or paywall surfaces, and always [patterns/vibe-code-tells.md](patterns/vibe-code-tells.md). Use [patterns/motion-recipes.md](patterns/motion-recipes.md) as the bar when scoring Motion & interaction, and [patterns/worst-case-data.md](patterns/worst-case-data.md) when the target renders user data (Robustness).
+3. Read the matching pattern files: [patterns/landing-pages.md](patterns/landing-pages.md) for Persuade, [patterns/dashboards.md](patterns/dashboards.md) for Operate or any table/chart, [patterns/mobile-web.md](patterns/mobile-web.md) whenever a mobile cell exists, [patterns/onboarding.md](patterns/onboarding.md) for signup, login, verification, setup, first-run, permission, trial, upgrade, or paywall surfaces, [patterns/forms.md](patterns/forms.md) whenever the target has an input, select, or submit action, [patterns/chat-and-agents.md](patterns/chat-and-agents.md) whenever the target has a message composer, streaming responses, or agent/tool activity, and always [patterns/vibe-code-tells.md](patterns/vibe-code-tells.md). Use [patterns/motion-recipes.md](patterns/motion-recipes.md) as the bar when scoring Motion & interaction, and [patterns/worst-case-data.md](patterns/worst-case-data.md) when the target renders user data (Robustness).
 4. Read the target's source files when available (components, styles, tokens).
 
 ## Step 2: Capture
 
-Run a Capture across the Capture Matrix ([capture.md](capture.md)). For source targets, also run:
+Run a Capture across the Capture Matrix ([capture.md](capture.md)), including every interaction and data state the surface has: focus, hover, pressed, open menus, loading, empty, no results, error. Don't move to Step 3 until each one is captured. For source targets, also run:
 
 ```bash
 node <skill dir>/scripts/detect.mjs <target source paths>
@@ -38,9 +38,9 @@ Write what broke for *that* Persona, naming the element. No generic persona pros
 | # | Dimension | 10/10 means |
 |---|---|---|
 | 1 | **Persona fit** | Every choice serves the Personas' job, context, and expectations; they'd pick this over competitors |
-| 2 | **Hierarchy & clarity** | One obvious focal point per view; purpose and next action clear in 5s; ≤4 competing choices at any decision (Hick's law) |
+| 2 | **Hierarchy & clarity** | One obvious focal point per view; purpose and next action clear in 5s; ≤4 competing focal actions at any decision (Hick's law) |
 | 3 | **Layout & spacing** | Consistent spacing scale; deliberate rhythm; strong alignment; related things grouped, distinct things separated (proximity, common region); long runs chunked |
-| 4 | **Typography** | Clear type scale (≥1.2 ratio between levels); readable measure (45–75ch); purposeful families; no orphans or ragged headings |
+| 4 | **Typography** | Clear type scale (adjacent levels ≥1.125× size or ≥200 weight); readable measure (45–75ch); purposeful families; no orphans or ragged headings |
 | 5 | **Color & theming** | Purposeful palette from tokens; one accent in product UI, color carries meaning (status, data); status colors reserved for status, decorative lines neutral; meaning never by color alone; dark mode designed (surfaces lighten with elevation), not inverted |
 | 6 | **Consistency** | Same thing looks and behaves the same everywhere (similarity), and familiar patterns work as users expect from other products (Jakob's law); no one-off values; one icon family; themeable variables are actually overridable from outside (not re-declared on the component's own root) and match their docs |
 | 7 | **Responsiveness** | Designed (not merely squeezed) for 390px through 1440px+; tap targets ≥44px (Fitts' law); no horizontal scroll; thumb-reachable primary actions |
@@ -79,7 +79,7 @@ Rules:
 - An action that fails the cold read (looks like plain text at rest) caps Hierarchy & clarity at 6 and the overall Score at 7. Knowing from the code that it is a button doesn't count.
 - A section seen only in an error or empty state it wasn't meant to be in is uncaptured: it caps the overall Score at 7 until its success state is captured.
 - The overall Score can't exceed the surface's Level by more than 1.
-- **Don't score what you haven't seen.** A state that exists on the surface but wasn't captured caps the Dimensions that depend on it at 6, and the overall Score at 7: hover, pressed, and tooltip/menu-open states for Motion & interaction; focus-visible for Accessibility; dark mode (when supported) for Color & theming; loading, empty, and error for Robustness. Reading the CSS doesn't count. List the uncaptured states in the report header and lift the cap only after capturing them.
+- **Capture every state you know exists before scoring.** If you know about a state (from the UI, the code, or the Persona's task), you must capture it. Listing it as "not captured" is a miss, not a disclosure. Force each state as [capture.md](capture.md) → "Force every state" describes. Only if a state truly can't be reached (no runnable code, auth you don't have) does it cap the Dimensions that depend on it at 6 and the overall Score at 7: hover, pressed, and tooltip/menu-open states for Motion & interaction; focus-visible for Accessibility; dark mode (when supported) for Color & theming; loading, empty, and error for Robustness. Reading the CSS doesn't count. In that case, ask the user for what you need before reporting.
 - Don't inflate to be kind. Don't deflate to seem tough. If it's good, say why precisely.
 
 ## Step 5: Report
@@ -88,9 +88,10 @@ Use this exact structure:
 
 ```markdown
 ## Pristine Critique: <target> (<url | screenshot | file | feature>; files: <resolved files>)
-**Overall: X/10** · Level: <2 | 6 | 8 | 10> · Mode: <mode> · Personas: <names> · Captured: <cells and states, or "Not visually verified: reason"> · Not captured: <states, or "none">
+Design context: <DESIGN.md chain, e.g. DESIGN.md → apps/web/DESIGN.md, or "none">
+**Overall: X/10**
 
-> <2–3 sentence brutally honest verdict: the single biggest reason this isn't 10/10.>
+<One paragraph, 3–5 sentences, brutally honest: what is good (name the elements worth keeping), then what is bad (name the biggest reasons this isn't 10/10, by element). No metadata, no list of what was captured.>
 
 ### Scores
 | Dimension | Score | Why (evidence) | To reach 10/10 |
@@ -113,7 +114,7 @@ Use this exact structure:
 <Short sequence: "Fix P0s → ~X/10; then P1s → ~Y/10; to hit 10 also needs …">
 ```
 
-Then offer, in one line: "Run `/pristine polish` to apply these fixes?" If the Level is below 6 or the fixes amount to a new visual direction, offer `/pristine design` (redesign) instead. Do not edit anything unless the user agrees.
+Then offer, in one line: "Run `/pristine polish` to apply these fixes?" If the surface sits below Level 6 (template), is a Persuade surface at Level 6 or below, or the fixes amount to a new visual direction, offer `/pristine design` (redesign) instead. Do not edit anything unless the user agrees.
 
 ## Fallback Personas (only when DESIGN.md has none)
 

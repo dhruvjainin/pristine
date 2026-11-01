@@ -81,9 +81,10 @@ skills/pristine/
   agents/openai.yaml    display metadata for Codex
   reference/            one file per command, plus capture, craft floor
   reference/lenses/     the 16 Lenses
-  reference/patterns/   landing pages, dashboards, onboarding, motion recipes, ...
+  reference/patterns/   landing pages, dashboards, forms, onboarding, chat and agents, motion recipes, ...
   scripts/capture.mjs   light/dark x desktop/mobile screenshots, zoom, element capture
   scripts/detect.mjs    static scan for common UI defects
+  scripts/design-context.mjs  which DESIGN.md files (root, package, component) apply to a target
 site/                   the showcase (Astro, Cloudflare Pages), built with Pristine
 .claude-plugin/         plugin and marketplace manifests
 ```

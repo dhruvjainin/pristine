@@ -5,6 +5,7 @@ Signals that a UI was generated and shipped without a designer's eye. Each one c
 | Tell | Why it hurts | Fix | Lens |
 |---|---|---|---|
 | Emojis as icons (🚀 ✨ 📊) | Cheap, inconsistent sizing and color across OSes | One SVG library (Lucide, Phosphor, Heroicons), one stroke weight | consistency |
+| Icon in a rounded or tinted square above each feature heading, where the icon only pictures the heading's noun (shield = "Safe", layers = "Batch") | The icon row becomes the section's loudest element and says nothing; reads as generated on sight | Test: swap the icons between items. If nothing reads wrong, they're decoration: remove them, or replace each with a product artifact (snippet, output, real number) | distill |
 | AI-picked bright, saturated colors on everything | No hierarchy; color stops meaning anything | Neutral foundation, one accent, semantic colors only for status | decolorize |
 | Gradient letter-avatars | Instantly reads as generated | Real image, or neutral initials on a subtle tinted surface | decolorize |
 | The same KPI shown 2–3 times | Wastes the most valuable space; implies no one checked | Show each number once, where it's most useful | distill |
@@ -22,7 +23,7 @@ Signals that a UI was generated and shipped without a designer's eye. Each one c
 | Infinite scroll on a page with a footer | Footer unreachable | Pagination or "Load more" | layout |
 | Modal with a 6-bullet onboarding list | Skipped instantly | Sequenced contextual tips | clarify |
 | Everything animates: command palette, every hover, fade-up on every section, `transition: all` | Feels slow; motion stops meaning anything | Animate only by purpose and frequency; never keyboard-triggered actions | animate |
-| Popovers that pop from `scale(0)` or the center, with `ease-in` | Feels detached and sluggish | Grow from the trigger at `scale(0.95)`, ease-out, under 250ms | animate |
+| Popovers that pop from `scale(0)` or the center, with `ease-in` | Feels detached and sluggish | Grow from the trigger at `scale(0.95)`, `--ease-out`, `--dur-medium` or shorter | animate |
 | Results blurred behind "Sign up to see your report" | Feels like a ransom; visitors leave | Show a useful partial result, then "Save your report" | clarify |
 | Guilt-trip dismiss copy ("I'll risk it"), fake countdowns | Reads as manipulation; trust drops | Neutral "Not now", real deadlines only | clarify |
 | Signup form with email, password, confirm password, name, company | Each field drops completion | SSO + email only; ask the rest later | distill |

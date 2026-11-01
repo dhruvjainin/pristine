@@ -30,7 +30,7 @@ Open the Capture and use the target as the Persona would. Look for the single pl
 
 **6. Context fit.** Does the idea relate to the product and brand, or is it a particle background, cursor trail, or 3D blob that could sit on any site? Does it change how the product *feels*, or creep into changing what it *does* (new backend features)?
 
-**7. Cost on a real phone.** Picture it on a mid-range phone with 4× CPU throttle. Would it hold ≥ 50fps? Would it hide content until JS runs? What happens on a browser without the API?
+**7. Cost on a real phone.** Picture it on a mid-range phone with 4× CPU throttle. Would it hold 60fps (16.7ms frames, script work < 8ms per frame)? Would it hide content until JS runs? What happens on a browser without the API?
 
 ## How to fix
 
@@ -48,7 +48,7 @@ Open the Capture and use the target as the Persona would. Look for the single pl
    - big data: virtual scrolling (render only visible rows), canvas-rendered charts, animated data transitions;
    - heavy work: Web Workers, WASM.
 6. **Hold performance:**
-   - 60fps target; if frames drop below 50fps on a mid-range phone, simplify;
+   - 60fps (16.7ms frames, script work < 8ms per frame) on a mid-range phone; if it misses, simplify;
    - lazy-initialize heavy contexts (WebGL, WASM) only when near the viewport;
    - pause rendering when offscreen or the tab is hidden (`IntersectionObserver`, `visibilitychange`);
    - keep the main thread free for input (INP < 200ms).
@@ -60,7 +60,7 @@ Open the Capture and use the target as the Persona would. Look for the single pl
 - [ ] Directions proposed (or lowest-risk choice justified) before any code.
 - [ ] Exactly one extraordinary moment per page or flow.
 - [ ] Works and looks good with the enhancement unavailable.
-- [ ] ≥ 50fps on a mid-range phone (4× CPU throttle); no long tasks > 50ms during interaction.
+- [ ] 60fps (16.7ms frames, script work < 8ms per frame) on a mid-range phone (4× CPU throttle); no long tasks > 50ms during interaction.
 - [ ] Heavy resources lazy-load and pause offscreen.
 - [ ] Reduced-motion path exists; no flashing; sound opt-in only.
 - [ ] Added JS/asset weight is justified (state it in KB).

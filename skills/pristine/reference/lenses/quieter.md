@@ -25,6 +25,8 @@ Open the Capture and look before touching code. Run these checks in order, and w
 
 **7. Think about the Persona's session.** Would someone stare at this for hours (a dashboard, an editor, an inbox)? Loudness that is fine on a landing page is tiring there.
 
+**8. Find what gets ignored.** People notice only what relates to their goal and filter out the rest (selective attention), especially anything that looks like an ad. Is critical information (an error, a deadline, a security notice, the next step) styled like a promo banner, a carousel slide, or a colored box in a sidebar or page top? Then it will be skipped.
+
 Write down before editing: **what stays loud** (at most ONE focal element per viewport, plus the primary action). Everything else recedes.
 
 ## How to fix
@@ -37,9 +39,10 @@ Write down before editing: **what stays loud** (at most ONE focal element per vi
    - tint neutrals 1–3% toward the brand hue instead of pure gray.
 3. **Reduce weight:** 900 → 600, 700 → 500 where the element is not the focal point. Keep at least two clearly different weights so hierarchy survives.
 4. **Flatten surfaces:** remove decorative gradients, glows, textures, and stacked shadows. Use one subtle elevation token (e.g. `0 1px 2px` + `0 4px 12px` at ≤ 8% opacity) or a 1px hairline border, not both.
-5. **Calm motion:** shorten travel to 4–12px, durations to 150–250ms, use ease-out (`cubic-bezier(0.25, 1, 0.5, 1)`). Remove autoplaying and decorative loops. No bounce or elastic.
+5. **Calm motion:** shorten travel to 4–12px, durations to 150–250ms, use `var(--ease-out)`. Remove autoplaying and decorative loops. No bounce or elastic.
 6. **Add air:** increase section spacing by one or two steps on the spacing scale; reduce scale jumps between adjacent type roles to 1.2–1.333.
-7. **Express all changes through tokens.** Update DESIGN.md if a token's value changes globally.
+7. **Put critical information where the task is (selective attention):** an error or required step sits inline next to the control it concerns, in the content's own type style, not in a full-width colored banner, carousel, or sidebar box. Keep banner styling for genuinely optional announcements.
+8. **Express all changes through tokens.** Update DESIGN.md if a token's value changes globally.
 
 ## Rules
 - [ ] At most one focal element per viewport; the primary action is still obvious.
@@ -47,6 +50,7 @@ Write down before editing: **what stays loud** (at most ONE focal element per vi
 - [ ] Bold (≥ 700) used only on headings or the focal element.
 - [ ] No glow halos, gradient text, or decorative blur remain.
 - [ ] No animation runs without user input except meaningful progress indicators.
+- [ ] No error, deadline, or required step is styled as a promo banner, carousel slide, or sidebar box.
 - [ ] Section spacing visibly more generous than before.
 - [ ] Contrast still passes: body ≥ 4.5:1, large text and controls ≥ 3:1. Quieter must not mean lower-contrast text.
 - [ ] The surface still looks like this brand, not a generic template.

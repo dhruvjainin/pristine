@@ -46,10 +46,10 @@ Open the Capture and look before touching code. Run these checks in order.
 4. **Set the values:**
    - body 16–18px (1rem–1.125rem); never below 16px for body on mobile (iOS zooms inputs under 16px); mobile web base ≈ 16–17px, and text often gets *bigger* on mobile, not smaller;
    - dense desktop app UI (tables, sidebars, toolbars) may use 13–14px for secondary/data text; reading body and all inputs stay ≥ 16px;
-   - line-height runs inverse to size: body 1.5–1.7; headings 1.05–1.25; tighter as size grows; looser for scripts with tall ascenders or stacked diacritics; tighter (≈1.3–1.4) for dense data UI;
+   - line-height runs inverse to size: body 1.5–1.7; headings 1.05–1.25; tighter as size grows; looser for scripts with tall ascenders or stacked diacritics; 1.4 allowed for dense UI text ≤ 14px;
    - prose `max-width: 60–70ch`;
    - tracking is size-specific, never one value for all sizes: display -0.01 to -0.03em (floor -0.04em), always applied to text ≳ 70–80px; body ≈ 0; small caps, labels, and tiny text (≤ 12px) slightly positive (+0.04 to +0.1em for caps);
-   - weights: body 400, emphasis 500–600, headings 600–800; adjacent roles differ by ≥ 200 weight or ≥ 1.25× size;
+   - weights: body 400, emphasis 500–600, headings 600–800; Lens target: adjacent roles differ by ≥ 200 weight or ≥ 1.25× size (above the craft-floor minimum of 1.125×);
    - tints: 3 text colors (heading, body, subtext) combined with weight and size for hierarchy;
    - set size, weight, and leading together per role; to emphasize inside a role, add weight before size.
 5. **Pairing:** one family is often enough for task UIs. The system font stack (`system-ui`) is a legitimate default with good optical sizing, provided weights, tracking, and scale are still deliberately tuned (check 4 applies); a custom face needs a reason (brand voice, a job system fonts can't do). Set `font-optical-sizing: auto` on variable fonts. Add a second family only when it does a job the first cannot (display voice, code). Never more than two families plus mono.
@@ -62,9 +62,9 @@ Open the Capture and look before touching code. Run these checks in order.
 
 ## Rules
 - [ ] Every text element maps to a named role; no stray px values.
-- [ ] Measure `getComputedStyle(heading).fontSize` after fonts and styles settle in every entry point and matrix cell. It must match the role's declared size (within 1px), or its declared fluid range. A declaration is not evidence when a generic heading selector wins the cascade; fix scope or specificity at the owning role, not by overriding library typography globally.
+- [ ] Measure `getComputedStyle(heading).fontSize` after fonts and styles settle in every route that renders it and every matrix cell. It must match the role's declared size (within 1px), or its declared fluid range. A declaration is not evidence when a generic heading selector wins the cascade; fix scope or specificity at the owning role, not by overriding library typography globally.
 - [ ] Heading, body, label, and caption distinguishable in a blurred Capture.
-- [ ] Body ≥ 16px, line-height 1.5–1.7, measure ≤ 75ch (dense desktop data/secondary text may be 13–14px; inputs never < 16px).
+- [ ] Body ≥ 16px, line-height 1.5–1.7 (1.4 for dense UI text ≤ 14px), headings 1.05–1.25, measure ≤ 75ch (dense desktop data/secondary text may be 13–14px; inputs never < 16px).
 - [ ] Hierarchy uses 3 text tints + weight + size, not size alone.
 - [ ] Display text ≳ 70–80px has negative tracking.
 - [ ] No heading wraps to a single orphan word at any captured width.

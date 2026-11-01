@@ -13,7 +13,7 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 - Reading flows top→bottom, left→right. The most important content sits **top-left** of the grid; supporting content flows right and down.
 - **Sidebar**: workspace/profile at the top; grouped links with icons and group labels; settings and help pinned at the bottom; a clear active state; collapsible to icons on narrower screens.
 - Group related data together and rank groups by importance. Drop labels the UI already implies (a "Dashboard" heading on the dashboard, "Name:" before an obvious name).
-- Separate groups with whitespace, not dividers. Use alternating row backgrounds only when rows are dense.
+- Separate groups with whitespace, not dividers. Inside tables, default to horizontal row dividers only; zebra striping replaces the dividers (never both) only on dense tables wider than 6 columns.
 - No cards inside cards. One surface level per group.
 
 ## Let the data drive the form
@@ -22,7 +22,7 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 |---|---|
 | Numbers, currency, percentages | Right-aligned, `tabular-nums`, consistent decimals and units |
 | Enumerated values (status, plan, type) | Chips/badges, semantic color only when the status means something |
-| Long text | Truncate with ellipsis plus full value on hover/expand |
+| Long text | Wrap, truncate, or clamp per [worst-case-data](worst-case-data.md#truncate-wrap-or-clamp-decide-per-field) |
 | Inactive/archived rows | Shaded or reduced-opacity row, still readable |
 | Time-based events | Timeline or relative time ("2h ago") with absolute time on hover |
 | People ("who") | Avatar plus name; image avatars or neutral initials, never gradient letter blobs |
@@ -35,9 +35,22 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 - Row actions: one primary inline action at most; the rest in a triple-dot menu or on row hover (with a keyboard/touch path).
 - A text button repeated on every row ("Edit", "Copy", "Open") is a finding in tool-style UIs: make it an icon button with a tooltip and an `aria-label` that names the row ("Edit invoice 1042"). Keep text only when no icon is unambiguous for the action, or when it's the row's single primary action and the column has room.
 - Sticky header on long tables. Empty, loading (skeleton rows), and no-results states designed.
-- Exercise a successful connected response with an empty array, separately from offline, loading and error states. After loading settles, require a visible explanation and one usable next action; invoke it and check the destination and preserved draft without auto-submission.
+- Exercise a successful connected response with an empty array, separately from offline, loading and error states. After loading settles, require a visible explanation and one usable next action; invoke it and check the destination, that any entered input is kept, and that nothing submits automatically.
 - A one-column name catalog must have `scrollWidth <= clientWidth + 1` at 390px, including its longest name. Do not inherit a multi-column table's minimum width. True column tables may scroll inside their own container, never the page.
 - Prefer pagination or "Load more" over infinite scroll when anything (footer, totals) lives below.
+
+### Row geometry
+
+- **Every row has the same height.** Cells are one line (`white-space: nowrap`). A cell with several values shows the first, then a `+N` chip whose tooltip or popover lists the rest. If two values share the same label, show the label once with all of their icons in front.
+- **Every cell shares one vertical center.** Use `vertical-align: middle` on table cells, or `align-items: center` on grid rows. Icon and text inside a cell sit in an `align-items: center` flex row, so no column's text sits higher than the others. Chips inline with running text elsewhere use `align-items: baseline`, but inside table cells center wins ([craft-floor](../craft-floor.md#spacing-and-layout)).
+- **Columns size to their content.** Fixed-format columns (status, type, dates, numbers, actions) take their content width. One flexible column, usually the name, takes the leftover space. Any text column may end-truncate or middle-truncate per [worst-case-data](worst-case-data.md#truncate-wrap-or-clamp-decide-per-field), with the full value on hover and focus.
+- **Rows are separated by horizontal lines only.** Drop the vertical lines between columns; alignment already makes the columns. Zebra striping replaces the row lines (never both) only on dense tables wider than 6 columns.
+- **A warning in a row comes with its fix.** A missing-permission chip sits next to the action that fixes it.
+
+Verify with the worst-case fixture (longest name, a cell with the most values, an empty cell):
+- [ ] Every body row's `getBoundingClientRect().height` is equal, within 1px.
+- [ ] In each row, every cell's first text line has the same vertical center, within 1px.
+- [ ] Only the flexible column takes leftover space. Every truncated cell shows its full value on hover and on focus.
 
 ## Charts
 
