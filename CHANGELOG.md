@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+- Design shows its Directions as live Variants: 2–3 structurally different builds of the region on its real route, with real data and no writes, flipped with `?variant=` and and a floating bar (arrow keys too, development builds only). Each pair must differ on two of four axes: layout primitive, block order, primary-action position, how much shows at once. The user picks one or a mix; the choice is rebuilt properly, the full set is kept on a local `prototype/<target>` branch, and every Variant file is removed. 
+- `reference/patterns/variants.md` replaces `direction-mocks.md`, and `scripts/compare.mjs` is removed: there are no standalone mocks and no side-by-side board, only the live page and its bottom bar.
+- Polish offers live Variants when a fix needs a new structure (reordered blocks, a different layout primitive, a moved primary action) instead of only recommending `/pristine design`. One set per run, before any other Lens. Layout and distill scope rules updated to match.
+- Bare `/pristine` routes "show me a few layouts" requests to design.
+
 ## 0.4.0
 
 - Read every `DESIGN.md` that applies to a target, not just the root one: repo root, monorepo app or package, component directory, and any file named on an `Extends:` line. The nearest file wins; everything else is inherited. `scripts/design-context.mjs` resolves the chain, and `/pristine init [path]` writes a package or component file holding only its overrides.

@@ -55,6 +55,7 @@ const tokens = (cmd.match(/\[[^\]]+\]|"[^"]*"|\s+|\S+/g) ?? []).map((t) => {
   .copy__prompt { color: var(--ink-3); margin-right: 0.6ch; user-select: none; }
   .copy button { position: relative; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border: 0; border-radius: 4px; background: none; color: var(--ink-2); cursor: pointer; touch-action: manipulation; transition: background-color var(--dur-state) var(--ease-out), color var(--dur-state) var(--ease-out), transform var(--dur-press) var(--ease-out); }
   .copy button:active { transform: scale(0.94); }
+  @media (max-width: 640px) { .copy { padding: 2px 2px 2px var(--s-3); } .copy button { width: 44px; height: 44px; } }
   .copy__icon, .copy__check { grid-area: 1 / 1; transition: opacity var(--dur-state) var(--ease-out), transform var(--dur-state) var(--ease-out); }
   .copy__check { opacity: 0; transform: scale(0.8); color: var(--ok); }
   .is-copied .copy__icon { opacity: 0; transform: scale(0.8); }

@@ -1,6 +1,6 @@
 ---
 name: pristine
-description: "Make web UI pristine. Use when the user wants to document a product's design context (DESIGN.md), critique or rate a UI, screenshot, URL, or file, design a new page/component/flow from scratch or redesign an existing one, or polish/improve any web interface: sites, apps, components, docs, blogs, landing pages, dashboards, charts. Covers hierarchy, layout, typography, color, dark mode, responsive/mobile, 60fps motion and micro-transitions, accessibility, UX copy, edge cases, and performance. Commands: init, critique, design, polish (bare invocation routes by intent). Not for native iOS/Android or backend-only work."
+description: "Make web UI pristine. Use when the user wants to document a product's design context (DESIGN.md), critique or rate a UI, screenshot, URL, or file, design a new page/component/flow from scratch or redesign an existing one, see several live layout variants of a page to choose from, or polish/improve any web interface: sites, apps, components, docs, blogs, landing pages, dashboards, charts. Covers hierarchy, layout, typography, color, dark mode, responsive/mobile, 60fps motion and micro-transitions, accessibility, UX copy, edge cases, and performance. Commands: init, critique, design, polish (bare invocation routes by intent). Not for native iOS/Android or backend-only work."
 argument-hint: "[init | critique | design | polish [lens]] [url | screenshot | file path | feature name]"
 user-invocable: true
 license: Apache-2.0
@@ -18,7 +18,7 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 |---|---|---|
 | `/pristine init [path]` | Learn the product, Personas, and Design System; write `DESIGN.md` (repo root, or a package/component directory's overrides) | [reference/init.md](reference/init.md) |
 | `/pristine critique [target]` | Score the target out of 10 per Dimension, through the Personas, with the fixes to reach 10/10. No edits. | [reference/critique.md](reference/critique.md) |
-| `/pristine design [target]` | Build new UI from scratch, or redesign existing UI in a new Direction (keeping its content and behavior): show 2–3 Directions as side-by-side mocks (A, B, C), build the chosen one. Edits code. | [reference/design.md](reference/design.md) |
+| `/pristine design [target]` | Build new UI from scratch, or redesign existing UI in a new Direction (keeping its content and behavior): show 2–3 Directions as live Variants on the real route, flipped with `?variant=` and a bottom bar (A, B, C), build the chosen one. Edits code. | [reference/design.md](reference/design.md) |
 | `/pristine polish [lens…] [target]` | Diagnose, then apply the Lenses that raise the Score, keeping the current look. Edits code. | [reference/polish.md](reference/polish.md) |
 | `/pristine [target]` or any other design request | Routes by intent (below) to design or polish | — |
 
@@ -28,12 +28,13 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 |---|---|
 | doesn't exist yet ("build a pricing page", "add an onboarding flow", a new file path, an empty route) | **design** |
 | exists, and the user wants a new look or direction ("redesign", "revamp", "make it look completely different", "start over", "it looks dated") | **design** (redesign case) |
+| exists (or belongs inside a page that does), and the user wants to see options for its layout or structure ("show me a few layouts", "try three versions", "what could this look like") | **design** (redesign case, structure only) |
 | exists, and the user wants it better, fixed, or finished ("improve", "clean up", "make it pop", "fix mobile") or gives no instruction | **polish** |
 | only asks for an opinion or a rating | **critique** |
 
-If the request is truly ambiguous between a redesign and a polish, ask once. Otherwise state the route in one line and proceed. If polish places the target below Level 6 (template), or a Persuade surface at Level 6 or below, recommend `/pristine design` in its report instead of quietly redesigning.
+If the request is truly ambiguous between a redesign and a polish, ask once. Otherwise state the route in one line and proceed. If polish places the target below Level 6 (template), or a Persuade surface at Level 6 or below, recommend `/pristine design` in its report instead of quietly redesigning. If polish finds a fix that needs a new structure, it offers live Variants of that region ([reference/polish.md](reference/polish.md) Step 3).
 
-Pattern files in `reference/patterns/` (landing pages, dashboards and charts, forms, mobile web, onboarding and signup, chat and agents, vibe-code tells, motion recipes, worst-case data, direction mocks) are loaded by `critique`, `design`, and `polish` based on the surface's mode and the Lenses in play.
+Pattern files in `reference/patterns/` (landing pages, dashboards and charts, forms, mobile web, onboarding and signup, chat and agents, vibe-code tells, motion recipes, worst-case data, live variants) are loaded by `critique`, `design`, and `polish` based on the surface's mode and the Lenses in play.
 
 ## Target
 
@@ -64,7 +65,7 @@ Routing rules:
 
 1. **Look before judging.** Never critique or edit from imagination. Run a **Capture** per [reference/capture.md](reference/capture.md) before judging, and again to verify before reporting. For a runnable target, capture every Capture Matrix cell and every state the surface has (focus, hover, menus, loading, empty, error); if you know a state exists and don't capture it, that's a miss, not a caveat. For a screenshot target, judge the provided image and list the cells and states it doesn't show. Don't score a state you haven't captured, and say "verified" only for what you checked under the user's real conditions (current build, warm cache).
 2. **DESIGN.md wins.** Read the target's whole chain first; the nearest file wins conflicts. Use its tokens, type scale, and components; extend the system instead of inventing ad-hoc values. A brief or explicit user instruction overrides your taste.
-3. **Refine, don't smuggle a redesign.** `polish` keeps the product's identity, content, and behavior. A new look happens only through `design`, where the user picks the Direction. Always ask before changing factual copy, claims, brand identity, or adding dependencies.
+3. **Refine, don't smuggle a redesign.** `polish` keeps the product's identity, content, and behavior. A new look happens only through `design`, where the user picks the Direction. A new structure happens only through live Variants, where the user picks one. Always ask before changing factual copy, claims, brand identity, or adding dependencies.
 4. **Meet the craft floor.** Read [reference/craft-floor.md](reference/craft-floor.md) before any UI edit. Its bans hold unless DESIGN.md explicitly records an exception (accessibility and dark-pattern bans never yield), and its **default standard** (WCAG 2.2 AA, evergreen browsers, readable with JS off, reduced motion, LCP < 2.5s on mobile, no new fonts/deps without approval) applies unless DESIGN.md records an exception.
 5. **Run the detector** on edited or critiqued source files: `node <skill dir>/scripts/detect.mjs <paths>`. Treat findings as evidence to verify, not verdicts. A clean scan does not prove quality.
 6. **Be concrete.** Name the element, file, value, and fix. "Improve spacing" is not feedback; "Hero CTA sits 8px from the subhead; use `--space-6` (24px)" is.
@@ -114,4 +115,5 @@ These are the laws behind the Lenses. Each link goes to the checks and fixes tha
 - **Score**: overall /10 plus each Dimension /10.
 - **Lens**: one improvement technique, applied during Polish and used as build rules during Design.
 - **Direction**: a short design brief (idea, structure, type, color, motion, signature moment) offered as one of 2–3 options before Design builds anything.
+- **Variant**: one of 2–3 structurally different live builds of the same region on its real route, flipped with a bottom bar for the user to pick from ([reference/patterns/variants.md](reference/patterns/variants.md)). In design, each Variant is one Direction.
 - **Capture**: screenshots across the **Capture Matrix**: {light, dark} × {desktop 1440×900, mobile 390×844}.

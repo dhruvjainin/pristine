@@ -5,7 +5,7 @@
 - **Fresh**: the UI doesn't exist yet (a new page, section, component, or flow).
 - **Redesign**: the UI exists and the user wants a new look, not just a better version of the current one.
 
-Both cases offer 2–3 **Directions** (as side-by-side mocks when they differ in layout), build the one the user picks, and verify it visually. **It edits code.**
+Both cases offer 2–3 **Directions** (as live **Variants** on the real route, flipped with a bar at the bottom, when they differ in layout), build the one the user picks, and verify it visually. **It edits code.**
 
 | | Fresh | Redesign |
 |---|---|---|
@@ -15,6 +15,8 @@ Both cases offer 2–3 **Directions** (as side-by-side mocks when they differ in
 | Free to change | Everything within the system | Layout, hierarchy, type, color, motion, and component styling |
 
 If the user only wants the existing UI to be better without changing its look, that's **polish**, not redesign.
+
+If the user only asks for layout options ("show me a few layouts", "try three versions of this table"), that's a redesign where every Direction keeps the current Design System and differs in **Structure** only.
 
 ## Step 1: Context
 
@@ -50,7 +52,7 @@ Rules:
 - Stay inside DESIGN.md's Brand and Design System unless the user asked for a new look; for a redesign, at least one Direction should keep the brand recognizable.
 - Ground every choice in the Personas or the brief. "Modern and clean" is not a reason.
 - Mark one as **Recommended**, list it first, and say why in one line.
-- **Show them, don't only describe them.** When the Directions differ in layout or structure, build a mock of each and open them side by side as A, B, C, with the Recommended one marked, per [patterns/direction-mocks.md](patterns/direction-mocks.md). Skip the mocks when the Directions differ only in non-visual ways (copy tone, motion) or when the user named a direction or gave a reference image.
+- **Show them, don't only describe them.** When the Directions differ in layout or structure, build each one as a live Variant on the target's real route and switch between them with `?variant=A`, `B`, `C` and a bar at the bottom of the page, with the Recommended one marked, per [patterns/variants.md](patterns/variants.md). That file also covers the choice, keeping the full set, and removing the Variants afterwards. Skip the Variants when the Directions differ only in non-visual ways (copy tone, motion) or when the user named a direction or gave a reference image.
 - Present them with the harness's choice UI. If the user already named a direction ("make it brutalist", "like our marketing site"), turn that into a single Direction, state it in two lines, and proceed without asking.
 - **A reference image fixes the look, not the behavior.** When the user says "make it like this screenshot", skip the Directions, but don't guess what a still image can't show. Before building, list what the image leaves open: how states change (idle, running, success, error), what moves and how (a pulse, a spin, a progress sweep, nothing), hover and focus, and loading. Ask **one** question about motion and state behavior, offering 2–3 concrete options with a recommended one first (e.g. for a "running" status: 1. a slow opacity pulse, 2. a rotating dashed ring, 3. static with a label). Ask more only if another open behavior would change the build.
 
@@ -78,7 +80,7 @@ Rules:
 ```markdown
 ## Pristine Design (<fresh | redesign>): <target> (<route>; files: <created/edited files>)
 Design context: <DESIGN.md chain, or "none">
-**Direction: <name>** · **Score: <before → >Y/10** · Level: <n> · Captured: <cells and states> (paths) · Not captured: <states, or "none">
+**Direction: <name>** (from A · <name>, B · <name>, C · <name>; full set: branch `prototype/<target-slug>`) · **Score: <before → >Y/10** · Level: <n> · Captured: <cells and states> (paths) · Not captured: <states, or "none">
 
 ### What was built
 - <structure, signature moment, and the system changes (tokens and DESIGN.md)>

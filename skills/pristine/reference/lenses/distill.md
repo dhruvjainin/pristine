@@ -4,7 +4,7 @@ Distill is about removing the obstacles between a Persona and their goal. Simpli
 
 **Raises:** Hierarchy & clarity, Persona fit.
 **Skip it when:** the target is sparse and the problem is flatness (use bolder) or missing information (use clarify or harden). For intensity problems without excess elements, use quieter. Never remove features the Personas need. This lens also covers "simplify".
-**Polish scope:** In polish, adjust within the existing structure; structural changes (new sections, reordering, cutting copy beyond filler, adding artifacts) go in the report as a `/pristine design` recommendation.
+**Polish scope:** In polish, adjust within the existing structure. A fix that needs a new structure for the same content (reordering blocks, a different layout primitive, moving the primary action) goes through live Variants the user picks from, per [polish.md](../polish.md) Step 3. Changes to the content itself (new sections, cutting copy beyond filler, adding artifacts) go in the report as a `/pristine design` recommendation.
 
 ## What a designer looks at
 
