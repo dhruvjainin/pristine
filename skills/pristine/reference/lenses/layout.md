@@ -4,7 +4,7 @@ Layout is the order in which someone's eye travels, and whether that order match
 
 **Raises:** Layout & spacing, Hierarchy & clarity.
 **Skip it when:** structure is sound and only type or color is weak (use typeset or colorize). If the problem is *too much stuff*, run distill first, then layout. If it only breaks at one viewport, use adapt.
-**Polish scope:** In polish, adjust within the existing structure; structural changes (new sections, reordering, cutting copy beyond filler, adding artifacts) go in the report as a `/pristine design` recommendation.
+**Polish scope:** In polish, adjust within the existing structure. A fix that needs a new structure for the same content (reordering blocks, a different layout primitive, moving the primary action) goes through live Variants the user picks from, per [polish.md](../polish.md) Step 3. Changes to the content itself (new sections, cutting copy beyond filler, adding artifacts) go in the report as a `/pristine design` recommendation.
 
 ## What a designer looks at
 

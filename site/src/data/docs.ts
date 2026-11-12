@@ -106,7 +106,7 @@ export const commandDocs: CommandDoc[] = [
     name: "design",
     line: "Build something new, or redesign what you have in a new direction.",
     intro:
-      "Design is for when there's nothing to polish yet, or when the current look can't reach a 10. It offers two or three Directions, shown as live mocks side by side in your browser (A, B, C, with one marked Recommended), builds the one you pick in your real codebase, and checks it in all four Capture cells before it says it's done. A redesign keeps every feature and every word that matters.",
+      "Design is for when there's nothing to polish yet, or when the current look can't reach a 10. It offers two or three Directions, built live on your real page (A, B, C, with one marked Recommended). Add ?variant=B to the URL or use the small bar at the bottom to flip between them. It builds the one you pick properly, removes the others, and checks it in all four Capture cells before it says it's done. A redesign keeps every feature and every word that matters.",
     edits: true,
     tryIt: [
       { cmd: "/pristine design a pricing page for teams of 5 to 50", note: "A fresh build. Say who it's for and it shapes the Directions around them." },
@@ -116,7 +116,7 @@ export const commandDocs: CommandDoc[] = [
     ],
     steps: [
       { t: "Reads context and the baseline", d: "DESIGN.md, the routes around the target, and on a redesign a full Capture of the current page plus a list of every feature it must keep." },
-      { t: "Shows 2 to 3 Directions", d: "Each one is an idea, not a shade. Layout Directions open as mocks side by side, one marked Recommended. You pick in your agent." },
+      { t: "Shows 2 to 3 Directions", d: "Each one is an idea, not a shade. Layout Directions run live on your real route with your real data, one marked Recommended. A bar at the bottom flips between them. You pick in your agent." },
       { t: "Builds tokens first", d: "Extends your tokens with what the Direction needs and updates DESIGN.md to match. No hard-coded one-off values." },
       { t: "Builds to the craft floor", d: "Light and dark, desktop and mobile, every state (empty, loading, error, long content), keyboard and screen reader." },
       { t: "Verifies by looking", d: "One more Capture of all four cells, then fixes what it finds before reporting." },
@@ -163,6 +163,7 @@ export const commandDocs: CommandDoc[] = [
       "Do the main task on a narrow screen, then try the empty, loading and error states.",
       "Tab through it. Every focusable thing should show where focus is.",
       "If polish says the page is below Level 6, it will recommend design instead of quietly redesigning.",
+      "If a fix needs a new layout, polish asks first, then shows three live Variants to pick from.",
     ],
     followUp: { cmd: "The error message is clearer now, but the form jumps when it appears. Keep the button still.", note: "Point at what's still wrong; it fixes that and captures again." },
     related: ["critique", "design"],

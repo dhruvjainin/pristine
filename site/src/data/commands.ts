@@ -18,9 +18,9 @@ export const commands = [
   {
     name: "design",
     usage: '/pristine design "a pricing page for teams"',
-    does: "Builds new UI from scratch, or redesigns existing UI in a new direction. Shows 2 to 3 Directions as side-by-side mocks, builds the one you pick, keeps every feature on a redesign.",
+    does: "Builds new UI from scratch, or redesigns existing UI in a new direction. Shows 2 to 3 Directions live on the real page, side by side, with a switch at the bottom, builds the one you pick, keeps every feature on a redesign.",
     when: "Nothing exists yet, or the current look can't be polished to a 10.",
-    out: ["2 to 3 Directions as mocks, side by side, to choose from", "Production code to the craft floor, in light and dark, desktop and mobile", "A preserved-features checklist on redesigns"],
+    out: ["2 to 3 Directions running on your real route, flipped with a bar, to choose from", "Production code to the craft floor, in light and dark, desktop and mobile", "A preserved-features checklist on redesigns"],
     edits: true,
   },
   {
@@ -36,6 +36,7 @@ export const commands = [
 export const routes = [
   { ask: "\u201cBuild a pricing page\u201d", to: "design" },
   { ask: "\u201cRedesign the dashboard, it looks dated\u201d", to: "design" },
+  { ask: "\u201cShow me three layouts for the invoices table\u201d", to: "design" },
   { ask: "\u201cClean up the settings page\u201d", to: "polish" },
   { ask: "\u201cIs this signup any good?\u201d", to: "critique" },
 ];

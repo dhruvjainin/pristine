@@ -1,0 +1,101 @@
+---
+import { examples } from "../data/examples";
+---
+<div class="wp">
+  <div class="wp__tabs" role="tablist" aria-label="Examples">
+    {examples.map((e, i) => (
+      <button type="button" role="tab" aria-selected={i === 0 ? "true" : "false"} id={`wp-${e.slug}`} aria-controls={`wp-p-${e.slug}`} tabindex={i === 0 ? 0 : -1} data-wp-tab>
+        <span>{e.title}</span>
+        <span class="mono num wp__s"><span class="pen">{e.before.score.toFixed(1)}</span> → <span class="ok">{e.after.score.toFixed(1)}</span></span>
+      </button>
+    ))}
+  </div>
+  {examples.map((e, i) => (
+    <div class="wp__panel" role="tabpanel" id={`wp-p-${e.slug}`} aria-labelledby={`wp-${e.slug}`} data-wp-panel>
+      <div class="wp__stage" style="--x: 50%">
+        <picture>
+          <source media="(max-width: 720px)" srcset={`/shots/${e.slug}/after/mobile-light.webp`} />
+          <img src={`/shots/${e.slug}/after/desktop-light.webp`} alt={`${e.title} after Pristine`} loading={i === 0 ? "eager" : "lazy"} />
+        </picture>
+        <picture class="wp__before">
+          <source media="(max-width: 720px)" srcset={`/shots/${e.slug}/before/mobile-light.webp`} />
+          <img src={`/shots/${e.slug}/before/desktop-light.webp`} alt={`${e.title} before Pristine`} loading={i === 0 ? "eager" : "lazy"} />
+        </picture>
+        <span class="wp__tag wp__tag--b mono">Before <b class="pen num">{e.before.score.toFixed(1)}</b></span>
+        <span class="wp__tag wp__tag--a mono">After <b class="ok num">{e.after.score.toFixed(1)}</b></span>
+        <span class="wp__line" aria-hidden="true"><span class="wp__knob">↔</span></span>
+        <input type="range" min="0" max="100" value="50" aria-label={`Drag to compare ${e.title} before and after`} aria-valuetext="Before shows 50%" />
+      </div>
+      <aside class="wp__notes">
+        <p class="wp__mode mono">{e.mode}</p>
+        <p class="wp__blurb">{e.blurb}</p>
+        <ol class="wp__marks" aria-label="What the critique flagged">
+          {e.critique.slice(0, 3).map((c) => (
+            <li><span class="mono wp__p">{c.priority}</span><span class="wp__mt">{c.title}</span><span class="mono wp__lens">Lens: {c.lens}</span></li>
+          ))}
+        </ol>
+        <p class="wp__cap">Fixed by <code>{e.command}</code>.</p>
+        <p class="wp__links"><a href={`/demo/${e.slug}/before`}>Open before</a><a href={`/demo/${e.slug}/after`}>Open after</a><a href={`/examples/${e.slug}`}>Read the critique</a></p>
+      </aside>
+    </div>
+  ))}
+</div>
+<script is:inline>document.querySelectorAll("[data-wp-panel]").forEach((p, i) => { p.hidden = i > 0; });</script>
+<script>
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>("[data-wp-tab]")];
+  const show = (t: HTMLButtonElement) => {
+    tabs.forEach((o) => { o.setAttribute("aria-selected", String(o === t)); o.tabIndex = o === t ? 0 : -1; });
+    document.querySelectorAll<HTMLElement>("[data-wp-panel]").forEach((p) => { p.hidden = p.id !== t.getAttribute("aria-controls"); });
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => show(t));
+    t.addEventListener("keydown", (e) => {
+      const n = tabs.length;
+      const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: n - 1 }[e.key];
+      if (to === undefined) return;
+      e.preventDefault();
+      const next = tabs[(to + n) % n];
+      show(next); next.focus();
+    });
+  });
+  document.querySelectorAll<HTMLInputElement>(".wp__stage input").forEach((r) => {
+    r.addEventListener("input", () => { r.parentElement!.style.setProperty("--x", r.value + "%"); r.setAttribute("aria-valuetext", `Before shows ${r.value}%`); });
+  });
+</script>
+<style>
+  .wp { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+  .wp__tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); }
+  .wp__tabs button { display: flex; align-items: center; justify-content: center; gap: var(--s-2); min-height: 44px; padding: 0 var(--s-3); border: 1px solid var(--rule); border-radius: 999px; background: none; color: var(--ink-2); font: 500 var(--text-sm)/1.2 var(--font-body); text-align: center; cursor: pointer; }
+  .wp__tabs button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+  .wp__tabs button[aria-selected="true"] :is(.pen, .ok) { color: inherit; }
+  .wp__tabs button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .wp__s { font-size: var(--text-xs); white-space: nowrap; }
+  .wp__panel:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--s-6); align-items: start; }
+  .wp__stage { position: relative; aspect-ratio: 1440 / 900; overflow: hidden; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface-2); box-shadow: var(--shadow); }
+  .wp__stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .wp__before img { clip-path: inset(0 calc(100% - var(--x)) 0 0); }
+  .wp__tag { position: absolute; bottom: var(--s-3); padding: 4px 8px; border-radius: 4px; background: var(--paper); color: var(--ink); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid var(--rule); }
+  .wp__tag--b { left: var(--s-3); }
+  .wp__tag--a { right: var(--s-3); }
+  .wp__line { position: absolute; top: 0; bottom: 0; left: var(--x); width: 2px; margin-left: -1px; background: var(--ink); }
+  .wp__knob { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: var(--on-ink); font: 500 var(--text-md)/1 var(--font-mono); }
+  .wp__stage input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+  .wp__stage:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .wp__notes { display: grid; gap: var(--s-4); align-content: start; }
+  .wp__mode { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+  .wp__blurb { color: var(--ink-2); font-size: var(--text-sm); }
+  .wp__marks { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
+  .wp__marks li { display: grid; gap: 2px; padding-left: var(--s-3); border-left: 2px solid var(--pen); }
+  .wp__p { font-size: var(--text-xs); color: var(--pen); font-weight: 600; }
+  .wp__mt { font: italic 400 var(--text-md)/1.35 var(--font-display); }
+  .wp__lens { font-size: var(--text-xs); color: var(--ink-3); }
+  .wp__cap { font-size: var(--text-sm); color: var(--ink-2); }
+  .wp__links { display: flex; flex-wrap: wrap; gap: 0 var(--s-5); font-size: var(--text-sm); }
+  .wp__links a { display: inline-flex; align-items: center; min-height: 44px; }
+  @media (max-width: 960px) { .wp__panel:not([hidden]) { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 720px) {
+    .wp__tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
+    .wp__tabs button { flex: none; white-space: nowrap; }
+    .wp__stage { aspect-ratio: 390 / 560; }
+  }
+</style>

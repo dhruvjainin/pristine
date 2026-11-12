@@ -108,6 +108,7 @@ const nav = [
     <style>
       .skip { position: absolute; left: var(--s-4); top: -60px; z-index: 50; padding: var(--s-2) var(--s-4); background: var(--ink); color: var(--on-ink); border-radius: var(--radius-sm); }
       .skip:focus { top: var(--s-4); }
+      .skip { min-height: 44px; display: inline-flex; align-items: center; }
       .top { position: sticky; top: 0; z-index: 20; background: color-mix(in oklab, var(--paper) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); padding-top: env(safe-area-inset-top); }
       .top__inner { display: flex; align-items: center; gap: var(--s-6); min-height: 64px; }
       .wordmark { display: inline-flex; align-items: center; gap: var(--s-2); font: 500 1.25rem/1 var(--font-display); letter-spacing: -0.02em; text-decoration: none; }
@@ -137,7 +138,8 @@ const nav = [
       }
       @media (max-width: 640px) {
         .top__nav, .top__cta, .top__actions > .top__icon { display: none; }
-        .wordmark { margin-right: auto; }
+        .wordmark { margin-right: auto; min-height: 44px; }
+        .top__icon, .theme { width: 44px; height: 44px; }
         .menu { display: block; }
       }
       .foot { border-top: 1px solid var(--rule); padding-block: var(--s-7) calc(var(--s-7) + env(safe-area-inset-bottom)); color: var(--ink-2); font-size: var(--text-sm); }
