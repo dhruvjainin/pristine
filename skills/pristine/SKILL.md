@@ -1,7 +1,7 @@
 ---
 name: pristine
-description: "Make web UI pristine. Use when the user wants to document a product's design context (DESIGN.md), critique or rate a UI, screenshot, URL, or file, design a new page/component/flow from scratch or redesign an existing one, see several live layout variants of a page to choose from, or polish/improve any web interface: sites, apps, components, docs, blogs, landing pages, dashboards, charts. Covers hierarchy, layout, typography, color, dark mode, responsive/mobile, 60fps motion and micro-transitions, accessibility, UX copy, edge cases, and performance. Commands: init, critique, design, polish (bare invocation routes by intent). Not for native iOS/Android or backend-only work."
-argument-hint: "[init | critique | design | polish [lens]] [url | screenshot | file path | feature name]"
+description: "Make web UI pristine. Use when the user wants to document a product's design context (DESIGN.md), critique or rate a UI, screenshot, URL, or file, design a new page/component/flow from scratch or redesign an existing one, see several live layout variants of a page to choose from, or polish/improve any web interface: sites, apps, components, docs, blogs, landing pages, dashboards, charts. Covers hierarchy, layout, typography, color, dark mode, responsive/mobile, 60fps motion and micro-transitions, accessibility, UX copy, edge cases, and performance, including a goal-driven loop that measures load and page transitions across network speeds and devices until the page is fast enough. Commands: init, critique, design, polish, perf (bare invocation routes by intent). Not for native iOS/Android or backend-only work."
+argument-hint: "[init | critique | design | polish [lens] | perf] [url | screenshot | file path | feature name]"
 user-invocable: true
 license: Apache-2.0
 ---
@@ -20,6 +20,7 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 | `/pristine critique [target]` | Score the target out of 10 per Dimension, through the Personas, with the fixes to reach 10/10. No edits. | [reference/critique.md](reference/critique.md) |
 | `/pristine design [target]` | Build new UI from scratch, or redesign existing UI in a new Direction (keeping its content and behavior): show 2–3 Directions as live Variants on the real route, flipped with `?variant=` and a bottom bar (A, B, C), build the chosen one. Edits code. | [reference/design.md](reference/design.md) |
 | `/pristine polish [lens…] [target]` | Diagnose, then apply the Lenses that raise the Score, keeping the current look. Edits code. | [reference/polish.md](reference/polish.md) |
+| `/pristine perf [goal] [target]` | Set a speed goal, measure load and transitions across networks, devices, and cold/warm visits, then fix one bottleneck at a time, keeping only measured wins, until the goal is met. Edits code. | [reference/perf.md](reference/perf.md) |
 | `/pristine [target]` or any other design request | Routes by intent (below) to design or polish | — |
 
 **Intent routing** for a bare invocation or a plain-language request:
@@ -30,6 +31,7 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 | exists, and the user wants a new look or direction ("redesign", "revamp", "make it look completely different", "start over", "it looks dated") | **design** (redesign case) |
 | exists (or belongs inside a page that does), and the user wants to see options for its layout or structure ("show me a few layouts", "try three versions", "what could this look like") | **design** (redesign case, structure only) |
 | exists, and the user wants it better, fixed, or finished ("improve", "clean up", "make it pop", "fix mobile") or gives no instruction | **polish** |
+| exists, and the user wants it faster ("slow", "load time", "faster than X", "3G") | **perf** |
 | only asks for an opinion or a rating | **critique** |
 
 If the request is truly ambiguous between a redesign and a polish, ask once. Otherwise state the route in one line and proceed. If polish places the target below Level 6 (template), or a Persuade surface at Level 6 or below, recommend `/pristine design` in its report instead of quietly redesigning. If polish finds a fix that needs a new structure, it offers live Variants of that region ([reference/polish.md](reference/polish.md) Step 3).
@@ -57,7 +59,7 @@ Rules:
 
 Routing rules:
 1. Load exactly one playbook above and follow it step by step.
-2. `critique` never edits files. `design` and `polish` always edit files.
+2. `critique` never edits files. `design`, `polish`, and `perf` always edit files.
 3. If no `DESIGN.md` applies to the target, every command except `init` still runs (use the code as the Design System and generic Personas), then offer `/pristine init` at the end. Never block on it.
 4. Lens words after `polish` (e.g. `polish bolder animate`) force those Lenses. Valid Lenses are listed in [reference/polish.md](reference/polish.md).
 

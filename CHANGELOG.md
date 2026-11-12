@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- New `perf` command: set a speed goal, measure load and page transitions across network speeds (slow 3G to none), devices (mobile with CPU slowdown, desktop), and cold and warm visits, then fix one bottleneck at a time and keep only changes that beat the noise, until the goal is met or three tries in a row fail.
+- `scripts/perf.mjs` runs that matrix with Playwright and prints medians for TTFB, FCP, LCP, ready, TBT, CLS, bytes and requests, plus click-to-content times for `--steps`. `--compare` measures a second URL side by side; `--cdp` attaches to a signed-in Chrome.
+- Bare `/pristine` routes "it's slow" and "faster than X" requests to perf.
+
 ## 0.5.0
 
 - Design shows its Directions as live Variants: 2–3 structurally different builds of the region on its real route, with real data and no writes, flipped with `?variant=` and and a floating bar (arrow keys too, development builds only). Each pair must differ on two of four axes: layout primitive, block order, primary-action position, how much shows at once. The user picks one or a mix; the choice is rebuilt properly, the full set is kept on a local `prototype/<target>` branch, and every Variant file is removed. 
