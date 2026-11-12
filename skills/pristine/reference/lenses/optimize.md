@@ -3,6 +3,7 @@
 Optimize is about how fast the product feels to the Persona on their real device, not on a developer's laptop. A designer judges speed by what they see: when the main content appears, whether things jump, and whether every tap answers instantly; then they measure, fix the biggest bottleneck, and measure again.
 
 **Raises:** Robustness & performance.
+**For a speed goal** ("faster than X", "under 2s on 3G"), use `/pristine perf` ([../perf.md](../perf.md)) instead: it loops until the goal is met.
 **Skip it when:** nothing is measurably slow; do not optimize by guesswork. Never trade accessibility, content, or the Design System's visual quality for a better number.
 
 ## What a designer looks at

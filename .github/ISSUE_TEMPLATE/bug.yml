@@ -6,7 +6,7 @@ body:
     id: command
     attributes:
       label: Command
-      options: [init, critique, design, polish, bare /pristine, capture.mjs, detect.mjs, site]
+      options: [init, critique, design, polish, perf, bare /pristine, capture.mjs, detect.mjs, perf.mjs, site]
     validations:
       required: true
   - type: input
