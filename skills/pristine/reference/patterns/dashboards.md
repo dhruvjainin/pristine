@@ -12,6 +12,7 @@ Use for **Operate** surfaces: apps, admin panels, dashboards, settings, data too
 - Four primitives build almost every dashboard: **lists/tables, cards, inputs, tabs**. Reach for a new primitive only when these fail.
 - Reading flows top→bottom, left→right. The most important content sits **top-left** of the grid; supporting content flows right and down.
 - **Sidebar**: workspace/profile at the top; grouped links with icons and group labels; settings and help pinned at the bottom; a clear active state; collapsible to icons on narrower screens.
+- **Account menu**: items come from this Persona's tasks in this product (a task tracker: set away status, pause notifications, switch workspace), not from other products' account menus. It doesn't repeat what its trigger already shows (name, then email beneath it) or a control already on screen (a Help item beside a Help icon). Show the email only when it tells accounts apart (several signed-in accounts or workspaces).
 - Group related data together and rank groups by importance. Drop labels the UI already implies (a "Dashboard" heading on the dashboard, "Name:" before an obvious name).
 - Separate groups with whitespace, not dividers. Inside tables, default to horizontal row dividers only; zebra striping replaces the dividers (never both) only on dense tables wider than 6 columns.
 - No cards inside cards. One surface level per group.
@@ -52,6 +53,14 @@ Verify with the worst-case fixture (longest name, a cell with the most values, a
 - [ ] In each row, every cell's first text line has the same vertical center, within 1px.
 - [ ] Only the flexible column takes leftover space. Every truncated cell shows its full value on hover and on focus.
 
+## Linked entities
+
+- Every entity name on a page (project, owner, assignee, customer, parent item) links to its detail page. Pages reach each other through their content, not only through the sidebar.
+- Entity links get a hover preview card that answers the quick question without leaving the page. It shows 2–4 fields chosen for the page it opens from (from a task, a project card shows assignees, status, and team; not every project field), plus a link to the full page.
+- The card opens after ~500ms of hover and on keyboard focus, stays open while the pointer is on the card, closes on Escape, and never holds the only path to its data. On touch, a tap follows the link.
+
+Verify: from each detail page, the Persona's next question is answered in at most one click without leaving the page.
+
 ## Charts
 
 - Axes, gridlines (light), axis labels, units, and a **summary value** (total, change vs. previous period) above the chart.
@@ -86,4 +95,5 @@ Warnings and errors that don't block: toast or inline. Destructive actions: sema
 - Dead cards: placeholder "Coming soon" or empty decorative charts.
 - Every card has 3–4 visible action buttons; collapse to one plus an overflow menu.
 - A flyout/popover containing only one or two items; inline them or use a proper menu.
+- Entity names as plain text, and pages that link only to the sidebar, never to each other.
 - Bright AI-picked colors on every chart and icon; color should mark status or the one series that matters.

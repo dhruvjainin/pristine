@@ -13,6 +13,10 @@ Signals that a UI was generated and shipped without a designer's eye. Each one c
 | Dead cards ("Coming soon", empty decorative charts) | Promises that break on click | Remove, or replace with a real empty state | distill |
 | Cluttered card actions (3–4 buttons per card) | Every card shouts; nothing is primary | One primary action plus an overflow menu | distill |
 | Sparse flyouts (1–2 items) | Extra click for nothing | Inline the actions, or use a proper menu/modal | layout |
+| Menu, popover, or card items copied from other products without a job here (the email under the name in an account menu, a Help item beside a visible Help icon) | The part survives but its reason doesn't; the Persona reads past items that answer nothing | Purpose test ([distill](../lenses/distill.md) check 3): name the question each item answers for this Persona on this surface. No answer, or the answer is already visible or one click away: cut it, and fill the space with the Persona's own tasks | distill |
+| A chevron that points away from where its menu opens (a down arrow on a bottom-of-screen account button whose menu opens upward) | The signal and the result disagree. P2 only; doesn't count toward critique's three-tell cap | Point the chevron toward where the menu opens, or use a neutral up-down chevron | polish-details |
+| Three dropdowns (day, month, year) for a near date | The user must work out which date "this Friday" is; the system pushed its work onto them | A calendar grid with weekday headers that also accepts a typed date ([forms](forms.md#4-pick-the-right-control)) | distill |
+| Entity names (project, owner, assignee, customer) shown as plain text; pages reach each other only through the sidebar | Each feature was built as its own page and never wired to the others; a quick question costs several clicks and loses the current page | Link every entity name to its detail page, with a hover preview card ([dashboards](dashboards.md#linked-entities)) | layout |
 | Too many pricing plans | Choice paralysis | ≤3–4 plans with one recommended | distill |
 | Hype copy ("Supercharge your workflow") | Says nothing; reads as filler | What it does → how it helps, in specific terms | clarify |
 | Icons with mixed styles or stroke weights | Feels assembled from parts | One library, one weight, one size grid | consistency |
@@ -21,7 +25,7 @@ Signals that a UI was generated and shipped without a designer's eye. Each one c
 | Rounded-top bar charts with no axes, smoothed lines | Pretty but unreadable data | Axes, gridlines, labels, real values | polish-details |
 | 60-30-10 color applied to a product UI | Far too much color for an app | Product UI runs ~90% neutral / 8% secondary / 2% accent | decolorize |
 | Infinite scroll on a page with a footer | Footer unreachable | Pagination or "Load more" | layout |
-| Modal with a 6-bullet onboarding list | Skipped instantly | Sequenced contextual tips | clarify |
+| Welcome modal or slides that explain the product (a 6-bullet list, "Next" through 4 slides) | Skipped instantly; explaining the product doesn't help anyone use it | Ask 2–3 questions, then build the first real object with the user ([onboarding](onboarding.md#setup-steps)); sequenced contextual tips after that | clarify |
 | Everything animates: command palette, every hover, fade-up on every section, `transition: all` | Feels slow; motion stops meaning anything | Animate only by purpose and frequency; never keyboard-triggered actions | animate |
 | Popovers that pop from `scale(0)` or the center, with `ease-in` | Feels detached and sluggish | Grow from the trigger at `scale(0.95)`, `--ease-out`, `--dur-medium` or shorter | animate |
 | Results blurred behind "Sign up to see your report" | Feels like a ransom; visitors leave | Show a useful partial result, then "Save your report" | clarify |

@@ -53,7 +53,7 @@ Signup, login, and verification forms also follow [onboarding.md](onboarding.md)
 | On/off that applies immediately | Switch |
 | On/off that applies on submit, or consent | Checkbox |
 | A number with a small range | Stepper or number input with `inputmode="numeric"`; a slider only when the exact value doesn't matter |
-| A date | Native `type="date"` for near dates; three labelled text fields (day, month, year) for birthdays and known dates |
+| A date | Near or relative dates ("this Friday", a due date): a calendar grid with weekday headers that also accepts a typed date (native `type="date"` qualifies). Birthdays and known dates: three labelled text fields (day, month, year). Never three `<select>`s for day, month, and year |
 | Long free text | `<textarea>` that grows with content, with a visible character count only when a limit exists |
 
 Never a dropdown for yes/no, never a select for 2–3 options, never a free-text field for something with a fixed set of answers.

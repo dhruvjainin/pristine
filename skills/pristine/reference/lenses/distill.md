@@ -24,6 +24,7 @@ Open the Capture and look before touching code. Then walk the primary task. Run 
 **3. Inventory every element and ask "what if this were gone?"**
 - Point at each element and tag it: essential (needed for the goal), supporting (needed sometimes), redundant (said elsewhere), decorative (no function).
 - Hunt what the UI already implies: labels that restate the obvious, duplicate KPIs, a second search bar, dead or placeholder cards, unneeded arrows, strokes, and dividers.
+- **Purpose test** for every item in a menu, popover, hover card, and detail card: name the question it answers for this Persona on this surface. An item with no answer, one that repeats what is already on screen (the email under a visible name), or one already a click away (a Help item beside a Help icon) is redundant. "Other products have it" is not an answer.
 - If removing it changes nothing for the Persona, it is decorative or redundant. If they would need it only sometimes, it can move behind disclosure.
 - Look at the sidebar: is its content used on most visits? Settings and options shown all at once?
 - Does every card show its full action row? Does a flyout or submenu open to only 1–2 items?
@@ -94,6 +95,7 @@ Write the screen's ONE goal in one sentence before editing.
 - [ ] Nothing interrupts the primary task between its start and completion.
 - [ ] No duplicate KPIs, search bars, or placeholder cards; ≤ 3–4 pricing plans.
 - [ ] Per-card secondary actions live in an overflow menu; no flyout with only 1–2 items.
+- [ ] Every menu, popover, and card item answers a named question for this Persona; none repeats what is visible or a click away.
 - [ ] Each mobile screen does one thing.
 - [ ] No question asks for what the system can infer, prefill, or detect.
 - [ ] Element count visibly lower than before; every remaining element is essential or supporting.

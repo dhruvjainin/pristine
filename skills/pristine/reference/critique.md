@@ -27,9 +27,10 @@ Verify every detector finding in context; drop false positives.
 
 For each Persona in DESIGN.md (max 3), and on the device they actually use:
 1. **First 5 seconds**: what do they see first? Do they know what this is, and what to do? Then the **skeleton test**: blur or squint at the capture; grouping and the one focal point must still read. Then the **cold read**: in each still capture, for every line of text, answer "can I click this?" without the code. An action that reads as text, or text that reads as an action, is a P1 finding. Then the **parity check**: for each set of sibling surfaces (one per provider, plan, or record type), list what each shows; anything one sibling shows and another lacks is a finding.
-2. **Primary task**: walk it step by step. Where do they hesitate, misread, or get stuck?
+2. **Primary task**: walk it step by step. Where do they hesitate, misread, or get stuck? Open every menu, popover, and card on the way and run the **purpose test** ([lenses/distill.md](lenses/distill.md) check 3) on each item. Then the **next-question test**: on each detail or item page, name the Persona's next question (who else works on this project? what's its status?) and count the clicks to answer it. More than one click, or an answer that leaves the current page, is a P1 finding; the fix is linked entities with a hover preview ([patterns/dashboards.md](patterns/dashboards.md#linked-entities)).
 3. **Deal-breakers**: does anything trigger the Persona's listed deal-breakers?
 4. **Delight**: anything they'd remember or share?
+5. **Opinion**: from the captures alone, answer four questions. Why would this Persona open it? How do they really use it? What do they want to know next? What does it leave out on purpose? Each one the surface doesn't answer is a Persona fit finding that names the element that should carry it. A surface that shows what similar products show, with no choice made for this Persona, caps Persona fit at 6.
 
 Write what broke for *that* Persona, naming the element. No generic persona prose.
 

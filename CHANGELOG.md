@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0
+
+- Purpose test: every item in a menu, popover, or card must answer a named question for the Persona; items copied from other products with no job here are a vibe-code tell. Critique runs it on every menu it opens; distill cuts what fails.
+- Account menus hold the Persona's own tasks and never repeat what the trigger or the screen already shows.
+- Linked entities: every entity name links to its detail page, with a hover preview card of 2–4 fields chosen for the page it opens from. Critique's next-question test makes more than one click, or leaving the page, a P1 finding.
+- Critique checks the surface's opinion (why open it, how it's used, what's next, what's left out); design writes it before any Direction.
+- Onboarding builds the first real object from 2–3 questions instead of explaining the product in a modal or slides.
+- Near dates use a calendar with weekdays that accepts typing; three day/month/year selects are banned. A chevron pointing away from its menu is a P2 tell.
+
 ## 0.6.0
 
 - New `perf` command: set a speed goal, measure load and page transitions across network speeds (slow 3G to none), devices (mobile with CPU slowdown, desktop), and cold and warm visits, then fix one bottleneck at a time and keep only changes that beat the noise, until the goal is met or three tries in a row fail.

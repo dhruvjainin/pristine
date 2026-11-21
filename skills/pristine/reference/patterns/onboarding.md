@@ -8,7 +8,7 @@ Onboarding is judged in mode **Operate** for the steps and **Persuade** for any 
 
 | Level | What it looks like |
 |---|---|
-| **2: template** | Signup wall first; long form; email + password + confirm password; a 6-bullet welcome modal; 0% progress; empty dashboard with "No data" |
+| **2: template** | Signup wall first; long form; email + password + confirm password; a welcome modal or slides that explain the product; 0% progress; empty dashboard with "No data" |
 | **6: clean** | Short form, SSO options, clear errors; a few setup steps with progress; empty states with one action |
 | **8: considered** | Value before the account; smart defaults; progress starts from real work done; each step explains why it's asked; sample data or templates fill the first screen |
 | **10: memorable** | The Persona has built or seen something of their own before signing up; the aha moment lands in the first minute; every later ask feels like a natural next step, never a toll |
@@ -48,6 +48,7 @@ Onboarding is judged in mode **Operate** for the steps and **Persuade** for any 
 
 ## Setup steps
 
+- **Build, don't explain.** Ask 2–3 questions that change the workspace (what they'll use it for, their team or department), then walk them through creating their first real object (a project, a page, an invoice) from those answers. Say on screen that every answer can be changed later, and where. A modal or slides that explain the product is a Level 2 marker.
 - 3–5 steps maximum, each with one clear purpose. Show position ("2 of 4") and allow back without losing input.
 - Each question says why it's asked when it isn't obvious ("So we can suggest templates for your team").
 - Every non-essential step has a visible "Skip", and skipped items come back later as gentle, contextual prompts.
