@@ -39,6 +39,7 @@ Open the Capture for two or three screens that share components and look before 
 
 **6. Words.**
 - Is the same action named the same everywhere ("Delete" / "Remove" / "Trash" is three concepts to the user)? Does the primary nav CTA use the same label as the hero CTA?
+- Are two adjacent features colliding on the same noun (such as calling third-party integrations "Your apps" when the product also has user-built "Apps", or labeling a background-runs search bar "Search tasks" beside a "Tasks" board)? Enforce strict 1-to-1 naming across headers, tabs, buttons, search placeholders, table headings, and empty states.
 - Is capitalization consistent across headings, buttons, and labels?
 - Are dates, numbers, and currency formatted one way?
 
@@ -89,6 +90,7 @@ Open the Capture for two or three screens that share components and look before 
 - [ ] Rows that mix item types show type independently of status: the type cue persists while status changes, uses the product's existing icon mapping, and is in the row's accessible name or description (hover alone is insufficient).
 - [ ] One small-component radius everywhere; nested corners follow inner = outer − padding (pills exempt).
 - [ ] The same action has the same label, icon, and style everywhere; nav CTA label matches the hero CTA.
+- [ ] Strict 1-to-1 vocabulary across adjacent features: one noun never refers to two distinct concepts across headings, tabs, buttons, search placeholders, table headers, and empty states.
 - [ ] One capitalization style across headings, buttons, and labels.
 - [ ] Same-looking things behave the same and sit in the same place; any broken familiar pattern has recorded evidence.
 - [ ] One set of easing and duration tokens; no per-component curves.

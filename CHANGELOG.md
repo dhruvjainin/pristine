@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0
+
+- Add `patterns/app-shell.md`: workspace switcher anchored top-left beside the primary creation action, personal account menu isolated at bottom-left, flat named nav groups instead of opaque "More" drawers, bounded recents, compact desktop rhythm with touch-friendly mobile drawers, and entity-aware `⌘K` / `Ctrl K` global search.
+- Intuitive UI & vocabulary consistency: one noun per concept across navigation, tabs, buttons, search placeholders, and headings; replace internal architecture jargon with plain task language; cross-link split mental models directly from headers and limit alerts.
+- Progressive disclosure & above-the-fold focus: collapse all-green preflight checklists into a 1-line summary banner so the primary action sits above the fold; tuck per-entity override matrices behind collapsible sections; hide inert disabled controls (especially checked-ON switches) until prerequisites are connected.
+- Forms & side sheets: use single-line `<input>` for short titles instead of multi-row textareas, drop noisy schema character-cap helper copy, keep drawer/sheet submit + Cancel actions on one compact horizontal footer row, and remove duplicate identity headers in live builder preview sidebars.
+- Tables, focus & accessibility: flush-left row links (no padded button variants), top-aligned multi-line rows, non-empty `sr-only` `"Actions"` column headers, human-readable empty-title fallbacks instead of raw UUIDs, responsive cell `max-width` bounds on mobile, and clean programmatic focus styling on headings (`h1[tabindex="-1"]`) without unintended focus rings on route load.
+
 ## 0.7.0
 
 - Purpose test: every item in a menu, popover, or card must answer a named question for the Persona; items copied from other products with no job here are a vibe-code tell. Critique runs it on every menu it opens; distill cuts what fails.

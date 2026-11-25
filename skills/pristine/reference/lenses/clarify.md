@@ -10,7 +10,8 @@ Clarify is about whether the words on screen tell a Persona what is happening, w
 Open the Capture and read the whole flow in order, not isolated strings. Then use it. Run these checks.
 
 **1. Read every label aloud as the Persona.**
-- Use their vocabulary, expertise, and emotional state from DESIGN.md. Do you stumble on any word? Would they say it themselves? If not, it is internal jargon.
+- Use their vocabulary, expertise, and emotional state from DESIGN.md. Do you stumble on any word? Would they say it themselves? If not, it is internal jargon. Hunt backend, schema, and protocol vocabulary (`row`, `sponsor`, `allowlist`, protocol acronyms, `server identity`, `private task`, ambiguous `trigger` labels) and replace it with plain mental-model words (`task`, `owner`, `custom integration`, `run`). Where sibling menu options have subtle behavioral differences (such as `One time` vs. `Repeat` vs. `Schedule`), add a plain one-line description under each option.
+- Where a product-specific assistant or mascot name appears in settings or secondary screens (such as Memory or Preferences), clarify who or what it is on first reference in plain language instead of assuming the Persona remembers the mascot.
 - Do names, structure, and icons match what the Persona already believes about how this works (mental model)? A "cart" that saves for later, a trash icon that deletes permanently, or settings grouped by database table instead of by task all break that belief.
 - "Would my parent understand this button?" "Submit", "OK", "Yes/No", "Click here" fail: they describe the gesture, not the outcome.
 - Read each link out of context (as a screen reader list would). "Learn more" or "click here" alone means nothing.
@@ -53,15 +54,16 @@ Open the Capture and read the whole flow in order, not isolated strings. Then us
 **7. Hunt for repetition and drift.**
 - Does the intro repeat the heading? Does helper text repeat the intro? Each idea should be said once.
 - Is the same thing called two names ("project" here, "workspace" there)? Varying words for literary effect makes users think they are different things.
+- Do two different concepts collide on the same word (e.g. calling third-party integrations `"Your apps"` or `"Add custom app"` when the product also has user-built `"Apps"`, or labeling a background-runs search bar `"Search tasks"` beside a `"Tasks"` board)? Enforce strict 1-to-1 naming across page headings, tabs, buttons, search placeholders, table headers, and empty states.
 - Mixed capitalization (Title Case and Sentence case), or inconsistent number, date, and currency formats?
 
-**8. Wayfinding.** On every screen, can the Persona answer: where am I, where can I go, what's here, and how do I get out? Open each modal, wizard, and full-screen view: is there always a visible way back or out, or does the user get trapped?
+**8. Wayfinding.** On every screen, can the Persona answer: where am I, where can I go, what's here, and how do I get out? Open each modal, wizard, and full-screen view: is there always a visible way back or out, or does the user get trapped? When work spans two related surfaces (such as a tasks board and background runs, or a paused resource and workspace usage/limits), is there an explicit link right in the header or banner so the Persona can jump to the sibling view without hunting?
 
 **9. Mapping and hidden context.**
 - Does each control sit next to what it affects, arranged like the thing it changes? If a control needs a label to explain what it maps to, the mapping is weak.
 - Did "clean" mean hiding everything? An interface that buries the needed fact looks minimal but isn't simple. Would one added piece of context (time remaining, items left, what happens next) remove a question?
 
-**10. Stress the strings.** Mentally add 30–40% length (German) and view at 320px. Do buttons truncate or wrap awkwardly? Are any sentences built by concatenating fragments, which cannot be translated?
+**10. Stress the strings.** Mentally add 30–40% length (German) and view at 320–375px. Do buttons truncate or wrap awkwardly? Do search or input placeholders clip mid-word on narrow mobile screens? Are any sentences built by concatenating fragments, which cannot be translated?
 
 Before editing, list every unclear string with its location and why it fails: vague, jargon, missing consequence, missing recovery, inconsistent, redundant, or wrong tone.
 
@@ -79,19 +81,19 @@ Before editing, list every unclear string with its location and why it fails: va
    - **Forms:** persistent visible labels; placeholders show an example only; format rules before submission; mark the minority (optional or required), not both.
    - **Validation:** what is wrong + how to fix, next to the field ("Use at least 8 characters"); no blame ("Invalid input" → "Enter a date like 21/10/2026").
    - **Errors:** what failed, why (if known and useful), how to recover; keep codes secondary.
-   - **Empty states:** separate copy for first use, no results, filtered out, no permission, and failed to load; each explains the state and offers the next action. First-run: explain the value + one primary action. No results: suggestions and a "Clear filters" action.
+   - **Empty states:** separate copy for first use, no results, filtered out, no permission, and failed to load; each explains the state and offers the next action. First-run: explain the value + one primary action. No results: suggestions and one-click recovery (clear search/filters, switch category filter, or start the primary creation action).
    - **Marketing and value copy:** short and punchy; lead with how it helps the user, not what it does; friendly, not corporate.
    - **Onboarding:** sequenced contextual tips at the moment of use, not a front-loaded multi-bullet modal; nothing must be read before the product can be used (paradox of the active user).
    - **Flows:** include skip, search, an "Other" option, and back wherever a Persona could get stuck. Multi-step flows show position and what's left ("Step 2 of 4", named steps), and credit work already done so progress never starts at zero (goal-gradient effect); keep the step count honest. State the expected time up front ("About 2 minutes") and add `autocomplete` tokens to every field the browser can fill (Parkinson's law). Autosave partial work and show what's unfinished on return ("Continue setup: 2 of 5 done") (Zeigarnik effect). Show earlier choices the current step depends on, such as a summary of the order, plan, or filters, instead of asking the Persona to remember them (working memory).
    - **Defaults and framing:** preselect the option most Personas would pick, never a paid extra; anchors and urgency must be true (cognitive bias).
-   - **Names and structure:** match the Persona's mental model: their words for things, grouping by their task, and icons that do what they usually do.
-   - **Pricing:** price large, plan name small, discount shown, and each plan states what it adds over the previous one.
+   - **Names and structure:** match the Persona's mental model: their words for things, grouping by their task, and icons that do what they usually do. Strip backend, schema, and protocol jargon (`row`, `sponsor`, `allowlist`, protocol acronyms, ambiguous `trigger` labels), add one-line disambiguators inside menus when sibling options are easily confused (`One time` vs. `Repeat` vs. `Schedule`), and introduce any assistant or mascot name in plain language on first reference in settings or secondary screens.
+   - **Pricing, plans, and limits:** price large, plan name small, discount shown, and each plan states what it adds over the previous one. In model, tier, or plan pickers, show billing source and relative cost or capability directly at selection time; when a feature is paused due to a quota or spending cap, state *which* limit was hit and link straight to where it can be raised.
    - **Loading:** name the real operation; show determinate progress when available.
    - **Success:** confirm the outcome briefly; mention the next step only if it changes what the user does.
    - **Helper text:** answers the user's question; does not restate the label.
    - **Navigation and section labels:** name them for their contents; replace "Home", "Misc", "General" with what's actually there.
    - **Feedback:** status for ongoing work, completion for meaningful actions, a warning before a problem, an error after one; validate inline as the user goes, not only on submit.
-   - **Wayfinding:** a page title that says where the user is, a current-location marker in nav, and a visible exit (back, close, cancel) from every modal, wizard, and full-screen view.
+   - **Wayfinding:** a page title that says where the user is, a current-location marker in nav (`aria-current="page"`), accurate mobile drawer titles (the workspace or mode name, never generic `"Navigation"`), explicit header or banner cross-links when work spans split surfaces (such as manual tasks vs. background runs, or a paused resource vs. usage settings), and a visible exit (back, close, cancel) from every modal, wizard, and full-screen view. Sub-modes such as Settings return to the exact prior route with a contextual label (`Back to <workspace>`) rather than a generic root.
    - **Mapping:** move a control beside what it affects before writing a longer label to explain it.
    - **Context over minimalism:** add the one fact that removes a question (time remaining, count left, consequence) even if the screen gets slightly busier.
 4. **Cut redundancy:** if the heading says it, the intro adds new information or disappears. Say each idea once.
@@ -114,9 +116,10 @@ Before editing, list every unclear string with its location and why it fails: va
 - [ ] No preselected paid option, fake countdown, or untrue anchor price.
 - [ ] Nothing must be read before first use; help appears in context.
 - [ ] No placeholder-as-label; all inputs have visible labels.
-- [ ] One term per concept across the flow.
+- [ ] Strict 1-to-1 terminology across the flow and adjacent features: one concept never has two names, and two distinct concepts never share one name across headers, tabs, buttons, search placeholders, table headers, and empty states.
 - [ ] No heading/intro/helper text repeating the same idea.
-- [ ] No jargon the Personas would not use themselves.
+- [ ] No internal architecture, schema, or protocol jargon the Personas would not use themselves; ambiguous sibling menu options carry a plain one-line description, and branded/mascot names are explained on first reference in settings.
+- [ ] Model/plan pickers surface billing source and relative cost/capability at selection time; paused-by-limit states name *which* limit was hit and link directly to where it can be raised.
 - [ ] Tone matches stakes: no jokes on errors involving money, data loss, or privacy.
 - [ ] Strings fit at 320px and with +40% length.
 - [ ] Every screen answers where am I, where can I go, what's here, how do I get out; no dead ends.

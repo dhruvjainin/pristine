@@ -36,7 +36,7 @@ All paths below are relative to the directory containing this `SKILL.md` (the **
 
 If the request is truly ambiguous between a redesign and a polish, ask once. Otherwise state the route in one line and proceed. If polish places the target below Level 6 (template), or a Persuade surface at Level 6 or below, recommend `/pristine design` in its report instead of quietly redesigning. If polish finds a fix that needs a new structure, it offers live Variants of that region ([reference/polish.md](reference/polish.md) Step 3).
 
-Pattern files in `reference/patterns/` (landing pages, dashboards and charts, forms, mobile web, onboarding and signup, chat and agents, vibe-code tells, motion recipes, worst-case data, live variants) are loaded by `critique`, `design`, and `polish` based on the surface's mode and the Lenses in play.
+Pattern files in `reference/patterns/` (app shell and global search, landing pages, dashboards and charts, forms, mobile web, onboarding and signup, chat and agents, vibe-code tells, motion recipes, worst-case data, live variants) are loaded by `critique`, `design`, and `polish` based on the surface's mode and the Lenses in play.
 
 ## Target
 

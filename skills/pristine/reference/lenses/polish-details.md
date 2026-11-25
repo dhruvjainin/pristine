@@ -22,7 +22,7 @@ Walk the full path the Persona takes (arrive → act → result → recover) wit
 
 **3. Hover every control, then tab through every control.**
 - Does every control react on hover, focus-visible, and active? Is any hover effect missing, or showing on a disabled control?
-- Is the focus ring visible on *every* background, including colored, image, and dark surfaces? Does it appear on mouse click (it should only show on `:focus-visible`)? Has `outline` been removed with nothing in its place?
+- Is the focus ring visible on *every* background, including colored, image, and dark surfaces? Does it appear on mouse click (it should only show on `:focus-visible`) or on initial route load around a programmatically focused non-interactive heading (`h1[tabindex="-1"]`)? Has `outline` been removed from an interactive control with nothing in its place?
 
 **4. Check every state.**
 - For each control: default, hover, focus-visible, active, disabled, loading, and where relevant selected, error, success. Which are missing?
@@ -62,7 +62,7 @@ Triage what you found before editing (see step 2 below). Fix tasks and states be
    5. code and asset cleanup.
 3. **Alignment and spacing:** every element on the spacing scale; similar components share identical padding; shared left edges align to the pixel; baselines align in rows mixing text sizes; icons optically centered with adjacent text (often a 1px nudge); icon + label gap 8px; more space above headings than below.
 4. **Interactive states for every control:** default, hover, focus-visible, active, disabled, loading, and (where relevant) selected, error, success.
-   - focus ring: ≥ 2px, ≥ 3:1 contrast against adjacent colors, `outline-offset: 2px`, visible on every background, only on `:focus-visible`;
+   - focus ring: ≥ 2px, ≥ 3:1 contrast against adjacent colors, `outline-offset: 2px`, visible on every background, only on `:focus-visible` for interactive controls; suppress visual outlines on programmatic route-announcement targets (`h1[tabindex="-1"]`, `main[tabindex="-1"]`) so page loads stay clean;
    - disabled: reduced emphasis plus `cursor: not-allowed` and no hover effect; never the only way to explain why;
    - loading: button keeps its width; label or spinner inside; double submit prevented.
 5. **Pixel details:**

@@ -66,6 +66,7 @@ With a harness browser tool:
 - **Capture interaction states.** For each kind of interactive element on the surface (button, link, chip, row, input), capture rest, hover, pressed, and focus-visible, plus any tooltip, menu, or error state it has. With the bundled script: `--selector "<css>" --state hover --pad 48 --zoom 3`. A state you didn't capture can't be scored ([critique.md](critique.md) → Calibration).
 
 - **Chat and agent surfaces** need lifecycle and handoff captures, not just route captures: run the Verify steps in [patterns/chat-and-agents.md](patterns/chat-and-agents.md#verify).
+- **App shells and global search** need layout-mode and overlay captures, not just default route views: run the Verify steps in [patterns/app-shell.md](patterns/app-shell.md#verify) (expanded and collapsed desktop sidebar, portaled mobile drawer at 375–390px, sub-mode back path, and command palette in empty, populated, and zero-match states).
 
 ### Force every state
 
@@ -89,7 +90,7 @@ Only a state that truly can't be reached (no runnable code, auth you don't have,
 
 ## Step 5: Look properly
 
-For each image, check before writing anything: first-glance focal point, hierarchy, alignment, spacing rhythm, text overflow/wrapping, contrast, cut-off or overlapping elements, horizontal scroll on mobile, theme-specific bugs (invisible borders, unreadable text, images with white boxes in dark).
+For each image, check before writing anything: first-glance focal point, hierarchy, alignment, spacing rhythm (including oversized vertical gaps that push footer controls below the fold), unintended focus rings on initial route load (such as on `h1[tabindex="-1"]`), text and input-placeholder overflow/clipping (especially at 375px mobile), duplicate entries across sections, contrast, cut-off or overlapping elements, portaled drawer/popover styling, horizontal scroll on mobile, theme-specific bugs (invisible borders, unreadable text, images with white boxes in dark).
 
 **Unasked-for error states are bugs, not states.** If a capture shows an error, "could not load", or empty state that the scenario didn't ask for, find the failing request (console, network, mock handler). In `critique`, report it as a P0 finding and don't score the affected section. In `polish` and `design`, fix the data or route, then capture the success state with realistic data. Never score a section that you have only seen failing or empty.
 

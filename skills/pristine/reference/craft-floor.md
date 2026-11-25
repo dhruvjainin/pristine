@@ -41,7 +41,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Display text ≤ 6rem.
 - [ ] Headings use `text-wrap: balance`; body uses `text-wrap: pretty`.
 - [ ] Heading, body, label, and metadata roles are distinguishable at a glance (adjacent levels differ by ≥ 1.125× size or ≥ 200 weight).
-- [ ] Real copy never overflows or clips at any viewport in the Capture Matrix.
+- [ ] Real copy and input placeholders never overflow or clip mid-word at any viewport in the Capture Matrix (including narrow 375px mobile dialogs).
 - [ ] Each document has exactly one h1 after hydration, checked in the accessibility tree; never hide a duplicate with CSS.
 
 ### Spacing and layout
@@ -55,7 +55,7 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 ### Theming variables
 - [ ] A CSS variable that callers are told to set ("set `--card-padding`") is never re-declared on the component's own root element; a value set there beats anything a parent sets. Read it with a fallback (`padding: var(--card-padding, 16px)`), or put the default on `:root` or a zero-specificity `:where()` wrapper.
 - [ ] Docs, props, and comments name only variables that truly work from outside. Test one by overriding it from a parent.
-- [ ] Portaled content (popovers, tooltips, menus, dialogs rendered into `body`) doesn't inherit variables set on the component's DOM ancestors. Set the needed variables on the portaled element itself, or define them at `:root` or the theme scope.
+- [ ] Portaled content (popovers, tooltips, menus, dialogs, mobile drawers rendered into `body`) doesn't inherit CSS variables or ancestor-scoped selectors (such as `.app-shell .nav-item`) from the component's DOM tree. Set shared variables at `:root` or the theme scope, and scope styles directly to the portaled element.
 
 ### Depth
 - [ ] Elevation is declared once per element: border OR shadow, not a 1px border under a large soft shadow.
@@ -69,7 +69,8 @@ Every project meets this unless DESIGN.md → Product → Constraints records an
 - [ ] Every data view has loading, empty, error, and success states.
 - [ ] **Show the things you count.** When the UI acts on a set of items (channels, repositories, files, members) or states a count of them ("26 of 27 repositories"), the user can see that list and each item's state from the same page. Parity: if one provider lists its items, every provider of the same kind does too.
 - [ ] **Background work never moves the page.** A background refresh, poll, or revalidation (`isFetching`, `refreshing`, `isValidating`) must not insert or remove anything that pushes content: no "Checking…", "Refreshing…" or "Syncing…" line above a list. Show it in space that is always reserved (a fixed-width status slot, a spinner inside an existing badge or button, `aria-busy`), or not at all. Only a first load with no data may show a loading block.
-- [ ] Focus ring is visible on every background: ≥ 2px, ≥ 3:1 contrast, offset 2px.
+- [ ] Focus ring is visible on every background: ≥ 2px, ≥ 3:1 contrast, offset 2px, shown only on interactive controls (`:focus-visible`). Programmatic focus targets used for route announcements or skip links (such as `h1[tabindex="-1"]` or `main[tabindex="-1"]`) suppress visual focus outlines (`outline: none` on non-interactive headings, or `:focus:not(:focus-visible)`) so initial route loads never draw a bright focus box around the page title.
+- [ ] **No inert controls for unconnected prerequisites.** Never render disabled switches or toggles—especially in a visually "checked / ON" state—when the underlying integration or setup prerequisite isn't connected yet. Replace the inert controls with a clear single-step setup prompt until connected.
 - [ ] Meaning shown on hover (tooltips, hover cards) is also in the control's accessible name or visible text; hover is never the only way to learn it.
 - [ ] Touch targets ≥ 44×44px (Fitts' law). When the visible mark is smaller, keep its size and enlarge only the hit area with an overlay: `position: relative` on the control and `::after { content: ""; position: absolute; inset: -8px; }` (pick the inset that reaches 44px). Don't use `min-height`/padding that bloats a visible chip or icon button. In wrapped rows and stacked lists, hit areas must not overlap: each side's overlay extends at most half the gap to the next target; if that can't reach 44px, widen the gap, not the mark.
 - [ ] Images have one fallback look: a missing URL, a failed load, and the loading state show the same placeholder at the final size. Loading never shows the error or broken-image icon, not even for a frame; start in the placeholder and swap only on `load`.

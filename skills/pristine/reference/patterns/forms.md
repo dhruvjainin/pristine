@@ -30,14 +30,14 @@ Signup, login, and verification forms also follow [onboarding.md](onboarding.md)
 - **Group headings outrank labels by at least one type step:** legend ≥ 1.125rem/600 when labels are ~0.9375rem/500. A heading that looks like a label reads as a field with no input.
 - **Fields sharing a row align to the top and keep their own height** (`align-items: start`); a helper line under one field must not stretch its neighbour's input.
 - **Spacing:** label → its input 4–8px; input → its helper or error 4–8px; field → next field 16–24px; group → group 32–48px. A helper line must sit closer to its own field than to the next field or the submit button (law of proximity).
-- **The submit button** follows the last field, aligned to the form's left edge on desktop; full width only on mobile or narrow dialogs. Secondary actions (Cancel, Back) sit beside it as quieter buttons; never a "Reset" button.
+- **The submit button** follows the last field, aligned to the form's left edge on desktop; full width only on mobile or narrow dialogs. Secondary actions (Cancel, Back) sit beside it as quieter buttons; never a "Reset" button. In form drawers and side sheets, keep the primary submit and Cancel actions on one compact horizontal footer row instead of stacking a full-width Cancel button underneath.
 
 ## 3. Labels, help, and required
 
 - **Every input has a visible `<label for>`.** Placeholder text is only an example ("e.g. Acme Ltd"), never the label; it vanishes on typing (working memory).
 - **Label and control use one noun.** A "Team" field's placeholder says "Choose a team", not "Choose a resource" (mental model).
 - **Mark the minority.** If most fields are required, mark only the optional ones "(optional)"; if most are optional, mark the required ones. A form or step with a single field marks neither. Never a bare `*` without a legend.
-- **Helper text answers the Persona's question** (why we ask, what format, what happens with it) and sits under the field, tied with `aria-describedby`. If it restates the label or describes system internals, delete it.
+- **Helper text answers the Persona's question** (why we ask, what format, what happens with it) and sits under the field, tied with `aria-describedby`. If it restates the label, describes system internals, or repeats a huge schema cap ("Up to 500 characters", "Up to 100,000 characters of Markdown"), delete it; show a counter only as the user nears a real limit.
 - **Helper text stays true for every option the form allows.** "Shown to everyone you invite" is false when the default visibility is the whole team; check each help line against each default and choice.
 - **Dependent fields follow what they depend on.** When one answer changes another field's format (card brand → CVC length and location, country → postcode), that field's label, help, rule, and error message all update together.
 - **Format rules show before typing** (password rules, file size and type limits), not only in the error.
@@ -54,9 +54,12 @@ Signup, login, and verification forms also follow [onboarding.md](onboarding.md)
 | On/off that applies on submit, or consent | Checkbox |
 | A number with a small range | Stepper or number input with `inputmode="numeric"`; a slider only when the exact value doesn't matter |
 | A date | Near or relative dates ("this Friday", a due date): a calendar grid with weekday headers that also accepts a typed date (native `type="date"` qualifies). Birthdays and known dates: three labelled text fields (day, month, year). Never three `<select>`s for day, month, and year |
-| Long free text | `<textarea>` that grows with content, with a visible character count only when a limit exists |
+| Short title or single-line name | Single-line `<input>`, never a multi-row `<textarea>` (even if the backend allows a few hundred characters) |
+| Long free text | `<textarea>` that grows with content, with a visible character count only when approaching a real limit |
 
 Never a dropdown for yes/no, never a select for 2–3 options, never a free-text field for something with a fixed set of answers.
+
+- **Hide inert controls until prerequisites are connected.** Never show disabled switches or checkboxes—especially rendered in a visually "checked / ON" state—when the underlying integration or prerequisite isn't linked yet. Replace inert controls with a clear single-step setup prompt until connected.
 
 ## 5. Input attributes
 
@@ -106,6 +109,8 @@ Be liberal in what you accept, strict in what you store (Postel's law):
 - **Back keeps every answer.** Show earlier answers the current step depends on (working memory).
 - **Save drafts.** Autosave long forms and restore them on return with "Continue where you left off" (Zeigarnik effect). Warn before leaving with unsaved changes (`beforeunload`, or an in-app "Discard changes?" dialog naming what's lost).
 - **Review before irreversible actions:** a final step summarises every answer with an edit link per section before payment, deletion, or sending.
+- **No duplicate identity chrome in live summary sidebars:** when a multi-step builder pairs steps with a live summary or preview sidebar, show the entity's avatar and title once—never duplicated in both the card header and the summary body directly below tabs.
+- **Progressive disclosure for override matrices:** in dense settings screens with global defaults and per-entity overrides (such as concurrency, rate, or credit limits), show workspace defaults up front and tuck per-entity overrides inside a collapsible section with clear column headers.
 
 ## 10. Accessibility and themes
 
@@ -130,6 +135,7 @@ Be liberal in what you accept, strict in what you store (Postel's law):
 - Blocking paste, autofill, or password managers.
 - Validating while the Persona is still typing their first attempt.
 - "Required" on the only field of a form or step; a bare `*` with no legend.
+- Disabled switches shown in a visually "checked / ON" state when the prerequisite integration isn't connected.
 - Pre-ticked marketing consent or paid add-ons.
 
 ## Verify

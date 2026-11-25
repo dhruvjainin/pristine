@@ -39,6 +39,8 @@ Demo data is chosen, usually without anyone noticing, to make a design look good
 | Text overflows its flex/grid cell | `min-width: 0` (grid: `minmax(0, 1fr)`) on the text column |
 | Email/URL runs past the edge | `overflow-wrap: anywhere` on that element |
 | Trailing action (•••) pushed off-screen | `min-width: 0` on the middle, `flex-shrink: 0` on the action |
+| Long table cell pushes neighboring columns off-screen on mobile | Cap flexible cell `max-width` responsively on small viewports alongside `min-width: 0` and truncation |
+| Raw UUID leaked when a record's primary title is blank | Fall back to a human-readable placeholder (`"Untitled record"`) in both visible text and row action `aria-label`s |
 | Badge wraps to two lines | `white-space: nowrap; flex-shrink: 0`, and decide what yields instead |
 | Avatar adrift beside wrapped text | `align-items: flex-start` once text can wrap |
 | Heading breaks mid-word | `overflow-wrap: anywhere`, not `word-break: break-all` |
